@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Nibbles</RootNamespace>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="1.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="QB.Compatibility">
+      <HintPath>..\..\QB.Compatibility\QB.Compatibility\bin\Debug\netcoreapp3.1\QB.Compatibility.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PLAYground": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\GitHub"
+    }
+  }
+}
