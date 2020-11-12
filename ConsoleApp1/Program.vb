@@ -36,11 +36,11 @@ Module Program
 
   Public Sub CanWeUseReadOnlySpans()
 
-    'Dim map As ReadOnlySpan(Of Byte) = s_map
-    'If map.Length <> 0 Then
-    'End If
+    Dim map As ReadOnlySpan(Of Byte) = s_map
+    If map.Length <> 0 Then
+    End If
 
-    Dim test = " test ".AsSpan.Trim.Length
+    'Dim test = " test ".AsParallel
 
   End Sub
 

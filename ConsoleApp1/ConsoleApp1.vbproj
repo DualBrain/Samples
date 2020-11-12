@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>ConsoleApp1</RootNamespace>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net5</TargetFramework>
   </PropertyGroup>
 
 </Project>

@@ -15,7 +15,6 @@ Module Program
     Dim response = twitter.Tweet("This is my first automated tweet!")
     Console.WriteLine(response)
 
-
   End Sub
 
 End Module
