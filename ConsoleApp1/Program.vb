@@ -1,3 +1,7 @@
+Option Explicit On
+Option Strict On
+Option Infer On
+
 Imports System
 Imports System.Runtime.CompilerServices
 
@@ -32,15 +36,18 @@ Module Program
     value &= "..."
   End Sub
 
-  Private ReadOnly s_map = New Byte() {Byte.Parse("0"), Byte.Parse("1"), Byte.Parse("2"), Byte.Parse("3"), Byte.Parse("4"), Byte.Parse("5"), Byte.Parse("6"), Byte.Parse("7"), Byte.Parse("8"), Byte.Parse("9"), Byte.Parse("A"), Byte.Parse("B"), Byte.Parse("C"), Byte.Parse("D"), Byte.Parse("E"), Byte.Parse("F")}
+  Private ReadOnly s_map As Byte() = New Byte() {Byte.Parse("0"), Byte.Parse("1"), Byte.Parse("2"), Byte.Parse("3"), Byte.Parse("4"), Byte.Parse("5"), Byte.Parse("6"), Byte.Parse("7"), Byte.Parse("8"), Byte.Parse("9"), Byte.Parse("A"), Byte.Parse("B"), Byte.Parse("C"), Byte.Parse("D"), Byte.Parse("E"), Byte.Parse("F")}
 
   Public Sub CanWeUseReadOnlySpans()
 
-    Dim map As ReadOnlySpan(Of Byte) = s_map
-    If map.Length <> 0 Then
-    End If
+    'Dim map As ReadOnlySpan(Of Byte) = s_map
+    'If map.Length <> 0 Then
+    'End If
 
     'Dim test = " test ".AsParallel
+
+    Dim aa = CreateA(1) ' New ClassLibrary1.A With {.A1 = 1}
+    Dim bb = New ClassLibrary1.B(1)
 
   End Sub
 
