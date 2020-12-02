@@ -196,17 +196,20 @@ Public Class Form1
 
       m_stopwatch.Start()
 
+      Dim rectCount = 20000
+
       LINE(0, 0, 639, 349, 0, QB.LineOption.BF)
       'draw stuff  eg...
-      For f = 1 To 20000
+      For f = 1 To rectCount
         Dim x = (640 >> 1) + m_random.Next(-450, 451)
         Dim y = (350 >> 1) + m_random.Next(-450, 451)
-        LINE(x, y, x + 4, y + 4, 8, QB.LineOption.BF)
+        Dim a = m_random.Next(1, 8)
+        LINE(x, y, x + 4, y + 4, a, QB.LineOption.BF)
       Next
       Render()
 
       m_stopwatch.Stop()
-      Label1.Text = $"20,000 rectangles per frame @ {1000 \ m_stopwatch.ElapsedMilliseconds} FPS"
+      Label1.Text = $"{rectCount} rectangles per frame @ {1000 \ m_stopwatch.ElapsedMilliseconds} FPS"
       m_stopwatch.Reset()
 
     Finally
