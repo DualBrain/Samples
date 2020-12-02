@@ -7,8 +7,6 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "ConsoleApp1", "ConsoleApp1\
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "TinyBASIC", "TinyBASIC\TinyBASIC.vbproj", "{66AE84D9-F04A-4088-95B2-963EB386E880}"
 EndProject
-Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "GameLoop1", "GameLoop1\GameLoop1.vbproj", "{4560E3E8-B195-41C6-839E-673920D24ED7}"
-EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "FileSystemWatcherSample", "FileSystemWatcherSample\FileSystemWatcherSample.vbproj", "{459A8083-F2E7-459D-94E6-33CB607CA788}"
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Gorilla", "Gorilla\Gorilla.vbproj", "{E7AF710F-797A-45A4-B986-3623423C3A17}"
@@ -16,8 +14,6 @@ EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "RemLine", "RemLine\RemLine.vbproj", "{E6DABF3A-F9B4-4FD9-9E58-172612B3FA53}"
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Nibbles", "Nibbles\Nibbles.vbproj", "{87F360ED-C3F9-4FAA-8A6F-79A7F17CE635}"
-EndProject
-Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "QB.Compatibility", "..\QB.Compatibility\QB.Compatibility\QB.Compatibility.vbproj", "{8D7A58B4-AADB-4D91-B618-32CB3E4BDF5F}"
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "SoundBeepPlay", "SoundBeepPlay\SoundBeepPlay.vbproj", "{D7B15983-B440-4D1C-BB65-441710D2528C}"
 EndProject
@@ -27,7 +23,13 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Audio", "Audio\Audio.vbproj
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Facebook", "Facebook\Facebook.vbproj", "{5FCA6054-628C-4C9D-B732-103A2D36C515}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{6E3A15EF-56EB-4E95-9A07-3952B6747050}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{6E3A15EF-56EB-4E95-9A07-3952B6747050}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Community", "Community", "{E217AEBC-D7BE-4BB6-950F-665E8FC61754}"
+EndProject
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "QB.Compatibility", "..\QB.Compatibility\QB.Compatibility\QB.Compatibility.vbproj", "{CA2D29FB-9923-460B-8D7A-2628DF728A7F}"
+EndProject
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "GameLoop1", "GameLoop1\GameLoop1.vbproj", "{D5D718A0-EE60-454D-A8CD-2F4BBE5145CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,10 +45,6 @@ Global
 		{66AE84D9-F04A-4088-95B2-963EB386E880}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66AE84D9-F04A-4088-95B2-963EB386E880}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66AE84D9-F04A-4088-95B2-963EB386E880}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4560E3E8-B195-41C6-839E-673920D24ED7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4560E3E8-B195-41C6-839E-673920D24ED7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4560E3E8-B195-41C6-839E-673920D24ED7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4560E3E8-B195-41C6-839E-673920D24ED7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{459A8083-F2E7-459D-94E6-33CB607CA788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{459A8083-F2E7-459D-94E6-33CB607CA788}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{459A8083-F2E7-459D-94E6-33CB607CA788}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,10 +61,6 @@ Global
 		{87F360ED-C3F9-4FAA-8A6F-79A7F17CE635}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87F360ED-C3F9-4FAA-8A6F-79A7F17CE635}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87F360ED-C3F9-4FAA-8A6F-79A7F17CE635}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8D7A58B4-AADB-4D91-B618-32CB3E4BDF5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D7A58B4-AADB-4D91-B618-32CB3E4BDF5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8D7A58B4-AADB-4D91-B618-32CB3E4BDF5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8D7A58B4-AADB-4D91-B618-32CB3E4BDF5F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D7B15983-B440-4D1C-BB65-441710D2528C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D7B15983-B440-4D1C-BB65-441710D2528C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7B15983-B440-4D1C-BB65-441710D2528C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -87,9 +81,20 @@ Global
 		{6E3A15EF-56EB-4E95-9A07-3952B6747050}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E3A15EF-56EB-4E95-9A07-3952B6747050}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E3A15EF-56EB-4E95-9A07-3952B6747050}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA2D29FB-9923-460B-8D7A-2628DF728A7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA2D29FB-9923-460B-8D7A-2628DF728A7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA2D29FB-9923-460B-8D7A-2628DF728A7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA2D29FB-9923-460B-8D7A-2628DF728A7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5D718A0-EE60-454D-A8CD-2F4BBE5145CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5D718A0-EE60-454D-A8CD-2F4BBE5145CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5D718A0-EE60-454D-A8CD-2F4BBE5145CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5D718A0-EE60-454D-A8CD-2F4BBE5145CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CA2D29FB-9923-460B-8D7A-2628DF728A7F} = {E217AEBC-D7BE-4BB6-950F-665E8FC61754}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDAC410C-0901-447E-8121-BF33A670D583}

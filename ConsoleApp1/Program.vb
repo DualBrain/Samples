@@ -12,6 +12,8 @@ Module Program
 
   Sub Main() 'args As String())
 
+    'Console.WriteLine(QB.Development.STACK)
+
     ' https://github.com/dotnet/vblang/issues/530
     ConsoleEx.WriteLines("Test", "Method", "Success")
     Dim l = New List(Of String) From {{"a", "b", "c", "d"}} 'From {{{"a", "b", "c", "d"}}}

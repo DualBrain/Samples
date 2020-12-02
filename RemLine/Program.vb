@@ -210,9 +210,9 @@ FileErr2:
 
       ' Print line to file or console (PRINT is faster than console device)
       If OutputFile$ = "CON" Then
-        Print(inLin$)
+        PRINT(inLin$)
       Else
-        Print(2, inLin$)
+        PRINT(2, inLin$)
       End If
 
     Loop
@@ -230,13 +230,13 @@ FileErr2:
   Sub GetFileNames()
 
     CLS()
-    Print(" Microsoft RemLine: Line Number Removal Utility")
-    Print("       (.BAS assumed if no extension given)")
-    Print()
-    Input("      Input file name (ENTER to terminate): ", InputFile$)
+    PRINT(" Microsoft RemLine: Line Number Removal Utility")
+    PRINT("       (.BAS assumed if no extension given)")
+    PRINT()
+    INPUT("      Input file name (ENTER to terminate): ", InputFile$)
     If InputFile$ = "" Then End
-    Input("      Output file name (ENTER to print to screen): ", OutputFile$)
-    Print()
+    INPUT("      Output file name (ENTER to print to screen): ", OutputFile$)
+    PRINT()
     If (OutputFile$ = "") Then OutputFile$ = "CON"
 
     If InStr(InputFile$, ".") = 0 Then
@@ -264,8 +264,8 @@ FileErr2:
 
 FileErr1:
     CLS()
-    Print("      Invalid file name") : Print()
-    Input("      New input file name (ENTER to terminate): ", InputFile$)
+    PRINT("      Invalid file name") : PRINT()
+    INPUT("      New input file name (ENTER to terminate): ", InputFile$)
     If InputFile$ = "" Then End
 
   End Sub

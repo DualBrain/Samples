@@ -11,7 +11,7 @@ Module Program
   Public Sub Main(args() As String)
 
     ' If a directory is not specified, exit the program.
-    If args.Length <> 2 Then
+    If args.Length <> 1 Then
       ' Display the proper way to call the program.
       Console.WriteLine("Usage: Watcher.exe (directory)")
       Return
@@ -20,7 +20,7 @@ Module Program
     ' Create a new FileSystemWatcher and set its properties.
     Using watcher As New FileSystemWatcher()
 
-      watcher.Path = args(1)
+      watcher.Path = args(0)
 
       ' Watch for changes in LastAccess and LastWrite times, and
       ' the renaming of files or directories. 

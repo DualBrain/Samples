@@ -5,21 +5,25 @@ Imports NAudio.Wave
 
 Module Program
 
-  Sub Main(args As String())
+  Sub Main() 'args As String())
 
     Console.WriteLine("******* Using WMI ******* ")
 
-    Dim objSearcher = New ManagementObjectSearcher("SELECT * FROM Win32_SoundDevice")
-    Dim objCollection = objSearcher.Get()
-    For Each d In objCollection
-      For Each p In d.Properties
-        Select Case p.Name
-          Case "Name"
-            Console.WriteLine($"{p.Value}")
-          Case Else
-        End Select
+    If OperatingSystem.IsWindows Then
+
+      Dim objSearcher = New ManagementObjectSearcher("SELECT * FROM Win32_SoundDevice")
+      Dim objCollection = objSearcher.Get()
+      For Each d In objCollection
+        For Each p In d.Properties
+          Select Case p.Name
+            Case "Name"
+              Console.WriteLine($"{p.Value}")
+            Case Else
+          End Select
+        Next
       Next
-    Next
+
+    End If
 
     Console.WriteLine("******* Using WaveOut ******* ")
 

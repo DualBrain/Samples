@@ -11,11 +11,11 @@ Module Program
 
   Private WithEvents Player As New Player3()
 
-  Private streams As New Dictionary(Of Integer, IO.Stream)
+  Private ReadOnly streams As New Dictionary(Of Integer, IO.Stream)
 
-  Private m_stack As New Stack(Of IO.Stream)
+  Private ReadOnly m_stack As New Stack(Of IO.Stream)
 
-  Sub Main(args As String())
+  Sub Main() 'args As String())
 
     Do
       If Console.KeyAvailable Then
