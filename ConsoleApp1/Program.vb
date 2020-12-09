@@ -33,6 +33,31 @@ Module Program
 
   End Sub
 
+
+  Public Sub SpanTest1()
+
+    '' Create a span over an array.
+    'Dim array As Byte() = New Byte(99) {}
+    'Dim arraySpan = New Span(Of Byte)(array)
+
+    'Dim data As Byte = 0
+
+    'For ctr As Integer = 0 To arraySpan.Length - 1
+    '  arraySpan(ctr) = Math.Min(Threading.Interlocked.Increment(data), data - 1)
+    'Next
+
+    'Dim arraySum As Integer = 0
+
+    'For Each value As Byte In array
+    '  arraySum += value
+    'Next
+
+    'Console.WriteLine($"The sum is {arraySum}")
+    '' Output:  The sum is 4950
+
+  End Sub
+
+
   Public Sub WriteLineByRef(ByRef value As String)
     Console.WriteLine(value)
     value &= "..."
