@@ -5,6 +5,18 @@ namespace ClassLibrary1
     public class Class1
     {
 
+        public static void InlineIncrementTest()
+        {
+
+            int value = 1;
+            Console.WriteLine($"({value}) value=5 = {value=5} ({value})");
+            Console.WriteLine($"({value}) value++ = {value++} ({value})");
+            Console.WriteLine($"({value}) value-- = {value--} ({value})");
+            Console.WriteLine($"({value}) ++value = {++value} ({value})");
+            Console.WriteLine($"({value}) --value = {--value} ({value})");
+
+        }
+
     }
 
     public record A
