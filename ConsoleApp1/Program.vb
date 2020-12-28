@@ -23,6 +23,14 @@ Module Program
     '  Console.WriteLine($"{index}:{l(index)}")
     'Next
 
+    Dim l = New List(Of Boolean)
+
+    Dim d = True
+
+    If d = True Then
+
+    End If
+
     'Dim a = "a"
     'Dim b = "b"
     'Dim c = "c"
@@ -244,3 +252,31 @@ Public Module Inline
   ' Double
 
 End Module
+
+Class Test
+
+  Private m_blah As Boolean
+
+  Public Function Blah(value As Boolean) As Boolean
+    Dim bb = New B
+    Dim something = NameOf(B)
+    CreateWidget()
+    m_blah = value
+    Return m_blah
+  End Function
+
+  Private Sub CreateWidget()
+    Throw New NotImplementedException
+  End Sub
+
+End Class
+
+Class B
+
+End Class
+
+MustInherit Class C
+
+  Public MustOverride Sub M()
+
+End Class

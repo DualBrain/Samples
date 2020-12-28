@@ -5,6 +5,13 @@ namespace ClassLibrary1
     public class Class1
     {
 
+        private bool _blah;
+
+        public bool Blah(bool value) {
+            _blah = value;
+            return _blah;
+        }
+
         public static void InlineIncrementTest()
         {
 
