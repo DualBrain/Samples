@@ -4,6 +4,7 @@ Option Infer On
 
 Imports System
 Imports System.Runtime.CompilerServices
+Imports Community.VisualBasic.Inline
 
 ' Because Visual Studio 2019 changed how you create "temporary project";
 ' I'm using this project as a placeholder for testing out code.
@@ -59,12 +60,23 @@ Module Program
     '                      (CUInt(header(Math.Max(Threading.Interlocked.Increment(index), index - 1))) << 24)
 
     Dim value As Integer = 1
-    Console.WriteLine($"({value}) value=5 = {value.Assign(5)} ({value})")
-    Console.WriteLine($"({value}) value++ = {value.Incr} ({value})")
-    Console.WriteLine($"({value}) value-- = {value.Decr} ({value})")
-    Console.WriteLine($"({value}) ++value = {value.Incr(Apply.Before)} ({value})")
-    Console.WriteLine($"({value}) --value = {value.Decr(Apply.Before)} ({value})")
+    Console.WriteLine($"({value}) value=5 = {Community.VisualBasic.Inline.Assign(value, 5)} ({value})")
+    Console.WriteLine($"({value}) value++ = {IncrAfter(value)} ({value})")
+    Console.WriteLine($"({value}) value-- = {DecrAfter(value)} ({value})")
+    Console.WriteLine($"({value}) ++value = {IncrBefore(value)} ({value})")
+    Console.WriteLine($"({value}) --value = {DecrBefore(value)} ({value})")
 
+  End Sub
+
+  ' For an interesting way to write "flags" and/or enums that are pretty much specific to a particular method.
+  ' https://github.com/dotnet/vblang/issues/526#issuecomment-748856530
+  Enum Order : First : Second : Last : End Enum
+  Sub Foo1(x As Order)
+    Select Case x
+      Case Order.First
+      Case Order.Second
+      Case Else
+    End Select
   End Sub
 
   Public Sub SpanTest1()
@@ -133,123 +145,6 @@ Public Module Extensions
       l.Add(entry)
     Next
   End Sub
-
-End Module
-
-Public Module Inline
-
-  Public Enum Apply
-    Before
-    After
-  End Enum
-
-  <Extension>
-  <MethodImpl(MethodImplOptions.AggressiveInlining)>
-  Public Function Assign(Of T)(ByRef value As T, replacement As T) As T
-    value = replacement : Return value
-  End Function
-
-  ' Byte
-
-  ' SByte
-
-  ' Char
-
-  ' Short
-
-  ' UShort
-
-  ' Integer
-
-  <Extension>
-  <MethodImpl(MethodImplOptions.AggressiveInlining)>
-  Public Function Incr(ByRef value As Integer, Optional apply As Apply = Apply.After) As Integer
-    If apply = Apply.Before Then
-      Return Threading.Interlocked.Increment(value)
-    Else
-      Return Math.Min(Threading.Interlocked.Increment(value), value - 1)
-    End If
-  End Function
-
-  <Extension>
-  <MethodImpl(MethodImplOptions.AggressiveInlining)>
-  Public Function Decr(ByRef value As Integer, Optional apply As Apply = Apply.After) As Integer
-    If apply = Apply.Before Then
-      Return Threading.Interlocked.Decrement(value)
-    Else
-      Return Math.Max(Threading.Interlocked.Decrement(value), value + 1)
-    End If
-  End Function
-
-  ' UInteger
-
-  <MethodImpl(MethodImplOptions.AggressiveInlining)>
-  <Extension>
-  Public Function Incr(ByRef value As UInteger, Optional apply As Apply = Apply.After) As UInteger
-    If apply = Apply.Before Then
-      Return Threading.Interlocked.Increment(value)
-    Else
-      Return CUInt(Math.Min(Threading.Interlocked.Increment(value), value - 1))
-    End If
-  End Function
-
-  <MethodImpl(MethodImplOptions.AggressiveInlining)>
-  <Extension>
-  Public Function Decr(ByRef value As UInteger, Optional apply As Apply = Apply.After) As UInteger
-    If apply = Apply.Before Then
-      Return Threading.Interlocked.Decrement(value)
-    Else
-      Return CUInt(Math.Max(Threading.Interlocked.Decrement(value), value + 1))
-    End If
-  End Function
-
-  ' Long
-
-  <Extension>
-  <MethodImpl(MethodImplOptions.AggressiveInlining)>
-  Public Function Incr(ByRef value As Long, Optional apply As Apply = Apply.After) As Long
-    If apply = Apply.Before Then
-      Return Threading.Interlocked.Increment(value)
-    Else
-      Return Math.Min(Threading.Interlocked.Increment(value), value - 1)
-    End If
-  End Function
-
-  <Extension>
-  <MethodImpl(MethodImplOptions.AggressiveInlining)>
-  Public Function Decr(ByRef value As Long, Optional apply As Apply = Apply.After) As Long
-    If apply = Apply.Before Then
-      Return Threading.Interlocked.Decrement(value)
-    Else
-      Return Math.Max(Threading.Interlocked.Decrement(value), value + 1)
-    End If
-  End Function
-
-  ' ULong
-
-  <Extension>
-  <MethodImpl(MethodImplOptions.AggressiveInlining)>
-  Public Function Incr(ByRef value As ULong, Optional apply As Apply = Apply.After) As ULong
-    If apply = Apply.Before Then
-      Return Threading.Interlocked.Increment(value)
-    Else
-      Return CULng(Math.Min(Threading.Interlocked.Increment(value), value - 1))
-    End If
-  End Function
-
-  <Extension>
-  <MethodImpl(MethodImplOptions.AggressiveInlining)>
-  Public Function Decr(ByRef value As ULong, Optional apply As Apply = Apply.After) As ULong
-    If apply = Apply.Before Then
-      Return Threading.Interlocked.Decrement(value)
-    Else
-      Return CULng(Math.Max(Threading.Interlocked.Decrement(value), value + 1))
-    End If
-  End Function
-
-  ' Single
-
-  ' Double
 
 End Module
 
