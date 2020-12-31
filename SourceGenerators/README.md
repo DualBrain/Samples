@@ -35,3 +35,16 @@ You can add the sample generators to your own project by adding an item group co
 ```
 
 You will most likely need to close and reopen the solution in Visual Studio for any changes made to the generators to take effect.  From what I understand, Microsoft is looking into resolving this issue; but until then... just restart. ;-)
+
+Debugging a Source Generator
+-----
+
+The following information is pulled from [a video](https://www.youtube.com/watch?v=3YwwdoRg2F4) (12:00) and placing here for future follow up.
+
+- Debugger.Launch() - might not be a good idea within Visual Studio.
+- GeneratorDriver
+  - Test console app
+  - Unit tests
+- https://github.com/davidwengier/SourceGeneratorTemplate
+- https://github.com/chsienki/kittitas
+- https://sourcegen.dev/  <------ This is something that would be really nice to have in VB.
