@@ -39,6 +39,8 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "SourceGeneratorSamples", "S
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "GeneratedDemo", "SourceGenerators\GeneratedDemo\GeneratedDemo.vbproj", "{626D842E-E466-415F-BA0F-A1C24A31395F}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestConsoleApp", "SourceGenerators\TestConsoleApp\TestConsoleApp.vbproj", "{7382C11D-DD06-4551-BF68-9520028C3F00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -109,6 +111,10 @@ Global
 		{626D842E-E466-415F-BA0F-A1C24A31395F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{626D842E-E466-415F-BA0F-A1C24A31395F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{626D842E-E466-415F-BA0F-A1C24A31395F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7382C11D-DD06-4551-BF68-9520028C3F00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7382C11D-DD06-4551-BF68-9520028C3F00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7382C11D-DD06-4551-BF68-9520028C3F00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7382C11D-DD06-4551-BF68-9520028C3F00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -117,6 +123,7 @@ Global
 		{CA2D29FB-9923-460B-8D7A-2628DF728A7F} = {E217AEBC-D7BE-4BB6-950F-665E8FC61754}
 		{F93E00C5-E761-48D0-B8AC-90482917EA55} = {22AEE70F-B724-4682-B5CD-40C03E903966}
 		{626D842E-E466-415F-BA0F-A1C24A31395F} = {22AEE70F-B724-4682-B5CD-40C03E903966}
+		{7382C11D-DD06-4551-BF68-9520028C3F00} = {22AEE70F-B724-4682-B5CD-40C03E903966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDAC410C-0901-447E-8121-BF33A670D583}

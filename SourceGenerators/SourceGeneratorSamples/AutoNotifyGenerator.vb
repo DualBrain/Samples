@@ -15,21 +15,24 @@ Namespace SourceGeneratorSamples
   Public Class AutoNotifyGenerator
     Implements ISourceGenerator
 
-    Private Const ATTRIBUTE_TEXT As String = "
-Imports System
+    Private Const ATTRIBUTE_TEXT As String = "Option Explict On
+Option Strict On
+Option Infer On
 
 Namespace Global.AutoNotify
-    <AttributeUsage(AttributeTargets.Field, Inherited:=False, AllowMultiple:=False)>
-    Friend NotInheritable Class AutoNotifyAttribute
-        Inherits Attribute
 
-        Public Sub New()
-        End Sub
+  <AttributeUsage(AttributeTargets.Field, Inherited:=False, AllowMultiple:=False)>
+  Friend NotInheritable Class AutoNotifyAttribute
+    Inherits Attribute
 
-        Public Property PropertyName As String
-    End Class
-End Namespace
-"
+    Public Sub New()
+    End Sub
+
+    Public Property PropertyName As String
+
+  End Class
+
+End Namespace"
 
     Public Sub Initialize(context As GeneratorInitializationContext) Implements ISourceGenerator.Initialize
       ' Register a syntax receiver that will be created for each generation pass
