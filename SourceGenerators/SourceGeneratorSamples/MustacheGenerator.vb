@@ -56,7 +56,7 @@ End Namespace
       Dim namesSources = SourceFilesFromMustachePaths(options)
 
       For Each entry In namesSources
-        context.AddSource($"Mustache{entry.Item1}", SourceText.From(entry.Item2, Encoding.UTF8))
+        context.AddSource($"Mustache{entry.Name}", SourceText.From(entry.Code, Encoding.UTF8))
       Next
 
     End Sub

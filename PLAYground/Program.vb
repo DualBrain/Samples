@@ -12,10 +12,13 @@ Namespace Global.PlayString
       Console.WriteLine()
 
       If args.Length = 1 OrElse args.Length = 2 Then
-        Dim outfilefile As String = If(args.Length = 2, args(1), Nothing)
-        Dim _str2wav As New ParsePlayMacro(args(0))
-        _str2wav.Generate()
-        _str2wav.PlayOrSaveWav(outfilefile)
+        Dim file As String = If(args.Length = 2, args(1), Nothing)
+        Dim result As New ParsePlayMacro(args(0))
+        If file Is Nothing Then
+          result.Play()
+        Else
+          result.Save(file)
+        End If
       ElseIf args.Length = 0 Then
 
         ' Jingle Bells
@@ -61,10 +64,9 @@ Namespace Global.PlayString
 
           Console.WriteLine($"PLAY ""{input}""")
 
-          Dim str2wav As New ParsePlayMacro(input)
+          Dim result As New ParsePlayMacro(input)
           Try
-            str2wav.Generate()
-            str2wav.PlayOrSaveWav(Nothing)
+            result.Play()
           Catch ex As Exception
             Console.WriteLine(ex.Message)
           End Try

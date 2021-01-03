@@ -176,19 +176,19 @@ MustInherit Class C
 
 End Class
 
-Class Test1
+'Class Test1
 
-  ' https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/procedures/partial-methods
-  Partial Private Shared Sub Test()
-    ' Must be blank... will be implemented "elsewhere".
-  End Sub
+'  ' https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/procedures/partial-methods
+'  Partial Private Shared Sub Test()
+'    ' Must be blank... will be implemented "elsewhere".
+'  End Sub
 
-End Class
+'End Class
 
-Partial Class Test1
+'Partial Class Test1
 
-  Private Shared Sub Test()
-    Console.WriteLine("B")
-  End Sub
+'  Private Shared Sub Test()
+'    Console.WriteLine("B")
+'  End Sub
 
-End Class
+'End Class

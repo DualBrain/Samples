@@ -71,29 +71,15 @@ End Namespace"
         End If
       Next
 
-      'For Each prop In receiver.CandidateProperties
-      '  Dim model = compilation.GetSemanticModel(prop.SyntaxTree)
-      '  For Each variable In prop.Declarators
-      '    For Each name In variable.Names
-      '      ' Get the symbol being decleared by the field, and keep it if its annotated
-      '      Dim propertySymbol = TryCast(model.GetDeclaredSymbol(name), IPropertySymbol)
-      '      If propertySymbol IsNot Nothing AndAlso
-      '         propertySymbol.GetAttributes().Any(Function(ad) ad.AttributeClass.Equals(attributeSymbol, SymbolEqualityComparer.[Default])) Then
-      '        propertySymbols.Add(propertySymbol)
-      '      End If
-      '    Next
-      '  Next
-      'Next
-
       ' group the fields by class, and generate the source
       For Each group In propertySymbols.GroupBy(Function(f) f.ContainingType)
-        Dim classSource = ProcessClass(group.Key, group.ToList(), attributeSymbol)
+        Dim classSource = ProcessClass(group.Key, group.ToList())
         context.AddSource($"{group.Key.Name}_Record.vb", SourceText.From(classSource, Encoding.UTF8))
       Next
 
     End Sub
 
-    Private Function ProcessClass(classSymbol As INamedTypeSymbol, properties As List(Of IPropertySymbol), attributeSymbol As ISymbol) As String
+    Private Function ProcessClass(classSymbol As INamedTypeSymbol, properties As List(Of IPropertySymbol)) As String
 
       If Not classSymbol.ContainingSymbol.Equals(classSymbol.ContainingNamespace, SymbolEqualityComparer.[Default]) Then
         Return Nothing 'TODO: issue a diagnostic that it must be top level
@@ -146,7 +132,7 @@ Namespace Global.{namespaceName}
 ")
       End If
       For Each propertySymbol In properties
-        ProcessProperty(source, propertySymbol, attributeSymbol)
+        ProcessProperty(source, propertySymbol)
       Next
 
       source.Append($"
@@ -172,7 +158,7 @@ End Namespace")
 
     End Function
 
-    Private Sub ProcessProperty(source As StringBuilder, propertySymbol As IPropertySymbol, attributeSymbol As ISymbol)
+    Private Sub ProcessProperty(source As StringBuilder, propertySymbol As IPropertySymbol)
 
       Dim chooseName As Func(Of String, TypedConstant, String) =
         Function(fieldName1 As String, overridenNameOpt1 As TypedConstant) As String

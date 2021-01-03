@@ -256,9 +256,12 @@ Namespace Global.PlayString
         i += 1
 
       End While
+
+      Generate()
+
     End Sub
 
-    Friend Sub Generate() ' PROCESS
+    Private Sub Generate() ' PROCESS
       For Each c As Command In m_commands
         If TypeOf c Is PlayTempo Then
           m_tempo = CType(c, PlayTempo).Tempo
@@ -297,14 +300,14 @@ Namespace Global.PlayString
           ElseIf n.Dotted Then
             noteSeconds += (noteSeconds / 2)
           End If
-          Tone(herz, noteSeconds)
+          GenerateTone(herz, noteSeconds)
           If pause > 0 Then
-            Tone(0, pause)
+            GenerateTone(0, pause)
           End If
         ElseIf TypeOf c Is PlayPause Then
           Dim pp = TryCast(c, PlayPause)
           Dim totalSeconds = (1 / (m_tempo / 60)) * (4 / pp.Pause)
-          Tone(0, totalSeconds)
+          GenerateTone(0, totalSeconds)
         ElseIf TypeOf c Is PlayOctave Then
           m_octave = CType(c, PlayOctave).Octave
         Else
@@ -313,7 +316,7 @@ Namespace Global.PlayString
       Next
     End Sub
 
-    Private Sub Tone(hz As Double, seconds As Double)
+    Private Sub GenerateTone(hz As Double, seconds As Double)
       Dim sampleRate = 44100.0#
       Dim duration = CInt(Fix((sampleRate * seconds)))
       Dim d = New Byte(duration - 1) {}
@@ -340,7 +343,15 @@ Namespace Global.PlayString
       Return _length
     End Function
 
-    Friend Sub PlayOrSaveWav(Optional filespec As String = Nothing)
+    Friend Sub Play()
+      PlayOrSaveWav(Nothing)
+    End Sub
+
+    Friend Sub Save(filespec As String)
+      PlayOrSaveWav(filespec)
+    End Sub
+
+    Private Sub PlayOrSaveWav(Optional filespec As String = Nothing)
 
       Dim subChunk2Size = GetTotalLength()
       Dim audioFormat = 1US ' PCM
