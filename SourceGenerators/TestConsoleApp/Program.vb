@@ -23,7 +23,7 @@ Module Program
     'Console.ReadLine()
     'Return
 
-    Dim source As String = "
+    Dim source = <![CDATA[
 Imports RecordGenerator
 
 Namespace Foo
@@ -33,10 +33,11 @@ Namespace Foo
     Public ReadOnly Property FirstName As String
     Public ReadOnly Property LastName As Integer
     Public Overrides Function ToString() As String
+      Return "Yo!"
     End Function
   End Class
 
-End Namespace"
+End Namespace]]>.Value
 
     Dim result = GetGeneratedOutput(source)
 
@@ -57,7 +58,7 @@ End Namespace"
 
     Dim syntaxTree = VisualBasicSyntaxTree.ParseText(source)
 
-    Dim references As List(Of Microsoft.CodeAnalysis.MetadataReference) = New List(Of MetadataReference)
+    Dim references As List(Of MetadataReference) = New List(Of MetadataReference)
     Dim assemblies As Assembly() = AppDomain.CurrentDomain.GetAssemblies()
     For Each assembly As Assembly In assemblies
       If Not assembly.IsDynamic Then
