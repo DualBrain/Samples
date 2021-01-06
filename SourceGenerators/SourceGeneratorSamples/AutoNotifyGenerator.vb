@@ -77,9 +77,10 @@ End Namespace"
       Next
 
       ' group the fields by class, and generate the source
-      For Each group In fieldSymbols.GroupBy(Function(f) f.ContainingType)
-        Dim classSource = ProcessClass(group.Key, group.ToList(), attributeSymbol, notifySymbol)
-        context.AddSource($"{group.Key.Name}_AutoNotify.vb", SourceText.From(classSource, Encoding.UTF8))
+      For Each entry In From p In fieldSymbols Group p By Key = p.ContainingType.Name, Type = p.ContainingType Into Group ' fieldSymbols.GroupBy(Function(f) f.ContainingType)
+        'Dim classSource = ProcessClass(entry.Key, entry.ToList(), attributeSymbol, notifySymbol)
+        Dim classSource = ProcessClass(entry.Type, entry.Group.ToList(), attributeSymbol, notifySymbol)
+        context.AddSource($"{entry.Key}_AutoNotify.vb", SourceText.From(classSource, Encoding.UTF8))
       Next
 
     End Sub

@@ -85,11 +85,11 @@ End Namespace"
         End If
       Next
 
-      ' group the fields by class, and generate the source
-      For Each group In propertySymbols.GroupBy(Function(f) f.ContainingType)
-        Dim methods = From p In methodSymbols Where p.ContainingType.Name = group(0).ContainingType.Name
-        Dim classSource = ProcessClass(group.Key, group.ToList(), methods.ToList())
-        context.AddSource($"{group.Key.Name}_Record.vb", SourceText.From(classSource, Encoding.UTF8))
+      ' group the properties by class and generate the source
+      For Each entry In From p In propertySymbols Group p By Key = p.ContainingType.Name, Type = p.ContainingType Into Group ' propertySymbols.GroupBy(Function(f) f.ContainingType)
+        Dim methods = From p In methodSymbols Where p.ContainingType.Name = entry.Group(0).ContainingType.Name
+        Dim classSource = ProcessClass(entry.Type, entry.Group.ToList(), methods.ToList())
+        context.AddSource($"{entry.Key}_Record.vb", SourceText.From(classSource, Encoding.UTF8))
       Next
 
     End Sub
