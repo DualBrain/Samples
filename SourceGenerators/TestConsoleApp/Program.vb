@@ -3,7 +3,9 @@ Option Strict On
 Option Infer On
 
 Imports System.Collections.Immutable
+Imports System.Diagnostics.CodeAnalysis
 Imports System.Reflection
+Imports System.Runtime.InteropServices
 Imports Microsoft.CodeAnalysis
 Imports Microsoft.CodeAnalysis.VisualBasic
 Imports SourceGeneratorSamples
@@ -12,27 +14,21 @@ Module Program
 
   Public Sub Main() 'args As String())
 
+    'Dim p As New Person With {.FirstName = "Cory", .LastName = "Smith"}
+    'Console.WriteLine(p)
+    'Console.ReadLine()
+    'Return
+
     Dim source As String = "
 Imports RecordGenerator
 
 Namespace Foo
 
   <Record>
-  Public Class PersonRecord
-    Public Property Name As String
-    Public Property Age As Integer
-  End Class
-
-  Public Class SomethingElseRecord
-    Public Property Name As String
-    Public Property Count As Integer
-  End Class
-
-  Class C
-
-    Sub M()
-    End Sub
-
+  Public Class Garble
+    Public Property FirstName As String
+    Public Property LastName As Integer
+    Public ReadOnly Property Birth As Date
   End Class
 
 End Namespace"
@@ -92,3 +88,82 @@ End Namespace"
   End Function
 
 End Module
+
+Public Class PersonX
+
+  Public Property FirstName As String
+  Public Property LastName As String
+  Public Property X1 As String
+  Public Property X2 As Integer
+
+End Class
+
+Partial Public Class PersonX
+  Implements IEquatable(Of PersonX)
+
+  Public Overrides Function ToString() As String
+    Dim sb As New System.Text.StringBuilder
+    sb.Append("Person")
+    sb.Append(" { ")
+    If PrintMembers(sb) Then
+      sb.Append(" ")
+    End If
+    sb.Append("}")
+    Return sb.ToString()
+  End Function
+
+  Protected Overridable Function PrintMembers(builder As System.Text.StringBuilder) As Boolean
+    builder.Append("FirstName")
+    builder.Append(" = ")
+    builder.Append(FirstName)
+    builder.Append(", ")
+    builder.Append("LastName")
+    builder.Append(" = ")
+    builder.Append(LastName)
+    Return True
+  End Function
+
+  Public Shared Operator <>(r1 As PersonX, r2 As PersonX) As Boolean
+    Return Not (r1 Is r2)
+  End Operator
+
+  Public Shared Operator =(r1 As PersonX, r2 As PersonX) As Boolean
+    Return r1 Is r2 OrElse (r1 IsNot Nothing AndAlso r1.Equals(r2))
+  End Operator
+
+  Public Overrides Function GetHashCode() As Integer
+    ' Otherwise...
+    Dim result = HashCode.Combine(GetType(PersonX), FirstName)
+    result = HashCode.Combine(result, LastName)
+    result = HashCode.Combine(result, X1)
+    result = HashCode.Combine(result, X2)
+    ' Return the result...
+    Return result
+  End Function
+
+  Public Shadows Function Equals(obj As Object) As Boolean
+    Return Equals(TryCast(obj, PersonX))
+  End Function
+
+  Public Shadows Function Equals(<AllowNull> other As PersonX) As Boolean Implements IEquatable(Of PersonX).Equals
+    'TODO: What if the object being tested against is inherited/extended beyond Person?
+    Return other IsNot Nothing AndAlso
+           EqualityComparer(Of String).[Default].Equals(FirstName, other.FirstName) AndAlso
+           EqualityComparer(Of String).[Default].Equals(LastName, other.LastName)
+  End Function
+
+  Public Overridable Function Clone() As PersonX
+    Return New PersonX(Me)
+  End Function
+
+  Protected Sub New(original As PersonX)
+    FirstName = original.FirstName
+    LastName = original.LastName
+  End Sub
+
+  Public Sub Deconstruct(<Out> ByRef firstName As String, <Out> ByRef lastName As String)
+    firstName = Me.FirstName
+    lastName = Me.LastName
+  End Sub
+
+End Class

@@ -34,6 +34,12 @@ Running MustacheGenerator:
 ")
     UseMustacheGenerator.Run()
 
+    Console.WriteLine("
+
+Running RecordGenerator:
+")
+    UseRecordGenerator.Run()
+
   End Sub
 
 End Module

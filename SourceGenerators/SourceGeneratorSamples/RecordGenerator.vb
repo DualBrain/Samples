@@ -15,10 +15,7 @@ Namespace Global.SourceGeneratorSamples
   Public Class RecordGenerator
     Implements ISourceGenerator
 
-    Private Const ATTRIBUTE_TEXT As String = "Option Explicit On
-Option Strict On
-Option Infer On
-
+    Private Const ATTRIBUTE_TEXT As String = "
 Namespace Global.RecordGenerator
 
   <AttributeUsage(AttributeTargets.Class, Inherited:=False, AllowMultiple:=False)>
@@ -95,6 +92,7 @@ Option Infer On
 Namespace Global.{namespaceName}
 
   Partial Public Class {classSymbol.Name}
+    Implements IEquatable(Of {classSymbol.Name})
   
 ")
 
@@ -109,21 +107,68 @@ Namespace Global.{namespaceName}
 ")
       End If
 
-      source.Append($"    Protected Overrides Sub Finalize()
-      MyBase.Finalize()
+      source.Append($"    'Protected Overrides Sub Finalize()
+    '  MyBase.Finalize()
+    'End Sub
+
+    Public Overridable Function Clone() As {classSymbol.Name}
+      Return New {classSymbol.Name}(Me)
+    End Function
+")
+
+      Dim readonlyCount = Aggregate a In properties Where a.IsReadOnly Into Count()
+
+      If readonlyCount = 0 Then
+        source.Append($"
+    Public Sub New()
+
     End Sub
+")
+      Else
 
-    Friend Function Clone() As {classSymbol.Name}
-      Return Me.Clone
+        source.Append($"
+    Public Sub New(")
+
+        Dim insertComma = False
+        For Each propertySymbol In From p In properties Where p.IsReadOnly
+          If insertComma Then
+            source.Append(", ")
+          Else
+            insertComma = True
+          End If
+          source.Append($"{ToCamelCase(propertySymbol.Name)} As {propertySymbol.Type}")
+        Next
+
+        source.Append($")
+")
+
+        For Each propertySymbol In From p In properties Where p.IsReadOnly
+          source.Append($"      Me.{propertySymbol.Name} = {ToCamelCase(propertySymbol.Name)}
+")
+        Next
+
+        source.Append($"    End Sub
+")
+      End If
+
+      source.Append($"
+    Protected Sub New(original As {classSymbol.Name})
+")
+
+      For Each propertySymbol In properties
+        ProcessPropertyForClone(source, propertySymbol)
+      Next
+
+      source.Append($"    End Sub
+
+    Public Shadows Function Equals(target As Object) As Boolean
+      Return Equals(TryCast(target, {classSymbol.Name}))
     End Function
 
-    Public Overrides Function Equals(target As Object) As Boolean
-      Dim target As Object = TryCast(target, {classSymbol.Name})
+    Public Shadows Function Equals(target As {classSymbol.Name}) As Boolean Implements IEquatable(Of {classSymbol.Name}).Equals
+      'TODO: What if the object being tested against is inherited/extended beyond {classSymbol.Name}?
+
       If target Is Nothing Then Return False
-      Return Me.Equals(target)
-    End Function
-
-    Public Overloads Function Equals(target As {classSymbol.Name}) As Boolean
 ")
 
       ' create properties for each field 
@@ -132,7 +177,7 @@ Namespace Global.{namespaceName}
 ")
       End If
       For Each propertySymbol In properties
-        ProcessProperty(source, propertySymbol)
+        ProcessPropertyForEquals(source, propertySymbol)
       Next
 
       source.Append($"
@@ -141,11 +186,71 @@ Namespace Global.{namespaceName}
     End Function
 
     Public Overrides Function GetHashCode() As Integer
-      Return MyBase.GetHashCode()
+")
+
+      If properties.Count < 8 Then
+        source.Append($"      Return HashCode.Combine(GetType({classSymbol.Name})")
+        For Each propertySymbol In properties
+          source.Append($", {propertySymbol.Name}")
+        Next
+        source.Append($")")
+      Else
+        ' The "hard" way...
+        Dim first = True
+        For Each propertySymbol In properties
+          If first Then
+            source.Append($"      Dim result = HashCode.Combine(GetType({classSymbol.Name}), {propertySymbol.Name})
+")
+            first = False
+          Else
+            source.Append($"      result = HashCode.Combine(result, {propertySymbol.Name})
+")
+          End If
+        Next
+        source.Append($"      Return result
+")
+      End If
+
+      source.Append($"
     End Function
 
+    Public Shared Operator <>(r1 As {classSymbol.Name}, r2 As {classSymbol.Name}) As Boolean
+      Return Not (r1 Is r2)
+    End Operator
+
+    Public Shared Operator =(r1 As {classSymbol.Name}, r2 As {classSymbol.Name}) As Boolean
+      Return r1 Is r2 OrElse (r1 IsNot Nothing AndAlso r1.Equals(r2))
+    End Operator
+
     Public Overrides Function ToString() As String
-      Return MyBase.ToString()
+      Dim sb As New System.Text.StringBuilder
+      sb.Append(""{classSymbol.Name}"")
+      sb.Append("" {{ "")
+      If PrintMembers(sb) Then
+        sb.Append("" "")
+      End If
+      sb.Append(""}}"")
+      Return sb.ToString()
+    End Function
+
+    Protected Overridable Function PrintMembers(builder As System.Text.StringBuilder) As Boolean
+
+")
+
+      Dim skip = True
+      For Each propertySymbol In properties
+        If Not skip Then
+          source.Append($"      builder.Append("", "")
+")
+        Else
+          skip = False
+        End If
+        ProcessPropertyForToString(source, propertySymbol)
+      Next
+
+      source.Append($"
+      Return True
+
     End Function
 ")
 
@@ -158,7 +263,71 @@ End Namespace")
 
     End Function
 
-    Private Sub ProcessProperty(source As StringBuilder, propertySymbol As IPropertySymbol)
+    Private Function ToCamelCase(value As String) As String
+      Return value(0).ToString.ToLower & value.Substring(1)
+    End Function
+
+    Private Sub ProcessPropertyForToString(source As StringBuilder, propertySymbol As IPropertySymbol)
+
+      Dim chooseName As Func(Of String, TypedConstant, String) =
+        Function(fieldName1 As String, overridenNameOpt1 As TypedConstant) As String
+
+          If Not overridenNameOpt1.IsNull Then
+            Return overridenNameOpt1.Value.ToString()
+          End If
+
+          fieldName1 = fieldName1.TrimStart("_"c)
+          If fieldName1.Length = 0 Then
+            Return String.Empty
+          End If
+
+          If fieldName1.Length = 1 Then
+            Return fieldName1.ToUpper()
+          End If
+
+          Return fieldName1.Substring(0, 1).ToUpper() & fieldName1.Substring(1)
+
+        End Function
+
+      ' get the name and type of the field
+      Dim propertyName = propertySymbol.Name
+
+      source.Append($"      builder.Append($""{propertyName} = {{{propertyName}}}"")
+")
+
+    End Sub
+
+    Private Sub ProcessPropertyForClone(source As StringBuilder, propertySymbol As IPropertySymbol)
+
+      Dim chooseName As Func(Of String, TypedConstant, String) =
+        Function(fieldName1 As String, overridenNameOpt1 As TypedConstant) As String
+
+          If Not overridenNameOpt1.IsNull Then
+            Return overridenNameOpt1.Value.ToString()
+          End If
+
+          fieldName1 = fieldName1.TrimStart("_"c)
+          If fieldName1.Length = 0 Then
+            Return String.Empty
+          End If
+
+          If fieldName1.Length = 1 Then
+            Return fieldName1.ToUpper()
+          End If
+
+          Return fieldName1.Substring(0, 1).ToUpper() & fieldName1.Substring(1)
+
+        End Function
+
+      ' get the name and type of the field
+      Dim propertyName = propertySymbol.Name
+
+      source.Append($"      {propertyName} = original.{propertyName}
+")
+
+    End Sub
+
+    Private Sub ProcessPropertyForEquals(source As StringBuilder, propertySymbol As IPropertySymbol)
 
       Dim chooseName As Func(Of String, TypedConstant, String) =
         Function(fieldName1 As String, overridenNameOpt1 As TypedConstant) As String
@@ -188,8 +357,11 @@ End Namespace")
       'Dim attributeData = propertySymbol.GetAttributes().[Single](Function(ad) ad.AttributeClass.Equals(attributeSymbol, SymbolEqualityComparer.[Default]))
       'Dim overridenNameOpt = attributeData.NamedArguments.SingleOrDefault(Function(kvp) kvp.Key = "PropertyName").Value
 
-      source.Append($"      If Not Me.{propertyName}.Equals(target.{propertyName}) Then Return False
+      source.Append($"      If Not EqualityComparer(Of String).[Default].Equals({propertyName}, target.{propertyName}) Then Return False
 ")
+
+      '      source.Append($"      If Not Me.{propertyName}.Equals(target.{propertyName}) Then Return False
+      '")
 
     End Sub
 

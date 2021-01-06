@@ -15,9 +15,7 @@ Namespace SourceGeneratorSamples
   Public Class AutoNotifyGenerator
     Implements ISourceGenerator
 
-    Private Const ATTRIBUTE_TEXT As String = "Option Explict On
-Option Strict On
-Option Infer On
+    Private Const ATTRIBUTE_TEXT As String = "
 
 Namespace Global.AutoNotify
 
@@ -95,9 +93,7 @@ End Namespace"
       Dim namespaceName = classSymbol.ContainingNamespace.ToDisplayString()
 
       ' begin building the generated source
-      Dim source = New StringBuilder($"Option Explicit On
-Option Strict On
-Option Infer On
+      Dim source = New StringBuilder($"
 
 Namespace Global.{namespaceName}
 
