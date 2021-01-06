@@ -10,12 +10,16 @@ Imports Microsoft.CodeAnalysis
 Imports Microsoft.CodeAnalysis.VisualBasic
 Imports SourceGeneratorSamples
 
+Imports TestConsoleApp.PersonX.WithPositions
+
 Module Program
 
   Public Sub Main() 'args As String())
 
-    'Dim p As New Person With {.FirstName = "Cory", .LastName = "Smith"}
-    'Console.WriteLine(p)
+    'Dim p1 As New PersonX("Cory", "Smith", "Hazel", 50)
+    'Dim p2 = p1.With(FirstName Or Age, firstName:="Bill", lastName:="Gates", eyeColor:="Brown", 65)
+    'Console.WriteLine(p1)
+    'Console.WriteLine(p2)
     'Console.ReadLine()
     'Return
 
@@ -25,10 +29,11 @@ Imports RecordGenerator
 Namespace Foo
 
   <Record>
-  Public Class Garble
-    Public Property FirstName As String
-    Public Property LastName As Integer
-    Public ReadOnly Property Birth As Date
+  Public Class Person
+    Public ReadOnly Property FirstName As String
+    Public ReadOnly Property LastName As Integer
+    Public Overrides Function ToString() As String
+    End Function
   End Class
 
 End Namespace"
@@ -90,20 +95,52 @@ End Namespace"
 End Module
 
 Public Class PersonX
-
-  Public Property FirstName As String
-  Public Property LastName As String
-  Public Property X1 As String
-  Public Property X2 As Integer
-
+  Public ReadOnly Property FirstName As String
+  Public ReadOnly Property LastName As String
+  Public ReadOnly Property EyeColor As String
+  Public ReadOnly Property Age As Integer
 End Class
 
 Partial Public Class PersonX
   Implements IEquatable(Of PersonX)
 
-  Public Overrides Function ToString() As String
+  Public Sub New(firstName As String, lastName As String, eyeColor As String, age As Integer)
+    Me.FirstName = firstName
+    Me.LastName = lastName
+    Me.EyeColor = eyeColor
+    Me.Age = age
+  End Sub
+
+  Protected Sub New(original As PersonX)
+    FirstName = original.FirstName
+    LastName = original.LastName
+    EyeColor = original.EyeColor
+    Age = original.Age
+  End Sub
+
+  <Flags>
+  Public Enum WithPositions
+    None = 0
+    FirstName = 1
+    LastName = 2
+    EyeColor = 4
+    Age = 8
+  End Enum
+
+  Public Function [With](flags As WithPositions,
+                         Optional firstName As String = Nothing,
+                         Optional lastName As String = Nothing,
+                         Optional eyeColor As String = Nothing,
+                         Optional age As Integer = 0) As PersonX
+    Return New PersonX(If((flags And WithPositions.FirstName) = WithPositions.FirstName, firstName, Me.FirstName),
+                       If((flags And WithPositions.LastName) = WithPositions.LastName, lastName, Me.LastName),
+                       If((flags And WithPositions.EyeColor) = WithPositions.EyeColor, eyeColor, Me.EyeColor),
+                       If((flags And WithPositions.Age) = WithPositions.Age, age, Me.Age))
+  End Function
+
+  Public Overridable Shadows Function ToString() As String
     Dim sb As New System.Text.StringBuilder
-    sb.Append("Person")
+    sb.Append("PersonX")
     sb.Append(" { ")
     If PrintMembers(sb) Then
       sb.Append(" ")
@@ -120,6 +157,14 @@ Partial Public Class PersonX
     builder.Append("LastName")
     builder.Append(" = ")
     builder.Append(LastName)
+    builder.Append(", ")
+    builder.Append("EyeColor")
+    builder.Append(" = ")
+    builder.Append(EyeColor)
+    builder.Append(", ")
+    builder.Append("Age")
+    builder.Append(" = ")
+    builder.Append(Age)
     Return True
   End Function
 
@@ -132,13 +177,7 @@ Partial Public Class PersonX
   End Operator
 
   Public Overrides Function GetHashCode() As Integer
-    ' Otherwise...
-    Dim result = HashCode.Combine(GetType(PersonX), FirstName)
-    result = HashCode.Combine(result, LastName)
-    result = HashCode.Combine(result, X1)
-    result = HashCode.Combine(result, X2)
-    ' Return the result...
-    Return result
+    Return HashCode.Combine(GetType(PersonX), FirstName, LastName, EyeColor)
   End Function
 
   Public Shadows Function Equals(obj As Object) As Boolean
@@ -149,21 +188,19 @@ Partial Public Class PersonX
     'TODO: What if the object being tested against is inherited/extended beyond Person?
     Return other IsNot Nothing AndAlso
            EqualityComparer(Of String).[Default].Equals(FirstName, other.FirstName) AndAlso
-           EqualityComparer(Of String).[Default].Equals(LastName, other.LastName)
+           EqualityComparer(Of String).[Default].Equals(LastName, other.LastName) AndAlso
+           EqualityComparer(Of String).[Default].Equals(EyeColor, other.EyeColor) AndAlso
+           Age = other.Age
   End Function
 
   Public Overridable Function Clone() As PersonX
     Return New PersonX(Me)
   End Function
 
-  Protected Sub New(original As PersonX)
-    FirstName = original.FirstName
-    LastName = original.LastName
-  End Sub
-
-  Public Sub Deconstruct(<Out> ByRef firstName As String, <Out> ByRef lastName As String)
-    firstName = Me.FirstName
-    lastName = Me.LastName
-  End Sub
+  'Public Sub Deconstruct(<Out> ByRef firstName As String, <Out> ByRef lastName As String, <Out> Byref eyeColor As String)
+  '  firstName = Me.FirstName
+  '  lastName = Me.LastName
+  '  eyeColor = Me.EyeColor
+  'End Sub
 
 End Class

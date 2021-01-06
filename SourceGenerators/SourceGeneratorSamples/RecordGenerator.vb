@@ -55,7 +55,7 @@ End Namespace"
 
       For Each prop In receiver.CandidateProperties
         Dim model = compilation.GetSemanticModel(prop.SyntaxTree)
-        Dim name = prop.TryGetInferredMemberName
+        Dim name = prop.Identifier.Text
         Dim propertySymbol = TryCast(model.GetDeclaredSymbol(prop), IPropertySymbol)
         If propertySymbol IsNot Nothing Then
           For Each c In receiver.CandidateClasses
@@ -68,15 +68,33 @@ End Namespace"
         End If
       Next
 
+      Dim methodSymbols As New List(Of IMethodSymbol)
+
+      For Each method In receiver.CandidateMethods
+        Dim model = compilation.GetSemanticModel(method.SyntaxTree)
+        Dim name = method.Identifier.Text
+        Dim methodSymbol = TryCast(model.GetDeclaredSymbol(method), IMethodSymbol)
+        If methodSymbol IsNot Nothing Then
+          For Each c In receiver.CandidateClasses
+            Dim className = c.Identifier.Text
+            If className = methodSymbol.ContainingType.Name Then
+              methodSymbols.Add(methodSymbol)
+              Exit For
+            End If
+          Next
+        End If
+      Next
+
       ' group the fields by class, and generate the source
       For Each group In propertySymbols.GroupBy(Function(f) f.ContainingType)
-        Dim classSource = ProcessClass(group.Key, group.ToList())
+        Dim methods = From p In methodSymbols Where p.ContainingType.Name = group(0).ContainingType.Name
+        Dim classSource = ProcessClass(group.Key, group.ToList(), methods.ToList())
         context.AddSource($"{group.Key.Name}_Record.vb", SourceText.From(classSource, Encoding.UTF8))
       Next
 
     End Sub
 
-    Private Function ProcessClass(classSymbol As INamedTypeSymbol, properties As List(Of IPropertySymbol)) As String
+    Private Function ProcessClass(classSymbol As INamedTypeSymbol, properties As List(Of IPropertySymbol), methods As List(Of IMethodSymbol)) As String
 
       If Not classSymbol.ContainingSymbol.Equals(classSymbol.ContainingNamespace, SymbolEqualityComparer.[Default]) Then
         Return Nothing 'TODO: issue a diagnostic that it must be top level
@@ -221,7 +239,13 @@ Namespace Global.{namespaceName}
     Public Shared Operator =(r1 As {classSymbol.Name}, r2 As {classSymbol.Name}) As Boolean
       Return r1 Is r2 OrElse (r1 IsNot Nothing AndAlso r1.Equals(r2))
     End Operator
+    ")
 
+      Dim hasToString = (Aggregate a In methods Where a.Name = "ToString" Into Count()) > 0
+
+      If Not hasToString Then
+
+        source.Append($"
     Public Overrides Function ToString() As String
       Dim sb As New System.Text.StringBuilder
       sb.Append(""{classSymbol.Name}"")
@@ -237,22 +261,24 @@ Namespace Global.{namespaceName}
 
 ")
 
-      Dim skip = True
-      For Each propertySymbol In properties
-        If Not skip Then
-          source.Append($"      builder.Append("", "")
+        Dim skip = True
+        For Each propertySymbol In properties
+          If Not skip Then
+            source.Append($"      builder.Append("", "")
 ")
-        Else
-          skip = False
-        End If
-        ProcessPropertyForToString(source, propertySymbol)
-      Next
+          Else
+            skip = False
+          End If
+          ProcessPropertyForToString(source, propertySymbol)
+        Next
 
-      source.Append($"
+        source.Append($"
       Return True
 
     End Function
 ")
+
+      End If
 
       source.Append($"
   End Class
@@ -373,8 +399,8 @@ End Namespace")
 
       'Public ReadOnly Property CandidateFields As List(Of FieldDeclarationSyntax) = New List(Of FieldDeclarationSyntax)
       Public ReadOnly Property CandidateClasses As List(Of ClassStatementSyntax) = New List(Of ClassStatementSyntax)
+      Public ReadOnly Property CandidateMethods As List(Of MethodStatementSyntax) = New List(Of MethodStatementSyntax)
       Public ReadOnly Property CandidateProperties As List(Of PropertyStatementSyntax) = New List(Of PropertyStatementSyntax)
-
       ''' <summary>
       ''' Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation
       ''' </summary>
@@ -388,6 +414,15 @@ End Namespace")
         ElseIf TypeOf syntaxNode Is PropertyStatementSyntax Then
           Dim node = TryCast(syntaxNode, PropertyStatementSyntax)
           CandidateProperties.Add(node)
+        ElseIf TypeOf syntaxNode Is MethodStatementSyntax Then
+          Dim node = TryCast(syntaxNode, MethodStatementSyntax)
+          Dim parent = TryCast(node.Parent.Parent.ChildNodes(0), ClassStatementSyntax)
+          If parent IsNot Nothing AndAlso CandidateClasses.Contains(parent) Then
+            Dim name = node.Identifier.Text
+            If name = "ToString" Then
+              CandidateMethods.Add(node)
+            End If
+          End If
         End If
         'If TypeOf syntaxNode Is FieldDeclarationSyntax Then
         '  Dim fieldDeclarationSyntax = TryCast(syntaxNode, FieldDeclarationSyntax)
