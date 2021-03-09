@@ -58,10 +58,12 @@ Public Class Form1
             End If
           Next
         Next
+
       ElseIf TypeOf c Is StatusStrip Then
         Dim s = CType(c, StatusStrip)
         s.BackColor = SystemColors.Control
         s.ForeColor = SystemColors.ControlText
+
       ElseIf TypeOf c Is ToolStrip Then
         Dim ts = CType(c, ToolStrip)
         If m_capturedRenderer IsNot Nothing Then
@@ -85,14 +87,16 @@ Public Class Form1
         Next
 
       ElseIf TypeOf c Is Panel Then
-
         Dim p = CType(c, Panel)
         p.BackColor = SystemColors.Control
         p.ForeColor = SystemColors.ControlText
+        p.Padding = New Padding(1)
+        If TypeOf c Is PanelEx Then
+          CType(c, PanelEx).BorderColor = SystemColors.WindowFrame
+        End If
         SetLightMode(p.Controls)
 
       ElseIf TypeOf c Is RichTextBox Then
-
         Dim rtb = CType(c, RichTextBox)
         rtb.BackColor = Color.White
         rtb.ForeColor = SystemColors.ControlText
@@ -103,24 +107,21 @@ Public Class Form1
         tvw.ForeColor = SystemColors.ControlText
 
       ElseIf TypeOf c Is TextBox Then
-
         Dim tb = CType(c, TextBox)
         tb.BorderStyle = BorderStyle.FixedSingle
         tb.BackColor = Color.White
         tb.ForeColor = SystemColors.ControlText
 
       ElseIf TypeOf c Is Button Then
-
         Dim btn = CType(c, Button)
         btn.BackColor = SystemColors.Control
         btn.ForeColor = SystemColors.ControlText
-
 
       ElseIf TypeOf c Is Microsoft.Web.WebView2.WinForms.WebView2 Then
         ' do nothing...
 
       Else
-        MsgBox($"Unhandled Control: {c.ToString}")
+        MsgBox($"Unhandled Control: {c}")
       End If
 
     Next
@@ -142,14 +143,17 @@ Public Class Form1
             End If
           Next
         Next
+
       ElseIf TypeOf c Is StatusStrip Then
         Dim s = CType(c, StatusStrip)
         s.BackColor = Color.FromArgb(40, 40, 40)
         s.ForeColor = Color.Silver
+
       ElseIf TypeOf c Is ToolStrip Then
         Dim ts = CType(c, ToolStrip)
         ts.Renderer = New ToolStripProfessionalRenderer(New DarkColorTable)
         ts.ForeColor = Color.Silver 'Color.White
+
       ElseIf TypeOf c Is SplitContainer Then
         Dim s = CType(c, SplitContainer)
         s.BackColor = Color.FromArgb(40, 40, 40)
@@ -168,14 +172,16 @@ Public Class Form1
         Next
 
       ElseIf TypeOf c Is Panel Then
-
         Dim p = CType(c, Panel)
         p.BackColor = Color.FromArgb(40, 40, 40)
         p.ForeColor = Color.Silver
+        p.Padding = New Padding(1)
+        If TypeOf c Is PanelEx Then
+          CType(c, PanelEx).BorderColor = Color.FromArgb(60, 60, 60)
+        End If
         SetDarkMode(p.Controls)
 
       ElseIf TypeOf c Is RichTextBox Then
-
         Dim rtb = CType(c, RichTextBox)
         rtb.BackColor = Color.FromArgb(60, 60, 60)
         rtb.ForeColor = Color.Silver
@@ -186,26 +192,24 @@ Public Class Form1
         tvw.BackColor = Color.FromArgb(40, 40, 40)
         tvw.ForeColor = Color.Silver
         tvw.BorderStyle = BorderStyle.None
-      ElseIf TypeOf c Is TextBox Then
 
+      ElseIf TypeOf c Is TextBox Then
         Dim tb = CType(c, TextBox)
         tb.BorderStyle = BorderStyle.FixedSingle
         tb.BackColor = Color.FromArgb(60, 60, 60)
         tb.ForeColor = Color.Silver
 
       ElseIf TypeOf c Is Button Then
-
         Dim btn = CType(c, Button)
         btn.FlatStyle = FlatStyle.Flat
         btn.BackColor = Color.FromArgb(60, 60, 60)
         btn.ForeColor = Color.Silver
 
-
       ElseIf TypeOf c Is Microsoft.Web.WebView2.WinForms.WebView2 Then
         ' do nothing...
 
       Else
-        MsgBox($"Unhandled Control: {c.ToString}")
+        MsgBox($"Unhandled Control: {c}")
       End If
 
     Next
