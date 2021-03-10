@@ -17,22 +17,9 @@ Public Class Form1
     DarkMode.ToggleImmersiveDarkMode(CType(Controls(0).Parent, Form).Handle, True)
 
     If m_enableDarkMode Then
-
       SetDarkMode(Controls)
-
     Else
-
-      'Dim m As MenuStrip = DirectCast(component, MenuStrip)
-      'm.Renderer = m_menuStripLightRenderer
-      'm.ForeColor = Color.Black
-      'For Each item As ToolStripMenuItem In m.Items
-      '  For Each subItem As ToolStripItem In item.DropDownItems
-      '    If TypeOf subItem Is ToolStripMenuItem Then
-      '      CType(subItem, ToolStripMenuItem).ForeColor = Color.Black
-      '    End If
-      '  Next
-      'Next
-
+      SetLightMode(Controls) ' Not really needed at startup... but, hey, just in case.
     End If
 
     Await InitializeAsync()
@@ -70,6 +57,22 @@ Public Class Form1
           ts.Renderer = m_capturedRenderer
         End If
         ts.ForeColor = SystemColors.ControlText
+        SetLightMode(ts.Controls)
+
+      ElseIf TypeOf c Is CheckBox Then
+
+      ElseIf TypeOf c Is ComboBox Then
+        Dim cb = CType(c, ComboBox)
+        cb.BackColor = Color.White 'SystemColors.Control
+        cb.ForeColor = SystemColors.ControlText
+        If TypeOf c Is ComboBoxEx Then
+          If TypeOf cb.Parent Is ToolStrip Then
+            CType(c, ComboBoxEx).BorderColor = SystemColors.Control
+          Else
+            CType(c, ComboBoxEx).BorderColor = SystemColors.ControlText
+          End If
+        End If
+
       ElseIf TypeOf c Is SplitContainer Then
         Dim s = CType(c, SplitContainer)
         s.BackColor = SystemColors.Control
@@ -153,6 +156,17 @@ Public Class Form1
         Dim ts = CType(c, ToolStrip)
         ts.Renderer = New ToolStripProfessionalRenderer(New DarkColorTable)
         ts.ForeColor = Color.Silver 'Color.White
+        SetDarkMode(ts.Controls)
+
+      ElseIf TypeOf c Is CheckBox Then
+
+      ElseIf TypeOf c Is ComboBox Then
+        Dim cb = CType(c, ComboBox)
+        cb.BackColor = Color.FromArgb(50, 50, 50)
+        cb.ForeColor = Color.Silver 'Color.White
+        If TypeOf c Is ComboBoxEx Then
+          CType(c, ComboBoxEx).BorderColor = Color.FromArgb(60, 60, 60)
+        End If
 
       ElseIf TypeOf c Is SplitContainer Then
         Dim s = CType(c, SplitContainer)
@@ -183,9 +197,12 @@ Public Class Form1
 
       ElseIf TypeOf c Is RichTextBox Then
         Dim rtb = CType(c, RichTextBox)
-        rtb.BackColor = Color.FromArgb(60, 60, 60)
+        rtb.BackColor = Color.FromArgb(45, 45, 45)
         rtb.ForeColor = Color.Silver
         rtb.BorderStyle = BorderStyle.None
+        'If TypeOf rtb.Parent Is PanelEx Then
+        '  CType(rtb.Parent, PanelEx).BorderColor = Color.FromArgb(60, 60, 60)
+        'End If
 
       ElseIf TypeOf c Is TreeView Then
         Dim tvw = CType(c, TreeView)
@@ -266,5 +283,15 @@ Public Class Form1
       Case Else
     End Select
   End Sub
+
+  'Private Sub ToolStrip1_Paint(sender As Object, e As PaintEventArgs) Handles ToolStrip1.Paint
+  '  For Each item As ToolStripItem In ToolStrip1.Items
+  '    If TypeOf item Is ToolStripComboBox Then
+  '      Dim cb = CType(item, ToolStripComboBox)
+  '      Dim r As New Rectangle(cb.ComboBox.Location.X - 1, cb.ComboBox.Location.Y - 1, cb.ComboBox.Size.Width + 1, cb.ComboBox.Size.Height + 1)
+  '      e.Graphics.DrawRectangle(Pens.Purple, r)
+  '    End If
+  '  Next
+  'End Sub
 
 End Class

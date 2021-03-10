@@ -9,32 +9,32 @@ Imports System.Drawing.Drawing2D
 Public Class PanelEx
   Inherits Panel
 
-  Private m_borderStyle As BorderStyle = BorderStyle.None
+  Private m_borderStyle As BorderStyle = BorderStyle.FixedSingle
   Private m_borderColor As Color = SystemColors.WindowFrame
   Private m_borderWidth As Integer = 1
 
   Public Sub New()
     MyBase.New()
-    SetDefaultControlStyles()
-    CustomInitialisation()
+    'SetDefaultControlStyles()
+    CustomInitialize()
   End Sub
 
-  Private Sub SetDefaultControlStyles()
-    SetStyle(ControlStyles.DoubleBuffer, True)
-    SetStyle(ControlStyles.AllPaintingInWmPaint, False)
-    SetStyle(ControlStyles.ResizeRedraw, True)
-    SetStyle(ControlStyles.UserPaint, True)
-    SetStyle(ControlStyles.SupportsTransparentBackColor, True)
-  End Sub
+  'Private Sub SetDefaultControlStyles()
+  '  SetStyle(ControlStyles.DoubleBuffer, True)
+  '  SetStyle(ControlStyles.AllPaintingInWmPaint, False)
+  '  SetStyle(ControlStyles.ResizeRedraw, True)
+  '  SetStyle(ControlStyles.UserPaint, True)
+  '  SetStyle(ControlStyles.SupportsTransparentBackColor, True)
+  'End Sub
 
-  Private Sub CustomInitialisation()
+  Private Sub CustomInitialize()
     SuspendLayout()
     MyBase.BackColor = Color.Transparent
-    BorderStyle = BorderStyle.None
+    BorderStyle = BorderStyle.FixedSingle
     ResumeLayout(False)
   End Sub
 
-  <DefaultValue(GetType(BorderStyle), "None"),
+  <DefaultValue(GetType(BorderStyle), "FixedSingle"),
    Category("Appearance"),
    Description("The border style used to paint the control.")>
   Public Shadows Property BorderStyle() As BorderStyle
@@ -56,7 +56,9 @@ Public Class PanelEx
     End Get
     Set(value As Color)
       m_borderColor = value
-      If DesignMode Then Invalidate()
+      'If DesignMode Then
+      Invalidate()
+      'End If
     End Set
   End Property
 
@@ -82,8 +84,7 @@ Public Class PanelEx
     Select Case Me.m_borderStyle
       Case BorderStyle.FixedSingle
         Using borderPen = New Pen(m_borderColor, m_borderWidth)
-          If m_borderStyle = BorderStyle.FixedSingle AndAlso
-             m_borderWidth > 1 Then
+          If m_borderWidth > 1 Then
             Dim path = New GraphicsPath
             Try
               Dim offset = If(m_borderStyle = BorderStyle.FixedSingle AndAlso
@@ -96,8 +97,7 @@ Public Class PanelEx
           Else
             'path.AddRectangle(ClientRectangle)
             Dim rect = ClientRectangle
-            rect.Width -= 1
-            rect.Height -= 1
+            rect.Width -= 1 : rect.Height -= 1
             e.Graphics.DrawRectangle(borderPen, rect)
           End If
         End Using
