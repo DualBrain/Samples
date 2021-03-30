@@ -13,6 +13,16 @@ Module Program
 
   Sub Main() 'args As String())
 
+    'Dim a = New ClassLibrary1.A() With {.A1 = 1} ', .B1 = 2}
+    'Dim b = New ClassLibrary1.B(1)
+    'Dim c = New ClassLibrary1.C(1, 2)
+
+    'Console.WriteLine($"A1:{a.A1}, B1:{a.B1}, C1:{a.C1}, ToString:'{a}'")
+    'Console.WriteLine($"A1:{b.A1}, ToString:'{b}'")
+    'Console.WriteLine($"A1:{c.A1}, B1:{c.B1}, ToString:'{c}'")
+
+    'Return
+
     'Console.WriteLine(QB.Development.STACK)
 
     '' https://github.com/dotnet/vblang/issues/530
