@@ -59,9 +59,9 @@ Partial Class Form1
     Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
     Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
     Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-    Me.TreeViewPanel = New WinFormsApp1.PanelEx()
-    Me.TreeView1 = New System.Windows.Forms.TreeView()
+    Me.TreeViewPanel = New ScrollBarEx.ScrollBarExPanel 'WinFormsApp1.PanelEx()
     Me.RightSidePanel = New WinFormsApp1.PanelEx()
+        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.ComboBoxEx1 = New WinFormsApp1.ComboBoxEx()
         Me.PanelEx1 = New WinFormsApp1.PanelEx()
         Me.RichTextBoxPanel = New WinFormsApp1.PanelEx()
@@ -73,7 +73,7 @@ Partial Class Form1
         Me.ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
         Me.ToolStripComboBox2 = New WinFormsApp1.ToolStripComboBoxEx()
         Me.ToolStripSeparator9 = New System.Windows.Forms.ToolStripSeparator()
-        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
+        Me.ListBox1 = New System.Windows.Forms.ListBox()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -357,27 +357,17 @@ Partial Class Form1
         Me.SplitContainer1.Size = New System.Drawing.Size(789, 404)
         Me.SplitContainer1.SplitterDistance = 262
         Me.SplitContainer1.TabIndex = 5
-        '
-        'TreeViewPanel
-        '
-        Me.TreeViewPanel.BackColor = System.Drawing.Color.Transparent
-        Me.TreeViewPanel.Controls.Add(Me.TreeView1)
-        Me.TreeViewPanel.Dock = System.Windows.Forms.DockStyle.Fill
+    '
+    'TreeViewPanel
+    '
+    Me.TreeViewPanel.BackColor = System.Drawing.Color.Transparent
+    Me.TreeViewPanel.Controls.Add(Me.ListBox1)
+    Me.TreeViewPanel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TreeViewPanel.Location = New System.Drawing.Point(0, 0)
         Me.TreeViewPanel.Name = "TreeViewPanel"
         Me.TreeViewPanel.Padding = New System.Windows.Forms.Padding(1)
         Me.TreeViewPanel.Size = New System.Drawing.Size(262, 404)
         Me.TreeViewPanel.TabIndex = 1
-        '
-        'TreeView1
-        '
-        Me.TreeView1.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.TreeView1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TreeView1.Location = New System.Drawing.Point(1, 1)
-        Me.TreeView1.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.TreeView1.Name = "TreeView1"
-        Me.TreeView1.Size = New System.Drawing.Size(260, 402)
-        Me.TreeView1.TabIndex = 0
         '
         'RightSidePanel
         '
@@ -394,6 +384,16 @@ Partial Class Form1
         Me.RightSidePanel.Name = "RightSidePanel"
         Me.RightSidePanel.Size = New System.Drawing.Size(523, 404)
         Me.RightSidePanel.TabIndex = 4
+        '
+        'CheckBox1
+        '
+        Me.CheckBox1.AutoSize = True
+        Me.CheckBox1.Location = New System.Drawing.Point(320, 224)
+        Me.CheckBox1.Name = "CheckBox1"
+        Me.CheckBox1.Size = New System.Drawing.Size(85, 19)
+        Me.CheckBox1.TabIndex = 5
+        Me.CheckBox1.Text = "CheckBox1"
+        Me.CheckBox1.UseVisualStyleBackColor = True
         '
         'ComboBoxEx1
         '
@@ -484,16 +484,17 @@ Partial Class Form1
         '
         Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
         Me.ToolStripSeparator9.Size = New System.Drawing.Size(6, 26)
-        '
-        'CheckBox1
-        '
-        Me.CheckBox1.AutoSize = True
-        Me.CheckBox1.Location = New System.Drawing.Point(320, 224)
-        Me.CheckBox1.Name = "CheckBox1"
-        Me.CheckBox1.Size = New System.Drawing.Size(85, 19)
-        Me.CheckBox1.TabIndex = 5
-        Me.CheckBox1.Text = "CheckBox1"
-        Me.CheckBox1.UseVisualStyleBackColor = True
+    '
+    'ListBox1
+    '
+    Me.ListBox1.Dock = DockStyle.Fill
+    Me.ListBox1.BorderStyle = BorderStyle.None
+    Me.ListBox1.FormattingEnabled = True
+        Me.ListBox1.ItemHeight = 15
+        Me.ListBox1.Location = New System.Drawing.Point(12, 16)
+        Me.ListBox1.Name = "ListBox1"
+        Me.ListBox1.Size = New System.Drawing.Size(235, 364)
+        Me.ListBox1.TabIndex = 0
         '
         'Form1
         '
@@ -560,22 +561,22 @@ Partial Class Form1
   Friend WithEvents toolStripSeparator5 As ToolStripSeparator
   Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
   Friend WithEvents SplitContainer1 As SplitContainer
-  Friend WithEvents TreeView1 As TreeView
-  Private WithEvents ToolStripStatusLabel1 As ToolStripStatusLabel
-  Private WithEvents StatusStrip1 As StatusStrip
-  Friend WithEvents ToolStrip1 As ToolStrip
-  Friend WithEvents RichTextBox2 As RichTextBox
-  Friend WithEvents TextBox1 As TextBox
-  Private WithEvents RichTextBoxPanel As PanelEx
-  Private WithEvents TreeViewPanel As PanelEx
+    Private WithEvents ToolStripStatusLabel1 As ToolStripStatusLabel
+    Private WithEvents StatusStrip1 As StatusStrip
+    Friend WithEvents ToolStrip1 As ToolStrip
+    Friend WithEvents RichTextBox2 As RichTextBox
+    Friend WithEvents TextBox1 As TextBox
+    Private WithEvents RichTextBoxPanel As PanelEx
+  Private WithEvents TreeViewPanel As ScrollBarEx.ScrollBarExPanel ' PanelEx
   Private WithEvents RightSidePanel As PanelEx
-  Private WithEvents PanelEx1 As PanelEx
-  Private WithEvents WebView As Microsoft.Web.WebView2.WinForms.WebView2
-  Friend WithEvents ToolStripComboBox1 As ToolStripComboBoxEx
-  Friend WithEvents ToolStripSeparator8 As ToolStripSeparator
-  Friend WithEvents ToolStripLabel1 As ToolStripLabel
-  Friend WithEvents ToolStripComboBox2 As ToolStripComboBoxEx
-  Friend WithEvents ToolStripSeparator9 As ToolStripSeparator
-  Friend WithEvents ComboBoxEx1 As ComboBoxEx
+    Private WithEvents PanelEx1 As PanelEx
+    Private WithEvents WebView As Microsoft.Web.WebView2.WinForms.WebView2
+    Friend WithEvents ToolStripComboBox1 As ToolStripComboBoxEx
+    Friend WithEvents ToolStripSeparator8 As ToolStripSeparator
+    Friend WithEvents ToolStripLabel1 As ToolStripLabel
+    Friend WithEvents ToolStripComboBox2 As ToolStripComboBoxEx
+    Friend WithEvents ToolStripSeparator9 As ToolStripSeparator
+    Friend WithEvents ComboBoxEx1 As ComboBoxEx
     Friend WithEvents CheckBox1 As CheckBox
+    Friend WithEvents ListBox1 As ListBox
 End Class

@@ -4,15 +4,42 @@ Public Class Form1
 
   Private m_enableDarkMode As Boolean = False
 
+  'Friend WithEvents UserControl11 As ScrollBarEx.ScrollBarExPanel
+  'Friend WithEvents UserControl12 As ScrollBarEx.ScrollBarExPanel
+
+  Sub New()
+
+    ' This call is required by the designer.
+    InitializeComponent()
+
+    ' Add any initialization after the InitializeComponent() call.
+
+    'ResumeLayout(False)
+    'Controls.Remove(ListBox1)
+    'UserControl11 = New ScrollBarEx.ScrollBarExPanel(ListBox1)
+    ''UserControl12 = New ScrollBarEx.ScrollBarExPanel(TreeView1)
+    'UserControl11.TabIndex = 0
+    ''UserControl12.TabIndex = 1
+    'Controls.Add(UserControl11)
+    'UserControl11.BackColor = Color.Pink
+    ''Controls.Add(UserControl12)
+    'ResumeLayout(True)
+    'PerformLayout()
+
+  End Sub
+
   Private Async Sub Me_Load(sender As Object, e As EventArgs) Handles Me.Load
 
     ToolStripStatusLabel1.Text = "Saying some status..."
-    Dim nd = TreeView1.Nodes.Add("Main1")
-    nd.Nodes.Add("Sub1")
-    nd.Nodes.Add("Sub2")
-    nd = TreeView1.Nodes.Add("Main2")
-    nd.Nodes.Add("Sub3")
-    nd.Nodes.Add("Sub4")
+    'Dim nd = TreeView1.Nodes.Add("Main1")
+    'nd.Nodes.Add("Sub1")
+    'nd.Nodes.Add("Sub2")
+    'nd = TreeView1.Nodes.Add("Main2")
+    'nd.Nodes.Add("Sub3")
+    'nd.Nodes.Add("Sub4")
+    For index = 1 To 50
+      ListBox1.Items.Add(index)
+    Next
 
     DarkMode.ToggleImmersiveDarkMode(CType(Controls(0).Parent, Form).Handle, True)
 
@@ -120,7 +147,15 @@ Public Class Form1
         btn.BackColor = SystemColors.Control
         btn.ForeColor = SystemColors.ControlText
 
+      ElseIf TypeOf c Is ListBox Then
+        Dim lb = CType(c, ListBox)
+        lb.BackColor = SystemColors.Control
+        lb.ForeColor = SystemColors.ControlText
+
       ElseIf TypeOf c Is Microsoft.Web.WebView2.WinForms.WebView2 Then
+        ' do nothing...
+
+      ElseIf TypeOf c Is ScrollBarEx.VScrollBarEx Then
         ' do nothing...
 
       Else
@@ -222,7 +257,15 @@ Public Class Form1
         btn.BackColor = Color.FromArgb(60, 60, 60)
         btn.ForeColor = Color.Silver
 
+      ElseIf TypeOf c Is ListBox Then
+        Dim lb = CType(c, ListBox)
+        lb.BackColor = Color.FromArgb(60, 60, 60)
+        lb.ForeColor = Color.Silver
+
       ElseIf TypeOf c Is Microsoft.Web.WebView2.WinForms.WebView2 Then
+        ' do nothing...
+
+      ElseIf TypeOf c Is ScrollBarEx.VScrollBarEx Then
         ' do nothing...
 
       Else
