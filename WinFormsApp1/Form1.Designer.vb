@@ -59,20 +59,19 @@ Partial Class Form1
     Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
     Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
     Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-    Me.TreeViewPanel = New ScrollBarEx.ScrollBarExPanel 'WinFormsApp1.PanelEx()
-    Me.RightSidePanel = New WinFormsApp1.PanelEx()
-        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
-        Me.ComboBoxEx1 = New WinFormsApp1.ComboBoxEx()
-        Me.PanelEx1 = New WinFormsApp1.PanelEx()
-        Me.RichTextBoxPanel = New WinFormsApp1.PanelEx()
-        Me.RichTextBox2 = New System.Windows.Forms.RichTextBox()
+    Me.RightSidePanel = New Community.Windows.FormsEx.PanelEx()
+    Me.CheckBox1 = New System.Windows.Forms.CheckBox()
+    Me.ComboBoxEx1 = New Community.Windows.FormsEx.ComboBoxEx()
+    Me.PanelEx1 = New Community.Windows.FormsEx.PanelEx()
+    Me.RichTextBoxPanel = New Community.Windows.FormsEx.PanelEx()
+    Me.RichTextBox2 = New System.Windows.Forms.RichTextBox()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.ToolStripComboBox1 = New WinFormsApp1.ToolStripComboBoxEx()
-        Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
+    Me.ToolStripComboBox1 = New Community.Windows.FormsEx.ToolStripComboBoxEx()
+    Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
-        Me.ToolStripComboBox2 = New WinFormsApp1.ToolStripComboBoxEx()
-        Me.ToolStripSeparator9 = New System.Windows.Forms.ToolStripSeparator()
+    Me.ToolStripComboBox2 = New Community.Windows.FormsEx.ToolStripComboBoxEx()
+    Me.ToolStripSeparator9 = New System.Windows.Forms.ToolStripSeparator()
         Me.ListBox1 = New System.Windows.Forms.ListBox()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -80,9 +79,8 @@ Partial Class Form1
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
-        Me.TreeViewPanel.SuspendLayout()
-        Me.RightSidePanel.SuspendLayout()
-        Me.PanelEx1.SuspendLayout()
+    Me.RightSidePanel.SuspendLayout()
+    Me.PanelEx1.SuspendLayout()
         Me.RichTextBoxPanel.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -346,32 +344,21 @@ Partial Class Form1
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.SplitContainer1.Location = New System.Drawing.Point(0, 50)
         Me.SplitContainer1.Name = "SplitContainer1"
-        '
-        'SplitContainer1.Panel1
-        '
-        Me.SplitContainer1.Panel1.Controls.Add(Me.TreeViewPanel)
-        '
-        'SplitContainer1.Panel2
-        '
-        Me.SplitContainer1.Panel2.Controls.Add(Me.RightSidePanel)
+    '
+    'SplitContainer1.Panel1
+    '
+    Me.SplitContainer1.Panel1.Controls.Add(Me.ListBox1)
+    '
+    'SplitContainer1.Panel2
+    '
+    Me.SplitContainer1.Panel2.Controls.Add(Me.RightSidePanel)
         Me.SplitContainer1.Size = New System.Drawing.Size(789, 404)
         Me.SplitContainer1.SplitterDistance = 262
         Me.SplitContainer1.TabIndex = 5
     '
-    'TreeViewPanel
+    'RightSidePanel
     '
-    Me.TreeViewPanel.BackColor = System.Drawing.Color.Transparent
-    Me.TreeViewPanel.Controls.Add(Me.ListBox1)
-    Me.TreeViewPanel.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TreeViewPanel.Location = New System.Drawing.Point(0, 0)
-        Me.TreeViewPanel.Name = "TreeViewPanel"
-        Me.TreeViewPanel.Padding = New System.Windows.Forms.Padding(1)
-        Me.TreeViewPanel.Size = New System.Drawing.Size(262, 404)
-        Me.TreeViewPanel.TabIndex = 1
-        '
-        'RightSidePanel
-        '
-        Me.RightSidePanel.BackColor = System.Drawing.Color.Transparent
+    Me.RightSidePanel.BackColor = System.Drawing.Color.Transparent
         Me.RightSidePanel.Controls.Add(Me.CheckBox1)
         Me.RightSidePanel.Controls.Add(Me.ComboBoxEx1)
         Me.RightSidePanel.Controls.Add(Me.PanelEx1)
@@ -383,11 +370,12 @@ Partial Class Form1
         Me.RightSidePanel.Location = New System.Drawing.Point(0, 0)
         Me.RightSidePanel.Name = "RightSidePanel"
         Me.RightSidePanel.Size = New System.Drawing.Size(523, 404)
-        Me.RightSidePanel.TabIndex = 4
-        '
-        'CheckBox1
-        '
-        Me.CheckBox1.AutoSize = True
+    Me.RightSidePanel.TabIndex = 4
+    Me.RightSidePanel.VScrollBarVisible = False
+    '
+    'CheckBox1
+    '
+    Me.CheckBox1.AutoSize = True
         Me.CheckBox1.Location = New System.Drawing.Point(320, 224)
         Me.CheckBox1.Name = "CheckBox1"
         Me.CheckBox1.Size = New System.Drawing.Size(85, 19)
@@ -398,8 +386,8 @@ Partial Class Form1
         'ComboBoxEx1
         '
         Me.ComboBoxEx1.BorderColor = System.Drawing.Color.SteelBlue
-        Me.ComboBoxEx1.BorderDrawMode = WinFormsApp1.ComboBoxEx.ControlBorderDrawMode.Full
-        Me.ComboBoxEx1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+    Me.ComboBoxEx1.BorderDrawMode = Community.Windows.FormsEx.ComboBoxEx.ControlBorderDrawMode.Full
+    Me.ComboBoxEx1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ComboBoxEx1.FormattingEnabled = True
         Me.ComboBoxEx1.Location = New System.Drawing.Point(192, 224)
         Me.ComboBoxEx1.Name = "ComboBoxEx1"
@@ -417,11 +405,12 @@ Partial Class Form1
         Me.PanelEx1.Name = "PanelEx1"
         Me.PanelEx1.Padding = New System.Windows.Forms.Padding(1)
         Me.PanelEx1.Size = New System.Drawing.Size(517, 184)
-        Me.PanelEx1.TabIndex = 3
-        '
-        'RichTextBoxPanel
-        '
-        Me.RichTextBoxPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+    Me.PanelEx1.TabIndex = 3
+    Me.PanelEx1.VScrollBarVisible = False
+    '
+    'RichTextBoxPanel
+    '
+    Me.RichTextBoxPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.RichTextBoxPanel.BackColor = System.Drawing.Color.Transparent
         Me.RichTextBoxPanel.Controls.Add(Me.RichTextBox2)
@@ -429,11 +418,12 @@ Partial Class Form1
         Me.RichTextBoxPanel.Name = "RichTextBoxPanel"
         Me.RichTextBoxPanel.Padding = New System.Windows.Forms.Padding(1)
         Me.RichTextBoxPanel.Size = New System.Drawing.Size(517, 147)
-        Me.RichTextBoxPanel.TabIndex = 1
-        '
-        'RichTextBox2
-        '
-        Me.RichTextBox2.BorderStyle = System.Windows.Forms.BorderStyle.None
+    Me.RichTextBoxPanel.TabIndex = 1
+    Me.RichTextBoxPanel.VScrollBarVisible = True
+    '
+    'RichTextBox2
+    '
+    Me.RichTextBox2.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.RichTextBox2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.RichTextBox2.Location = New System.Drawing.Point(1, 1)
         Me.RichTextBox2.Name = "RichTextBox2"
@@ -517,9 +507,8 @@ Partial Class Form1
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
-        Me.TreeViewPanel.ResumeLayout(False)
-        Me.RightSidePanel.ResumeLayout(False)
-        Me.RightSidePanel.PerformLayout()
+    Me.RightSidePanel.ResumeLayout(False)
+    Me.RightSidePanel.PerformLayout()
         Me.PanelEx1.ResumeLayout(False)
         Me.RichTextBoxPanel.ResumeLayout(False)
         Me.ToolStrip1.ResumeLayout(False)
@@ -566,17 +555,16 @@ Partial Class Form1
     Friend WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents RichTextBox2 As RichTextBox
     Friend WithEvents TextBox1 As TextBox
-    Private WithEvents RichTextBoxPanel As PanelEx
-  Private WithEvents TreeViewPanel As ScrollBarEx.ScrollBarExPanel ' PanelEx
-  Private WithEvents RightSidePanel As PanelEx
-    Private WithEvents PanelEx1 As PanelEx
-    Private WithEvents WebView As Microsoft.Web.WebView2.WinForms.WebView2
-    Friend WithEvents ToolStripComboBox1 As ToolStripComboBoxEx
-    Friend WithEvents ToolStripSeparator8 As ToolStripSeparator
+  Private WithEvents RichTextBoxPanel As Community.Windows.FormsEx.PanelEx
+  Private WithEvents RightSidePanel As Community.Windows.FormsEx.PanelEx
+  Private WithEvents PanelEx1 As Community.Windows.FormsEx.PanelEx
+  Private WithEvents WebView As Microsoft.Web.WebView2.WinForms.WebView2
+  Friend WithEvents ToolStripComboBox1 As Community.Windows.FormsEx.ToolStripComboBoxEx
+  Friend WithEvents ToolStripSeparator8 As ToolStripSeparator
     Friend WithEvents ToolStripLabel1 As ToolStripLabel
-    Friend WithEvents ToolStripComboBox2 As ToolStripComboBoxEx
-    Friend WithEvents ToolStripSeparator9 As ToolStripSeparator
-    Friend WithEvents ComboBoxEx1 As ComboBoxEx
-    Friend WithEvents CheckBox1 As CheckBox
+  Friend WithEvents ToolStripComboBox2 As Community.Windows.FormsEx.ToolStripComboBoxEx
+  Friend WithEvents ToolStripSeparator9 As ToolStripSeparator
+  Friend WithEvents ComboBoxEx1 As Community.Windows.FormsEx.ComboBoxEx
+  Friend WithEvents CheckBox1 As CheckBox
     Friend WithEvents ListBox1 As ListBox
 End Class

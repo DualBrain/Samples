@@ -2,13 +2,13 @@
 Option Strict On
 Option Infer On
 
-Namespace ScrollBarEx
+Namespace Global.Community.Windows.FormsEx
 
   ''' <summary>
   ''' Themed  color, could be in properties...
   ''' </summary>
   ''' <remarks></remarks>
-  Class DarkMode
+  Friend Class ScrollBarDarkMode
     Public Shared ReadOnly Background As Color = Color.FromArgb(50, 50, 50)
     Public Shared ReadOnly Border As Color = Color.FromArgb(50, 50, 50)
     Public Shared ReadOnly Thumb As Color = Color.FromArgb(120, 120, 120)

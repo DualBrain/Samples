@@ -1,6 +1,6 @@
-﻿Namespace ScrollBarEx
+﻿Namespace Global.Community.Windows.FormsEx
 
-  Partial Class ScrollBarExPanel
+  Partial Class ScrollBarExPanel_Remove
     Inherits System.Windows.Forms.Panel
 
     <System.Diagnostics.DebuggerNonUserCode()>
@@ -46,7 +46,7 @@
 
       components = New System.ComponentModel.Container()
 
-      Me.VScrollBar1 = New ScrollBarEx.VScrollBarEx
+      Me.VScrollBar1 = New VScrollBarEx
       Me.SuspendLayout()
       '
       'VScrollBar1
@@ -73,7 +73,7 @@
 
     End Sub
 
-    Friend WithEvents VScrollBar1 As ScrollBarEx.VScrollBarEx
+    Friend WithEvents VScrollBar1 As VScrollBarEx
 
   End Class
 

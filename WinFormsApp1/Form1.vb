@@ -1,4 +1,5 @@
 ﻿Imports Microsoft.Web.WebView2.Core
+Imports Community.Windows.FormsEx
 
 Public Class Form1
 
@@ -7,6 +8,8 @@ Public Class Form1
   'Friend WithEvents UserControl11 As ScrollBarEx.ScrollBarExPanel
   'Friend WithEvents UserControl12 As ScrollBarEx.ScrollBarExPanel
 
+  Friend WithEvents PanelEx2 As PanelEx
+
   Sub New()
 
     ' This call is required by the designer.
@@ -14,17 +17,14 @@ Public Class Form1
 
     ' Add any initialization after the InitializeComponent() call.
 
-    'ResumeLayout(False)
-    'Controls.Remove(ListBox1)
-    'UserControl11 = New ScrollBarEx.ScrollBarExPanel(ListBox1)
-    ''UserControl12 = New ScrollBarEx.ScrollBarExPanel(TreeView1)
-    'UserControl11.TabIndex = 0
-    ''UserControl12.TabIndex = 1
-    'Controls.Add(UserControl11)
-    'UserControl11.BackColor = Color.Pink
-    ''Controls.Add(UserControl12)
-    'ResumeLayout(True)
-    'PerformLayout()
+    ResumeLayout(False)
+    Controls.Remove(ListBox1)
+    PanelEx2 = New PanelEx(ListBox1)
+    PanelEx2.TabIndex = 0
+    Controls.Add(PanelEx2)
+    PanelEx2.BackColor = Color.Pink
+    ResumeLayout(True)
+    PerformLayout()
 
   End Sub
 
@@ -155,7 +155,7 @@ Public Class Form1
       ElseIf TypeOf c Is Microsoft.Web.WebView2.WinForms.WebView2 Then
         ' do nothing...
 
-      ElseIf TypeOf c Is ScrollBarEx.VScrollBarEx Then
+      ElseIf TypeOf c Is VScrollBarEx Then
         ' do nothing...
 
       Else
@@ -265,7 +265,7 @@ Public Class Form1
       ElseIf TypeOf c Is Microsoft.Web.WebView2.WinForms.WebView2 Then
         ' do nothing...
 
-      ElseIf TypeOf c Is ScrollBarEx.VScrollBarEx Then
+      ElseIf TypeOf c Is VScrollBarEx Then
         ' do nothing...
 
       Else

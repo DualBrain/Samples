@@ -2,7 +2,7 @@
 Option Strict On
 Option Infer On
 
-Namespace ScrollBarEx
+Namespace Global.Community.Windows.FormsEx
 
   Public Class HScrollBarEx
     Inherits ScrollBar
@@ -114,17 +114,17 @@ Namespace ScrollBarEx
       End Get
     End Property
 
-    Protected Overloads Overrides ReadOnly Property SmallDecrementArrowDirection() As ArrowDirections
-      Get
-        Return ArrowDirections.Left
-      End Get
-    End Property
+    'Protected Friend Overloads Overrides ReadOnly Property SmallDecrementArrowDirection() As ArrowDirections
+    '  Get
+    '    Return ArrowDirections.Left
+    '  End Get
+    'End Property
 
-    Protected Overloads Overrides ReadOnly Property SmallIncrementArrowDirection() As ArrowDirections
-      Get
-        Return ArrowDirections.Right
-      End Get
-    End Property
+    'Protected Friend Overloads Overrides ReadOnly Property SmallIncrementArrowDirection() As ArrowDirections
+    '  Get
+    '    Return ArrowDirections.Right
+    '  End Get
+    'End Property
 
     Protected Overloads Overrides ReadOnly Property PixelDomain() As Integer
       Get

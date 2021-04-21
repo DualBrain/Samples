@@ -2,11 +2,13 @@
 Option Strict On
 Option Infer On
 
-Namespace ScrollBarEx
+Namespace Global.Community.Windows.FormsEx
 
-  Public Class ScrollBarExPanel
+  Public Class ScrollBarExPanel_Remove
 
     Private WithEvents ScrollableControl As Control = Nothing
+
+#Region "Interop"
 
     'Private Const WM_HSCROLL As Integer = 276
     Private Const WM_VSCROLL As Integer = 277
@@ -57,6 +59,8 @@ Namespace ScrollBarEx
       Public nPos As Integer
       Public nTrackPos As Integer
     End Structure
+
+#End Region
 
     ''' <summary>
     ''' Coded manually lets you to use this New(control)
@@ -125,7 +129,6 @@ Namespace ScrollBarEx
       If Controls.Count = 1 Then Exit Sub
       If Not IsNothing(ScrollableControl) Then Exit Sub
       ScrollableControl = e.Control
-
     End Sub
 
     ''' <summary>
@@ -134,7 +137,7 @@ Namespace ScrollBarEx
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks></remarks>
-    Private Sub Win_Resize(sender As Object, e As EventArgs) Handles ScrollableControl.Resize
+    Private Sub ScrollableControl_Resize(sender As Object, e As EventArgs) Handles ScrollableControl.Resize
       VScrollBar1.Size = New Size(18, ScrollableControl.Height)
       Size = New Size(ScrollableControl.Width, ScrollableControl.Height)
       VScrollBar1.Left = ScrollableControl.Right - 18

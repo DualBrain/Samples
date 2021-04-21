@@ -2,7 +2,7 @@
 Option Strict On
 Option Infer On
 
-Namespace ScrollBarEx
+Namespace Global.Community.Windows.FormsEx
 
   ''' <summary>
   ''' CustomControl give the guide and the base for VScroll
@@ -40,8 +40,8 @@ Namespace ScrollBarEx
     Protected MustOverride ReadOnly Property ThumbBarRectangle() As Rectangle
     Protected MustOverride ReadOnly Property LargeIncrementRectangle() As Rectangle
     Protected MustOverride ReadOnly Property SmallIncrementRectangle() As Rectangle
-    Protected MustOverride ReadOnly Property SmallDecrementArrowDirection() As ArrowDirections
-    Protected MustOverride ReadOnly Property SmallIncrementArrowDirection() As ArrowDirections
+    'Protected Friend MustOverride ReadOnly Property SmallDecrementArrowDirection() As ArrowDirections
+    'Protected Friend MustOverride ReadOnly Property SmallIncrementArrowDirection() As ArrowDirections
     Protected MustOverride ReadOnly Property PixelDomain() As Integer
 
     Public Property Minimum() As Integer
@@ -143,7 +143,7 @@ Namespace ScrollBarEx
     Protected Overloads Overrides Sub OnPaint(e As PaintEventArgs)
       MyBase.OnPaint(e)
       ' Background
-      Using brush = New SolidBrush(DarkMode.Background)
+      Using brush = New SolidBrush(ScrollBarDarkMode.Background)
         e.Graphics.FillRectangle(brush, ClientRectangle)
       End Using
       ' Border
@@ -154,7 +154,7 @@ Namespace ScrollBarEx
       DrawArrow(e.Graphics, SmallIncrementRectangle, ArrowDirections.Down)
       ' Thumb
       If _thumbvisible Then
-        Using brush = New SolidBrush(DarkMode.Thumb)
+        Using brush = New SolidBrush(ScrollBarDarkMode.Thumb)
           Dim r = ThumbRectangle
           r.Inflate(-2, -2) ' Actually... deflating.
           e.Graphics.FillRectangle(brush, r)
@@ -166,12 +166,12 @@ Namespace ScrollBarEx
       Dim w = r.Width
       Dim h = r.Height
       If w <= 0 OrElse h <= 0 Then Return
-      Using brush = New SolidBrush(DarkMode.Background)
+      Using brush = New SolidBrush(ScrollBarDarkMode.Background)
         g.FillRectangle(brush, r)
       End Using
       Select Case dir
         Case ArrowDirections.Up
-          Using brush = New SolidBrush(DarkMode.Thumb)
+          Using brush = New SolidBrush(ScrollBarDarkMode.Thumb)
             Using pen = New Pen(brush)
               Dim cx = r.Left + (w \ 2)
               Dim cy = r.Top + (h \ 2)
@@ -183,7 +183,7 @@ Namespace ScrollBarEx
             End Using
           End Using
         Case ArrowDirections.Down
-          Using brush = New SolidBrush(DarkMode.Thumb)
+          Using brush = New SolidBrush(ScrollBarDarkMode.Thumb)
             Using pen = New Pen(brush)
               Dim cx = r.Left + (w \ 2)
               Dim cy = r.Top + (h \ 2)
@@ -203,7 +203,7 @@ Namespace ScrollBarEx
     End Sub
 
     Private Shared Sub DrawBorder(g As Graphics, r As Rectangle)
-      Using pen = New Pen(DarkMode.Border)
+      Using pen = New Pen(ScrollBarDarkMode.Border)
         g.DrawLine(pen, r.X, r.Y, r.Right - 1, r.Y)
         g.DrawLine(pen, r.X, r.Y + 1, r.Right - 1, r.Y + 1)
         g.DrawLine(pen, r.X, r.Y, r.X, r.Bottom - 1)

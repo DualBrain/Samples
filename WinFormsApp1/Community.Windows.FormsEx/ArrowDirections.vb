@@ -2,9 +2,9 @@
 Option Strict On
 Option Infer On
 
-Namespace ScrollBarEx
+Namespace Global.Community.Windows.FormsEx
 
-  Public Enum ArrowDirections
+  Friend Enum ArrowDirections
     Left
     Up
     Right
