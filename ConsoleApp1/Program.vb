@@ -13,6 +13,10 @@ Module Program
 
   Sub Main() 'args As String())
 
+    ' tab+tab
+    'Dim l = New ArrayList
+    'l.BinarySearch(Nothing)
+
     Dim a = New ClassLibrary1.A() With {.A1 = 1}
     Dim b = New ClassLibrary1.B(1)
     Dim c = New ClassLibrary1.C(1, 2)
@@ -184,6 +188,14 @@ MustInherit Class C
 
   Public MustOverride Sub M()
 
+End Class
+
+Class D
+  Inherits C
+
+  Public Overrides Sub M()
+    Throw New NotImplementedException()
+  End Sub
 End Class
 
 'Class Test1

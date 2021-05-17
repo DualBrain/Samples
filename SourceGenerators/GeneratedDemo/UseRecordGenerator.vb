@@ -9,6 +9,7 @@ Public Class Person
   Public Property FirstName As String
   Public Property LastName As String
   Public Property Birth As Date
+  Public Property Test As string
 End Class
 
 <Record>

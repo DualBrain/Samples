@@ -18,6 +18,8 @@ Namespace Global.SourceGeneratorSamples
     Private Const ATTRIBUTE_TEXT As String = "
 Namespace Global.RecordGenerator
 
+  'This is a test...
+
   <AttributeUsage(AttributeTargets.Class, Inherited:=False, AllowMultiple:=False)>
   Friend NotInheritable Class RecordAttribute
     Inherits Attribute
@@ -108,6 +110,8 @@ Option Strict On
 Option Infer On
 
 Namespace Global.{namespaceName}
+
+'Test
 
   Partial Public Class {classSymbol.Name}
     Implements IEquatable(Of {classSymbol.Name})
