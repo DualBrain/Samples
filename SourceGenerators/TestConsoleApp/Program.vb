@@ -10,7 +10,7 @@ Imports Microsoft.CodeAnalysis
 Imports Microsoft.CodeAnalysis.VisualBasic
 Imports SourceGeneratorSamples
 
-Imports TestConsoleApp.PersonX.WithPositions
+'Imports TestConsoleApp.PersonX.WithPositions
 
 Module Program
 
@@ -23,21 +23,52 @@ Module Program
     'Console.ReadLine()
     'Return
 
+    '    Dim source = <![CDATA[
+    'Imports RecordGenerator
+
+    'Namespace Foo
+
+    '  <Record>
+    '  Public Class Person
+    '    Public ReadOnly Property FirstName As String
+    '    Public ReadOnly Property LastName As Integer
+    '    Public Overrides Function ToString() As String
+    '      Return "Yo!"
+    '    End Function
+    '  End Class
+
+    'End Namespace]]>.Value
+
     Dim source = <![CDATA[
-Imports RecordGenerator
+Imports ImplicitInterfaceGenerator
 
-Namespace Foo
+Public Interface IPerson
+  Property FirstName As String
+  Property LastName As String
+  Property Birth As Date
+  Sub WishHappyBirthday()
+  Function Age() As Integer
+End Interface
 
-  <Record>
-  Public Class Person
-    Public ReadOnly Property FirstName As String
-    Public ReadOnly Property LastName As Integer
-    Public Overrides Function ToString() As String
-      Return "Yo!"
-    End Function
-  End Class
+<Implicit>
+Public Class Boss
+  Implements IPerson
 
-End Namespace]]>.Value
+  Private m_firstName As String
+  Private m_lastName As String
+  Private m_birth As Date
+
+  Private Sub WishHappyBirthday()
+    ' Do something
+  End Sub
+
+  Private Function Age() As Integer
+    Return 1
+  End Function
+
+End Class
+
+]]>.Value
 
     Dim result = GetGeneratedOutput(source)
 
@@ -75,7 +106,8 @@ End Namespace]]>.Value
     '  Return (compilationDiagnostics, "")
     'End If
 
-    Dim generator1 As ISourceGenerator = New SourceGeneratorSamples.RecordGenerator
+    'Dim generator1 As ISourceGenerator = New SourceGeneratorSamples.RecordGenerator
+    Dim generator1 As ISourceGenerator = New SourceGeneratorSamples.ImplicitInterfaceGenerator
 
     Dim iaGenerator = {generator1}.ToImmutableArray
     'Dim iaGenerator = New ImmutableArray(Of ISourceGenerator) From {generator1}

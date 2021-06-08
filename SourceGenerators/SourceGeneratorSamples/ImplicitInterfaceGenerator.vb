@@ -12,14 +12,14 @@ Imports Microsoft.CodeAnalysis.VisualBasic.Syntax
 Namespace Global.SourceGeneratorSamples
 
   <Generator(LanguageNames.VisualBasic)>
-  Public Class RecordGenerator
+  Public Class ImplicitInterfaceGenerator
     Implements ISourceGenerator
 
     Private Const ATTRIBUTE_TEXT As String = "
-Namespace Global.RecordGenerator
+Namespace Global.ImplicitInterfaceGenerator
 
   <AttributeUsage(AttributeTargets.Class, Inherited:=False, AllowMultiple:=False)>
-  Friend NotInheritable Class RecordAttribute
+  Friend NotInheritable Class ImplicitAttribute
     Inherits Attribute
 
   End Class
@@ -33,10 +33,18 @@ End Namespace"
                                              End Function)
     End Sub
 
+    Private Class Prop
+      Public Property InterfaceName As String
+      Public Property Name As String
+      Public Property ReturnType As ITypeSymbol
+      Public Property Getter As Boolean
+      Public Property Setter As Boolean
+    End Class
+
     Public Sub Execute(context As GeneratorExecutionContext) Implements ISourceGenerator.Execute
 
       ' add the attribute text
-      context.AddSource("RecordAttribute", SourceText.From(ATTRIBUTE_TEXT, Encoding.UTF8))
+      context.AddSource("ImplicitAttribute", SourceText.From(ATTRIBUTE_TEXT, Encoding.UTF8))
 
       ' retrieve the populated receiver 
       If Not (TypeOf context.SyntaxReceiver Is SyntaxReceiver) Then Return
@@ -47,50 +55,167 @@ End Namespace"
       Dim options = context.Compilation.SyntaxTrees.First().Options
       Dim compilation = context.Compilation.AddSyntaxTrees(VisualBasicSyntaxTree.ParseText(SourceText.From(ATTRIBUTE_TEXT, Encoding.UTF8), CType(options, VisualBasicParseOptions)))
 
-      ' get the newly bound attribute, and INotifyPropertyChanged
-      Dim attributeSymbol = compilation.GetTypeByMetadataName("RecordGenerator.RecordAttribute")
+      ' For each Class...
+      '   If the Class has an Implements XXX
+      '     Find the Interface????
+      '     Determine Properties, Subs, Functions for the Interface.
+      '     Determine existing Private Member Definitions and Private Subs/Functions for Class
+      '     If Interface Property, Sub or Function not "manually" defined...
+      '       Create IXXX_Property, Sub or Function for Interface...
+      '       If similar member definition or private sub/function exists, add call in created property, sub or function.
 
-      ' loop over the candidate fields, and keep the ones that are actually annotated
-      Dim propertySymbols As New List(Of IPropertySymbol)
+      ' For now, attempting to "just create" the interface implementation
+      ' assuming everything exists, named properly and nothing is wrong
+      ' or duplicated.  We can then circle back to start validating one
+      ' way or the other.
 
-      For Each prop In receiver.CandidateProperties
-        Dim model = compilation.GetSemanticModel(prop.SyntaxTree)
-        Dim name = prop.Identifier.Text
-        Dim propertySymbol = TryCast(model.GetDeclaredSymbol(prop), IPropertySymbol)
-        If propertySymbol IsNot Nothing Then
-          For Each c In receiver.CandidateClasses
-            Dim className = c.Identifier.Text
-            If className = propertySymbol.ContainingType.Name Then
-              propertySymbols.Add(propertySymbol)
-              Exit For
-            End If
+      Dim sourceCode = ""
+
+      ' For each and every Implements that we find....
+      For Each i In receiver.CandidateImplements
+        ' Determine which class...
+        Dim interfaceName = DirectCast(i.Types(0), IdentifierNameSyntax).Identifier.Text
+        Dim className = CType(i.Parent, ClassBlockSyntax).ClassStatement.Identifier.Text
+        If receiver.CandidateClasses.Contains(CType(i.Parent, ClassBlockSyntax).ClassStatement) Then
+
+          sourceCode &= $"Partial Class {className}{vbCrLf}"
+          sourceCode &= $"{vbCrLf}"
+
+          Dim t = compilation.GetTypeByMetadataName(interfaceName)
+
+          ' First pass, farm all property getter and setters:
+
+          Dim props As New List(Of Prop)
+
+          For Each interfaceMember In t.GetMembers().OfType(Of IMethodSymbol)
+            Dim name = interfaceMember.Name
+            Select Case interfaceMember.MethodKind
+              Case MethodKind.PropertyGet
+                Dim existing = (From p In props Where p.InterfaceName = interfaceName AndAlso p.Name = name.Substring(4)).FirstOrDefault
+                If existing IsNot Nothing Then
+                  existing.Getter = True
+                  existing.ReturnType = interfaceMember.ReturnType
+                Else
+                  props.Add(New Prop With {.InterfaceName = interfaceName,
+                                                .Name = name.Substring(4),
+                                                .Getter = True,
+                                                .ReturnType = interfaceMember.ReturnType})
+                End If
+              Case MethodKind.PropertySet
+                Dim existing = (From p In props Where p.InterfaceName = interfaceName AndAlso p.Name = name.Substring(4)).FirstOrDefault
+                If existing IsNot Nothing Then
+                  existing.Setter = True
+                Else
+                  props.Add(New Prop With {.InterfaceName = interfaceName,
+                                                .Name = name.Substring(4),
+                                                .Setter = True,
+                                                .ReturnType = interfaceMember.ReturnType})
+                End If
+              Case Else
+            End Select
           Next
+
+          For Each entry In props
+            'TODO: Need to verify that the explicit version of this interface isn't already implemented.
+            sourceCode &= $"  Private{If(entry.Setter AndAlso entry.Getter, " ", If(entry.Getter, " ReadOnly ", " WriteOnly "))}Property {entry.InterfaceName}_{entry.Name} As {entry.ReturnType} Implements {entry.InterfaceName}.{entry.Name}{vbCrLf}"
+            If entry.Getter Then
+              sourceCode &= $"    Get{vbCrLf}"
+              'TODO: Currently assumes there is a public/friend/private member variable that exist with this name.
+              'TODO: This could also potentially map to an existing property.
+              sourceCode &= $"      Return m_{entry.Name(0).ToString().ToLower()}{entry.Name.Substring(1)}{vbCrLf}"
+              sourceCode &= $"    End Get{vbCrLf}"
+            End If
+            If entry.Setter Then
+              sourceCode &= $"    Set(value As {entry.ReturnType}){vbCrLf}"
+              'TODO: Currently assumes there is a public/friend/private member variable that exist with this name.
+              'TODO: This could also potentially map to an existing property.
+              sourceCode &= $"      m_{entry.Name(0).ToString().ToLower()}{entry.Name.Substring(1)} = value{vbCrLf}"
+              sourceCode &= $"    End Set{vbCrLf}"
+            End If
+            sourceCode &= $"  End Property{vbCrLf}"
+            sourceCode &= $"{vbCrLf}"
+          Next
+
+          ' Second pass, look for everything but properties...
+
+          For Each interfaceMember In t.GetMembers().OfType(Of IMethodSymbol)
+            Dim name = interfaceMember.Name
+            Select Case interfaceMember.MethodKind
+              Case MethodKind.PropertyGet
+              Case MethodKind.PropertySet
+              Case MethodKind.DeclareMethod, MethodKind.Ordinary
+                If interfaceMember.ReturnsVoid Then ' Sub
+                  'TODO: Need to verify that the explicit version of this interface isn't already implemented.
+                  sourceCode &= $"  Private Sub {interfaceName}_{interfaceMember.Name}() Implements {interfaceName}.{interfaceMember.Name}{vbCrLf}"
+                  'TODO: Currently assumes there is a public/friend/private sub that exist with this name.
+                  sourceCode &= $"    Call {interfaceMember.Name}(){vbCrLf}"
+                  sourceCode &= $"  End Sub{vbCrLf}"
+                  sourceCode &= $"{vbCrLf}"
+                Else ' Function
+                  'TODO: Need to verify that the explicit version of this interface isn't already implemented.
+                  sourceCode &= $"  Private Function {interfaceName}_{interfaceMember.Name}() As {interfaceMember.ReturnType} Implements {interfaceName}.{interfaceMember.Name}{vbCrLf}"
+                  'TODO: Currently assumes there is a public/friend/private function that exist with this name.
+                  sourceCode &= $"    Return {interfaceMember.Name}(){vbCrLf}"
+                  sourceCode &= $"  End Function{vbCrLf}"
+                  sourceCode &= $"{vbCrLf}"
+                End If
+              Case Else
+                ' Not sure what will hit here...
+                'TODO: Events?
+            End Select
+          Next
+
+          sourceCode &= $"End Class"
+
+          context.AddSource($"{className}_ImplicitInterface.vb", SourceText.From(sourceCode, Encoding.UTF8))
+
         End If
       Next
 
-      Dim methodSymbols As New List(Of IMethodSymbol)
+      '' get the newly bound attribute, and INotifyPropertyChanged
+      'Dim attributeSymbol = compilation.GetTypeByMetadataName("ImplicitInterfaceGenerator.ImplicitAttribute")
 
-      For Each method In receiver.CandidateMethods
-        Dim model = compilation.GetSemanticModel(method.SyntaxTree)
-        Dim name = method.Identifier.Text
-        Dim methodSymbol = TryCast(model.GetDeclaredSymbol(method), IMethodSymbol)
-        If methodSymbol IsNot Nothing Then
-          For Each c In receiver.CandidateClasses
-            Dim className = c.Identifier.Text
-            If className = methodSymbol.ContainingType.Name Then
-              methodSymbols.Add(methodSymbol)
-              Exit For
-            End If
-          Next
-        End If
-      Next
+      '' loop over the candidate fields, and keep the ones that are actually annotated
+      'Dim propertySymbols As New List(Of IPropertySymbol)
 
-      ' group the properties by class and generate the source
-      For Each entry In From p In propertySymbols Group p By Key = p.ContainingType.Name, Type = p.ContainingType Into Group ' propertySymbols.GroupBy(Function(f) f.ContainingType)
-        Dim methods = From p In methodSymbols Where p.ContainingType.Name = entry.Group(0).ContainingType.Name
-        Dim classSource = ProcessClass(entry.Type, entry.Group.ToList(), methods.ToList())
-        context.AddSource($"{entry.Key}_Record.vb", SourceText.From(classSource, Encoding.UTF8))
-      Next
+      'For Each prop In receiver.CandidateProperties
+      '  Dim model = compilation.GetSemanticModel(prop.SyntaxTree)
+      '  Dim name = prop.Identifier.Text
+      '  Dim propertySymbol = TryCast(model.GetDeclaredSymbol(prop), IPropertySymbol)
+      '  If propertySymbol IsNot Nothing Then
+      '    For Each c In receiver.CandidateClasses
+      '      Dim className = c.Identifier.Text
+      '      If className = propertySymbol.ContainingType.Name Then
+      '        propertySymbols.Add(propertySymbol)
+      '        Exit For
+      '      End If
+      '    Next
+      '  End If
+      'Next
+
+      'Dim methodSymbols As New List(Of IMethodSymbol)
+
+      'For Each method In receiver.CandidateMethods
+      '  Dim model = compilation.GetSemanticModel(method.SyntaxTree)
+      '  Dim name = method.Identifier.Text
+      '  Dim methodSymbol = TryCast(model.GetDeclaredSymbol(method), IMethodSymbol)
+      '  If methodSymbol IsNot Nothing Then
+      '    For Each c In receiver.CandidateClasses
+      '      Dim className = c.Identifier.Text
+      '      If className = methodSymbol.ContainingType.Name Then
+      '        methodSymbols.Add(methodSymbol)
+      '        Exit For
+      '      End If
+      '    Next
+      '  End If
+      'Next
+
+      '' group the properties by class and generate the source
+      'For Each entry In From p In propertySymbols Group p By Key = p.ContainingType.Name, Type = p.ContainingType Into Group ' propertySymbols.GroupBy(Function(f) f.ContainingType)
+      '  Dim methods = From p In methodSymbols Where p.ContainingType.Name = entry.Group(0).ContainingType.Name
+      '  Dim classSource = ProcessClass(entry.Type, entry.Group.ToList(), methods.ToList())
+      '  context.AddSource($"{entry.Key}_ImplicitInterface.vb", SourceText.From(classSource, Encoding.UTF8))
+      'Next
 
     End Sub
 
@@ -403,6 +528,7 @@ End Namespace")
       Public ReadOnly Property CandidateClasses As List(Of ClassStatementSyntax) = New List(Of ClassStatementSyntax)
       Public ReadOnly Property CandidateMethods As List(Of MethodStatementSyntax) = New List(Of MethodStatementSyntax)
       Public ReadOnly Property CandidateProperties As List(Of PropertyStatementSyntax) = New List(Of PropertyStatementSyntax)
+      Public ReadOnly Property CandidateImplements As List(Of ImplementsStatementSyntax) = New List(Of ImplementsStatementSyntax)
       ''' <summary>
       ''' Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation
       ''' </summary>
@@ -425,6 +551,10 @@ End Namespace")
               CandidateMethods.Add(node)
             End If
           End If
+        ElseIf TypeOf syntaxNode Is ImplementsStatementSyntax Then
+          ' Implements
+          Dim node = TryCast(syntaxNode, ImplementsStatementSyntax)
+          CandidateImplements.Add(node)
         End If
         'If TypeOf syntaxNode Is FieldDeclarationSyntax Then
         '  Dim fieldDeclarationSyntax = TryCast(syntaxNode, FieldDeclarationSyntax)
