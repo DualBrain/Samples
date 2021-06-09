@@ -58,7 +58,24 @@ Module Program
     Console.WriteLine()
     InlineIncrementTest()
 
+    Dim result1 = TestingOptional("abc")
+    Dim result2 = TestingOptional("xyz", result1)
+
   End Sub
+
+  Private Function TestingOptional(value1 As String, Optional value2 As Microsoft.CodeAnalysis.Optional(Of String) = Nothing) As String
+    If Not value2.HasValue Then
+      ' Do one thing...
+      Return value1
+    Else
+      ' Do another thing...
+      If value2.Value Is Nothing Then
+        Return value1
+      Else
+        Return value1 & value2.Value
+      End If
+    End If
+  End Function
 
   Public Sub InlineIncrementTest()
 
