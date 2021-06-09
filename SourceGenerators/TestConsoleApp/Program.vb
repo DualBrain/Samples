@@ -40,7 +40,6 @@ Module Program
     'End Namespace]]>.Value
 
     Dim source = <![CDATA[
-Imports ImplicitInterfaceGenerator
 
 Public Interface IPerson
   Property FirstName As String
@@ -50,20 +49,20 @@ Public Interface IPerson
   Function Age() As Integer
 End Interface
 
-<Implicit>
 Public Class Boss
   Implements IPerson
 
-  Private m_firstName As String
-  Private m_lastName As String
-  Private m_birth As Date
+  Private m_whatever, m_birth, m_death As Date
 
-  Private Sub WishHappyBirthday()
+  Public Property FirstName As String
+  Public Property LastName As String
+
+  Public Sub WishHappyBirthday()
     ' Do something
   End Sub
 
-  Private Function Age() As Integer
-    Return 1
+  Public Function Age() As Integer
+    Return m_birth.Year
   End Function
 
 End Class

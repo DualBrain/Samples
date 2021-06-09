@@ -15,16 +15,16 @@ Namespace Global.SourceGeneratorSamples
   Public Class ImplicitInterfaceGenerator
     Implements ISourceGenerator
 
-    Private Const ATTRIBUTE_TEXT As String = "
-Namespace Global.ImplicitInterfaceGenerator
+    '    Private Const ATTRIBUTE_TEXT As String = "
+    'Namespace Global.ImplicitInterfaceGenerator
 
-  <AttributeUsage(AttributeTargets.Class, Inherited:=False, AllowMultiple:=False)>
-  Friend NotInheritable Class ImplicitAttribute
-    Inherits Attribute
+    '  <AttributeUsage(AttributeTargets.Class, Inherited:=False, AllowMultiple:=False)>
+    '  Friend NotInheritable Class ImplicitAttribute
+    '    Inherits Attribute
 
-  End Class
+    '  End Class
 
-End Namespace"
+    'End Namespace"
 
     Public Sub Initialize(context As GeneratorInitializationContext) Implements ISourceGenerator.Initialize
       ' Register a syntax receiver that will be created for each generation pass
@@ -44,7 +44,7 @@ End Namespace"
     Public Sub Execute(context As GeneratorExecutionContext) Implements ISourceGenerator.Execute
 
       ' add the attribute text
-      context.AddSource("ImplicitAttribute", SourceText.From(ATTRIBUTE_TEXT, Encoding.UTF8))
+      'context.AddSource("ImplicitAttribute", SourceText.From(ATTRIBUTE_TEXT, Encoding.UTF8))
 
       ' retrieve the populated receiver 
       If Not (TypeOf context.SyntaxReceiver Is SyntaxReceiver) Then Return
@@ -53,7 +53,7 @@ End Namespace"
       ' we're going to create a new compilation that contains the attribute.
       ' TODO: we should allow source generators to provide source during initialize, so that this step isn't required.
       Dim options = context.Compilation.SyntaxTrees.First().Options
-      Dim compilation = context.Compilation.AddSyntaxTrees(VisualBasicSyntaxTree.ParseText(SourceText.From(ATTRIBUTE_TEXT, Encoding.UTF8), CType(options, VisualBasicParseOptions)))
+      Dim compilation = context.Compilation '.AddSyntaxTrees(VisualBasicSyntaxTree.ParseText(SourceText.From(ATTRIBUTE_TEXT, Encoding.UTF8), CType(options, VisualBasicParseOptions)))
 
       ' For each Class...
       '   If the Class has an Implements XXX
@@ -77,6 +77,8 @@ End Namespace"
         Dim interfaceName = DirectCast(i.Types(0), IdentifierNameSyntax).Identifier.Text
         Dim className = CType(i.Parent, ClassBlockSyntax).ClassStatement.Identifier.Text
         If receiver.CandidateClasses.Contains(CType(i.Parent, ClassBlockSyntax).ClassStatement) Then
+
+          Dim need = False
 
           sourceCode &= $"Partial Class {className}{vbCrLf}"
           sourceCode &= $"{vbCrLf}"
@@ -116,24 +118,87 @@ End Namespace"
           Next
 
           For Each entry In props
-            'TODO: Need to verify that the explicit version of this interface isn't already implemented.
-            sourceCode &= $"  Private{If(entry.Setter AndAlso entry.Getter, " ", If(entry.Getter, " ReadOnly ", " WriteOnly "))}Property {entry.InterfaceName}_{entry.Name} As {entry.ReturnType} Implements {entry.InterfaceName}.{entry.Name}{vbCrLf}"
-            If entry.Getter Then
-              sourceCode &= $"    Get{vbCrLf}"
-              'TODO: Currently assumes there is a public/friend/private member variable that exist with this name.
-              'TODO: This could also potentially map to an existing property.
-              sourceCode &= $"      Return m_{entry.Name(0).ToString().ToLower()}{entry.Name.Substring(1)}{vbCrLf}"
-              sourceCode &= $"    End Get{vbCrLf}"
+
+            'TODO: Need to handle nullable types.
+
+            ' Do we already have an implemented property for this interface?
+            ' If not, does the class have a property with the same name and return type that we can infer?
+            ' If not, does the class have a field with a "similar" name and type?
+
+            Dim found = False
+            Dim skip = False
+
+            Dim what As String = Nothing '= $"m_{entry.Name(0).ToString().ToLower()}{entry.Name.Substring(1)}"
+
+            'TODO: Need to handle...
+            ' Public Property IInterface_Name() As String Implements IInterface.Name
+            ' Need to review all of the properties for any matching interface match regardless
+            ' of method name to handle collision scenarios in implementing interfaces.
+            ' If found, skip.
+            For Each prop In receiver.CandidateProperties
+              ' Determine which class...
+              Dim findClassName = CType(prop.Parent, ClassBlockSyntax).ClassStatement.Identifier.Text
+              If className = findClassName Then
+                Dim propertyName = prop.Identifier.Text
+                If propertyName = entry.Name Then
+                  ' Just a "regular property" or "property that implements target interface"
+                  found = True
+                  what = $"{propertyName}"
+                  Dim imp = prop.ImplementsClause
+                  If imp IsNot Nothing Then
+                    For Each impMember In imp.InterfaceMembers
+                      Dim nm = impMember.ToString
+                      If nm = $"{entry.InterfaceName}.{entry.Name}" Then
+                        skip = True
+                        Exit For
+                      End If
+                    Next
+                  End If
+                  If found Then Exit For
+                End If
+              End If
+            Next
+
+            If Not found Then
+              For Each field In receiver.CandidateFields
+                ' Determine which class...
+                Dim findClassName = CType(field.Parent, ClassBlockSyntax).ClassStatement.Identifier.Text
+                If className = findClassName Then
+                  'TODO: Need to determine variable type matches target...
+                  For Each decl In field.Declarators
+                    For Each identifier In decl.Names
+                      Dim fieldName = identifier.Identifier.Text
+                      If fieldName = $"m_{ToCamelCase(entry.Name)}" OrElse
+                         fieldName = $"_{ToCamelCase(entry.Name)}" Then
+                        found = True
+                        what = $"{fieldName}"
+                        Exit For
+                      End If
+                    Next
+                    If found Then Exit For
+                  Next
+                  If found Then Exit For
+                End If
+              Next
             End If
-            If entry.Setter Then
-              sourceCode &= $"    Set(value As {entry.ReturnType}){vbCrLf}"
-              'TODO: Currently assumes there is a public/friend/private member variable that exist with this name.
-              'TODO: This could also potentially map to an existing property.
-              sourceCode &= $"      m_{entry.Name(0).ToString().ToLower()}{entry.Name.Substring(1)} = value{vbCrLf}"
-              sourceCode &= $"    End Set{vbCrLf}"
+
+            If found AndAlso Not skip AndAlso Not String.IsNullOrWhiteSpace(what) Then
+              sourceCode &= $"  Private{If(entry.Setter AndAlso entry.Getter, " ", If(entry.Getter, " ReadOnly ", " WriteOnly "))}Property {entry.InterfaceName}_{entry.Name} As {entry.ReturnType} Implements {entry.InterfaceName}.{entry.Name}{vbCrLf}"
+              If entry.Getter Then
+                sourceCode &= $"    Get{vbCrLf}"
+                sourceCode &= $"      Return {what}{vbCrLf}"
+                sourceCode &= $"    End Get{vbCrLf}"
+              End If
+              If entry.Setter Then
+                sourceCode &= $"    Set(value As {entry.ReturnType}){vbCrLf}"
+                sourceCode &= $"      {what} = value{vbCrLf}"
+                sourceCode &= $"    End Set{vbCrLf}"
+              End If
+              sourceCode &= $"  End Property{vbCrLf}"
+              sourceCode &= $"{vbCrLf}"
+              need = True
             End If
-            sourceCode &= $"  End Property{vbCrLf}"
-            sourceCode &= $"{vbCrLf}"
+
           Next
 
           ' Second pass, look for everything but properties...
@@ -144,21 +209,52 @@ End Namespace"
               Case MethodKind.PropertyGet
               Case MethodKind.PropertySet
               Case MethodKind.DeclareMethod, MethodKind.Ordinary
-                If interfaceMember.ReturnsVoid Then ' Sub
-                  'TODO: Need to verify that the explicit version of this interface isn't already implemented.
-                  sourceCode &= $"  Private Sub {interfaceName}_{interfaceMember.Name}() Implements {interfaceName}.{interfaceMember.Name}{vbCrLf}"
-                  'TODO: Currently assumes there is a public/friend/private sub that exist with this name.
-                  sourceCode &= $"    Call {interfaceMember.Name}(){vbCrLf}"
-                  sourceCode &= $"  End Sub{vbCrLf}"
+
+                ' Do we already have an implemented subroutine for this interface?
+                ' If not, does the class have a subroutine that we can infer?
+
+                'TODO: Are there any parameters, if so... do they match?
+                'TODO: If a function, does the return type match?
+
+                Dim found = False
+                Dim skip = False
+                For Each method In receiver.CandidateMethods
+                  ' Determine which class...
+                  Dim findClassName = CType(method.Parent.Parent, ClassBlockSyntax).ClassStatement.Identifier.Text
+                  If className = findClassName Then
+                    Dim methodName = method.Identifier.Text
+                    If methodName = interfaceMember.Name Then
+                      ' Just a "regular method" or "method that implements a interface"
+                      found = True
+                      Dim imp = method.ImplementsClause
+                      If imp IsNot Nothing Then
+                        For Each impMember In imp.InterfaceMembers
+                          Dim nm = impMember.ToString
+                          If nm = $"{interfaceName}.{interfaceMember.Name}" Then
+                            skip = True
+                            Exit For
+                          End If
+                        Next
+                      End If
+                      If found Then Exit For
+                    End If
+                  End If
+                Next
+
+                If found AndAlso Not skip Then
+                  If interfaceMember.ReturnsVoid Then ' Sub
+                    sourceCode &= $"  Private Sub {interfaceName}_{interfaceMember.Name}() Implements {interfaceName}.{interfaceMember.Name}{vbCrLf}"
+                    sourceCode &= $"    Call {interfaceMember.Name}(){vbCrLf}"
+                    sourceCode &= $"  End Sub{vbCrLf}"
+                  Else ' Function
+                    sourceCode &= $"  Private Function {interfaceName}_{interfaceMember.Name}() As {interfaceMember.ReturnType} Implements {interfaceName}.{interfaceMember.Name}{vbCrLf}"
+                    sourceCode &= $"    Return {interfaceMember.Name}(){vbCrLf}"
+                    sourceCode &= $"  End Function{vbCrLf}"
+                  End If
                   sourceCode &= $"{vbCrLf}"
-                Else ' Function
-                  'TODO: Need to verify that the explicit version of this interface isn't already implemented.
-                  sourceCode &= $"  Private Function {interfaceName}_{interfaceMember.Name}() As {interfaceMember.ReturnType} Implements {interfaceName}.{interfaceMember.Name}{vbCrLf}"
-                  'TODO: Currently assumes there is a public/friend/private function that exist with this name.
-                  sourceCode &= $"    Return {interfaceMember.Name}(){vbCrLf}"
-                  sourceCode &= $"  End Function{vbCrLf}"
-                  sourceCode &= $"{vbCrLf}"
+                  need = True
                 End If
+
               Case Else
                 ' Not sure what will hit here...
                 'TODO: Events?
@@ -167,7 +263,9 @@ End Namespace"
 
           sourceCode &= $"End Class"
 
-          context.AddSource($"{className}_ImplicitInterface.vb", SourceText.From(sourceCode, Encoding.UTF8))
+          If need Then
+            context.AddSource($"{className}_ImplicitInterface.vb", SourceText.From(sourceCode, Encoding.UTF8))
+          End If
 
         End If
       Next
@@ -524,44 +622,45 @@ End Namespace")
     Class SyntaxReceiver
       Implements ISyntaxReceiver
 
-      'Public ReadOnly Property CandidateFields As List(Of FieldDeclarationSyntax) = New List(Of FieldDeclarationSyntax)
       Public ReadOnly Property CandidateClasses As List(Of ClassStatementSyntax) = New List(Of ClassStatementSyntax)
-      Public ReadOnly Property CandidateMethods As List(Of MethodStatementSyntax) = New List(Of MethodStatementSyntax)
-      Public ReadOnly Property CandidateProperties As List(Of PropertyStatementSyntax) = New List(Of PropertyStatementSyntax)
       Public ReadOnly Property CandidateImplements As List(Of ImplementsStatementSyntax) = New List(Of ImplementsStatementSyntax)
+
+      Public ReadOnly Property CandidateProperties As List(Of PropertyStatementSyntax) = New List(Of PropertyStatementSyntax)
+      Public ReadOnly Property CandidateFields As List(Of FieldDeclarationSyntax) = New List(Of FieldDeclarationSyntax)
+      Public ReadOnly Property CandidateMethods As List(Of MethodStatementSyntax) = New List(Of MethodStatementSyntax)
       ''' <summary>
       ''' Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation
       ''' </summary>
       Public Sub OnVisitSyntaxNode(syntaxNode As SyntaxNode) Implements ISyntaxReceiver.OnVisitSyntaxNode
-        ' any field with at least one attribute is a candidate for property generation
-        If TypeOf syntaxNode Is ClassStatementSyntax Then
-          Dim node = TryCast(syntaxNode, ClassStatementSyntax)
-          If node.AttributeLists.Count > 0 Then
-            CandidateClasses.Add(node)
+        If TypeOf syntaxNode Is ImplementsStatementSyntax Then
+          Dim node = TryCast(syntaxNode, ImplementsStatementSyntax)
+          Dim parent = TryCast(node.Parent.ChildNodes(0), ClassStatementSyntax)
+          If parent IsNot Nothing Then
+            If Not CandidateClasses.Contains(parent) Then
+              CandidateClasses.Add(parent)
+            End If
+            CandidateImplements.Add(node)
           End If
         ElseIf TypeOf syntaxNode Is PropertyStatementSyntax Then
           Dim node = TryCast(syntaxNode, PropertyStatementSyntax)
-          CandidateProperties.Add(node)
+          Dim parent = TryCast(node.Parent.ChildNodes(0), ClassStatementSyntax)
+          If parent IsNot Nothing AndAlso CandidateClasses.Contains(parent) Then
+            CandidateProperties.Add(node)
+          End If
+        ElseIf TypeOf syntaxNode Is FieldDeclarationSyntax Then
+          Dim node = TryCast(syntaxNode, FieldDeclarationSyntax)
+          Dim parent = TryCast(node.Parent.ChildNodes(0), ClassStatementSyntax)
+          If parent IsNot Nothing AndAlso CandidateClasses.Contains(parent) Then
+            CandidateFields.Add(node)
+          End If
         ElseIf TypeOf syntaxNode Is MethodStatementSyntax Then
           Dim node = TryCast(syntaxNode, MethodStatementSyntax)
           Dim parent = TryCast(node.Parent.Parent.ChildNodes(0), ClassStatementSyntax)
           If parent IsNot Nothing AndAlso CandidateClasses.Contains(parent) Then
             Dim name = node.Identifier.Text
-            If name = "ToString" Then
-              CandidateMethods.Add(node)
-            End If
+            CandidateMethods.Add(node)
           End If
-        ElseIf TypeOf syntaxNode Is ImplementsStatementSyntax Then
-          ' Implements
-          Dim node = TryCast(syntaxNode, ImplementsStatementSyntax)
-          CandidateImplements.Add(node)
         End If
-        'If TypeOf syntaxNode Is FieldDeclarationSyntax Then
-        '  Dim fieldDeclarationSyntax = TryCast(syntaxNode, FieldDeclarationSyntax)
-        '  If fieldDeclarationSyntax.AttributeLists.Count > 0 Then
-        '    CandidateFields.Add(fieldDeclarationSyntax)
-        '  End If
-        'End If
       End Sub
 
     End Class
