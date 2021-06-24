@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TestNuGetPackages</RootNamespace>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DualBrain.ImplicitInterfaceGenerator" Version="1.0.0-alpha2" />
+  </ItemGroup>
+
+</Project>

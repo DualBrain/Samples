@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ImplicitInterfaceGenerator\ImplicitInterfaceGenerator.vbproj" />
     <ProjectReference Include="..\SourceGeneratorSamples\SourceGeneratorSamples.vbproj" />
   </ItemGroup>  
   

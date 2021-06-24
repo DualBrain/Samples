@@ -9,7 +9,7 @@ Imports Microsoft.CodeAnalysis.Text
 Imports Microsoft.CodeAnalysis.VisualBasic
 Imports Microsoft.CodeAnalysis.VisualBasic.Syntax
 
-Namespace Global.SourceGeneratorSamples
+Namespace Global.DualBrain
 
   <Generator(LanguageNames.VisualBasic)>
   Public Class ImplicitInterfaceGenerator

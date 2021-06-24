@@ -49,9 +49,13 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BrowserFx", "WinForms\Brows
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WinFormBugs", "WinFormBugs", "{717A6900-9192-4DCA-A8DC-1353196E3657}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ReparentWinForms", "WinFormBugs\ReparentWinForms\ReparentWinForms.vbproj", "{168A7106-C5A9-448B-A5B1-DD030CA190ED}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "ReparentWinForms", "WinFormBugs\ReparentWinForms\ReparentWinForms.vbproj", "{168A7106-C5A9-448B-A5B1-DD030CA190ED}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ReparentWinformsFx", "WinFormBugs\ReparentWinformsFx\ReparentWinformsFx.vbproj", "{C5D3D87D-33F5-4A76-9CC7-77681A94D5A8}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ImplicitInterfaceGenerator", "SourceGenerators\ImplicitInterfaceGenerator\ImplicitInterfaceGenerator.vbproj", "{4CE17C0C-B164-4C54-971B-9EBEF4053808}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestNuGetPackages", "TestNuGetPackages\TestNuGetPackages.vbproj", "{700FDD12-E652-4372-AB1D-A3E281648B3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -143,6 +147,14 @@ Global
 		{C5D3D87D-33F5-4A76-9CC7-77681A94D5A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5D3D87D-33F5-4A76-9CC7-77681A94D5A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5D3D87D-33F5-4A76-9CC7-77681A94D5A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CE17C0C-B164-4C54-971B-9EBEF4053808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CE17C0C-B164-4C54-971B-9EBEF4053808}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CE17C0C-B164-4C54-971B-9EBEF4053808}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CE17C0C-B164-4C54-971B-9EBEF4053808}.Release|Any CPU.Build.0 = Release|Any CPU
+		{700FDD12-E652-4372-AB1D-A3E281648B3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{700FDD12-E652-4372-AB1D-A3E281648B3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{700FDD12-E652-4372-AB1D-A3E281648B3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{700FDD12-E652-4372-AB1D-A3E281648B3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -156,6 +168,7 @@ Global
 		{97BA9170-DFC9-42C3-B9C1-D1AAC4E3C34D} = {4FBCFB03-A5D0-4254-AC74-3555EBA1369D}
 		{168A7106-C5A9-448B-A5B1-DD030CA190ED} = {717A6900-9192-4DCA-A8DC-1353196E3657}
 		{C5D3D87D-33F5-4A76-9CC7-77681A94D5A8} = {717A6900-9192-4DCA-A8DC-1353196E3657}
+		{4CE17C0C-B164-4C54-971B-9EBEF4053808} = {22AEE70F-B724-4682-B5CD-40C03E903966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDAC410C-0901-447E-8121-BF33A670D583}

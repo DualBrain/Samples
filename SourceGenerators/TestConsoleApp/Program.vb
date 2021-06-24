@@ -8,7 +8,7 @@ Imports System.Reflection
 Imports System.Runtime.InteropServices
 Imports Microsoft.CodeAnalysis
 Imports Microsoft.CodeAnalysis.VisualBasic
-Imports SourceGeneratorSamples
+'Imports SourceGeneratorSamples
 
 'Imports TestConsoleApp.PersonX.WithPositions
 
@@ -119,7 +119,7 @@ End Namespace
     'End If
 
     'Dim generator1 As ISourceGenerator = New SourceGeneratorSamples.RecordGenerator
-    Dim generator1 As ISourceGenerator = New SourceGeneratorSamples.ImplicitInterfaceGenerator
+    Dim generator1 As ISourceGenerator = New DualBrain.ImplicitInterfaceGenerator
 
     Dim iaGenerator = {generator1}.ToImmutableArray
     'Dim iaGenerator = New ImmutableArray(Of ISourceGenerator) From {generator1}
