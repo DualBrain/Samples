@@ -41,6 +41,14 @@ Module Program
 
     Dim source = <![CDATA[
 
+Namespace TopOne.LevelTwo
+
+Public Interface IJob
+  Property Description As String
+  Property Pay As Currency
+  Sub WishHappyBirthday()
+End Interface
+
 Public Interface IPerson
   Property FirstName As String
   Property LastName As String
@@ -50,14 +58,17 @@ Public Interface IPerson
 End Interface
 
 Public Class Boss
-  Implements IPerson
+  Implements IPerson, IJob
 
-  Private m_whatever, m_birth, m_death As Date
+  Private m_birth As Date
 
-  Public Property FirstName As String
+  Public Property FirstName As String Implements IPerson.FirstName
   Public Property LastName As String
 
-  Public Sub WishHappyBirthday()
+  Public Property Description As String
+  Public Property Pay As Currency
+
+  Public Sub WishHappyBirthday() Implements IPerson.WishHappyBirthday
     ' Do something
   End Sub
 
@@ -66,6 +77,8 @@ Public Class Boss
   End Function
 
 End Class
+
+End Namespace
 
 ]]>.Value
 
@@ -88,7 +101,7 @@ End Class
 
     Dim syntaxTree = VisualBasicSyntaxTree.ParseText(source)
 
-    Dim references As List(Of MetadataReference) = New List(Of MetadataReference)
+    Dim references As New List(Of MetadataReference)
     Dim assemblies As Assembly() = AppDomain.CurrentDomain.GetAssemblies()
     For Each assembly As Assembly In assemblies
       If Not assembly.IsDynamic Then
