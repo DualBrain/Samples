@@ -7,7 +7,7 @@ Option Infer On
 Public Interface IPerson
   Property FirstName As String
   Property LastName As String
-  Property Birth As Date
+  'Property Birth As Date
 
   Sub WishHappyBirthday()
   Function Age() As Integer

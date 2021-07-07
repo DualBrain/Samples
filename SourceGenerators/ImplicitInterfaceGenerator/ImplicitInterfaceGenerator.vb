@@ -33,6 +33,7 @@ Namespace Global.DualBrain
       Public Property FullyQualifiedName As String
       Public Property InterfaceName As String
       Public Property Name As String
+      Public Property Parameters As Immutable.ImmutableArray(Of IParameterSymbol)
       Public Property ReturnType As ITypeSymbol
       Public Property Getter As Boolean
       Public Property Setter As Boolean
@@ -40,12 +41,10 @@ Namespace Global.DualBrain
 
     Public Sub Execute(context As GeneratorExecutionContext) Implements ISourceGenerator.Execute
 
-      ' retrieve the populated receiver 
       If TypeOf context.SyntaxReceiver IsNot SyntaxReceiver Then Return
       Dim receiver = TryCast(context.SyntaxReceiver, SyntaxReceiver)
       Dim compilation = context.Compilation
 
-      'TODO: Need to handle parameter matching for methods and possibly properties/events.
       'TODO: Need to handle nullable types.
 
       For Each i In receiver.CandidateImplements
@@ -67,6 +66,11 @@ Namespace Global.DualBrain
             Dim t = compilation.GetTypeByMetadataName(fullyQualifiedName)
             Dim interfaceName = DirectCast(tp, IdentifierNameSyntax).Identifier.Text
 
+            'TODO: Looks like the addition of parameters on Properties
+            '      has caused non-ReadOnly signatures to generate as 
+            '      ReadOnly - so is it because the Parameter property
+            '      check (LinQ) is incorrectly compared?
+
             For Each interfaceMember In t?.GetMembers().OfType(Of IMethodSymbol)
               Dim name = interfaceMember.Name
               Select Case interfaceMember?.MethodKind
@@ -76,6 +80,7 @@ Namespace Global.DualBrain
                                   Where p.InterfaceType = InterfaceType.Property AndAlso
                                         p.FullyQualifiedName = fullyQualifiedName AndAlso
                                         p?.InterfaceName = interfaceName AndAlso
+                                        p?.Parameters = interfaceMember.Parameters AndAlso
                                         p.Name = name?.Substring(4)).FirstOrDefault
                   If existing IsNot Nothing Then
                     existing.Getter = True
@@ -85,6 +90,7 @@ Namespace Global.DualBrain
                                                                         .FullyQualifiedName = fullyQualifiedName,
                                                                         .InterfaceName = interfaceName,
                                                                         .Name = name.Substring(4),
+                                                                        .Parameters = interfaceMember.Parameters,
                                                                         .Getter = True,
                                                                         .ReturnType = interfaceMember?.ReturnType})
                   End If
@@ -95,6 +101,7 @@ Namespace Global.DualBrain
                                   Where p.InterfaceType = InterfaceType.Property AndAlso
                                         p.FullyQualifiedName = fullyQualifiedName AndAlso
                                         p?.InterfaceName = interfaceName AndAlso
+                                        p?.Parameters = interfaceMember.Parameters AndAlso
                                         p.Name = name.Substring(4)).FirstOrDefault
                   If existing IsNot Nothing Then
                     existing.Setter = True
@@ -103,6 +110,7 @@ Namespace Global.DualBrain
                                                                         .FullyQualifiedName = fullyQualifiedName,
                                                                         .InterfaceName = interfaceName,
                                                                         .Name = name.Substring(4),
+                                                                        .Parameters = interfaceMember.Parameters,
                                                                         .Setter = True,
                                                                         .ReturnType = interfaceMember?.ReturnType})
                   End If
@@ -113,6 +121,7 @@ Namespace Global.DualBrain
                                                                       .FullyQualifiedName = fullyQualifiedName,
                                                                       .InterfaceName = interfaceName,
                                                                       .Name = name,
+                                                                      .Parameters = interfaceMember.Parameters,
                                                                       .ReturnType = interfaceMember?.ReturnType})
 #End Region
                 Case MethodKind.EventRaise
@@ -130,6 +139,10 @@ Namespace Global.DualBrain
           ' Now that we have this, we need to review the current
           ' class implementation to see what, if any, has already
           ' been explicitly implemented...
+
+          'TODO: Need to remove properties/methods that not only
+          '      match in name, return type and implements... but also
+          '      in parameter count and align type-wise.
 
           For Each prop In receiver.CandidateProperties
             If CType(prop.Parent, ClassBlockSyntax).ClassStatement.Identifier.Text = className Then
@@ -180,21 +193,65 @@ Namespace Global.DualBrain
 
                   Dim found = False
                   Dim what As String = Nothing ' Holds the set/get existing item; a property or field.
+                  Dim parameters As String = Nothing
+                  Dim pass As String = Nothing
 
                   For Each prop In receiver.CandidateProperties
+                    ' Does the class name match...
                     If CType(prop.Parent, ClassBlockSyntax).ClassStatement.Identifier.Text = className Then
                       Dim propertyName = prop.Identifier.Text
+                      ' Does the property name match...
                       If propertyName = entry.Name Then
+                        ' Does the return type match...
                         If prop.AsClause?.Type.ToString = entry.ReturnType?.ToString Then
-                          found = True
-                          what = $"{propertyName}"
-                          Exit For
+                          ' Does the param count match...
+                          If prop.ParameterList?.Parameters.Count = entry.Parameters.Length Then
+                            ' Do each of the parameter modifiers/types match (align)?
+                            Dim success = True ' Assumed
+                            For index = 0 To entry.Parameters.Length - 1
+                              Dim isByref = HasByrefModifier(prop.ParameterList.Parameters(index).Modifiers)
+                              If (entry.Parameters(index).RefKind = RefKind.Ref AndAlso isByref) OrElse
+                                 (entry.Parameters(index).RefKind <> RefKind.Ref AndAlso Not isByref) Then
+                                If entry.Parameters(index).Type.ToString <> prop.ParameterList.Parameters(index).AsClause.Type.ToString Then
+                                  success = False
+                                  Exit For
+                                End If
+                              End If
+                            Next
+                            If success Then
+                              found = True
+                              what = $"{propertyName}"
+                              parameters = ""
+                              pass = ""
+                              For Each param In entry.Parameters
+                                If parameters <> "" Then parameters &= ", "
+                                If param.IsOptional Then
+                                  parameters &= "Optional "
+                                End If
+                                parameters &= $"{param.Name} As {param.Type}"
+                                If param.IsOptional Then
+                                  If param.HasExplicitDefaultValue Then
+                                    If param.Type.ToString = "String" Then
+                                      parameters &= $" = ""{param.ExplicitDefaultValue}"""
+                                    Else
+                                      parameters &= $" = {param.ExplicitDefaultValue}"
+                                    End If
+                                  Else
+                                    parameters &= " = Nothing"
+                                  End If
+                                End If
+                                If pass <> "" Then pass &= ", "
+                                pass &= $"{param.Name}"
+                              Next
+                              Exit For
+                            End If
+                          End If
                         End If
                       End If
                     End If
                   Next
 
-                  If Not found Then
+                  If Not found AndAlso entry.Parameters.Length = 0 Then
                     For Each field In receiver.CandidateFields
                       If CType(field.Parent, ClassBlockSyntax).ClassStatement.Identifier.Text = className Then
                         For Each decl In field.Declarators
@@ -216,15 +273,15 @@ Namespace Global.DualBrain
 FoundField:
 
                   If found AndAlso Not String.IsNullOrWhiteSpace(what) Then
-                    sourceCode &= $"  Private{If(entry.Setter AndAlso entry.Getter, " ", If(entry.Getter, " ReadOnly ", " WriteOnly "))}Property {entry.InterfaceName}_{entry.Name} As {entry.ReturnType} Implements {entry.FullyQualifiedName}.{entry.Name}{vbCrLf}"
+                    sourceCode &= $"  Private{If(entry.Setter AndAlso entry.Getter, " ", If(entry.Getter, " ReadOnly ", " WriteOnly "))}Property {entry.InterfaceName}_{entry.Name}({parameters}) As {entry.ReturnType} Implements {entry.FullyQualifiedName}.{entry.Name}{vbCrLf}"
                     If entry.Getter Then
                       sourceCode &= $"    Get{vbCrLf}"
-                      sourceCode &= $"      Return {what}{vbCrLf}"
+                      sourceCode &= $"      Return {what}{If(pass IsNot Nothing, $"({pass})", "")}{vbCrLf}"
                       sourceCode &= $"    End Get{vbCrLf}"
                     End If
                     If entry.Setter Then
                       sourceCode &= $"    Set(value As {entry.ReturnType}){vbCrLf}"
-                      sourceCode &= $"      {what} = value{vbCrLf}"
+                      sourceCode &= $"      {what}{If(pass IsNot Nothing, $"({pass})", "")} = value{vbCrLf}"
                       sourceCode &= $"    End Set{vbCrLf}"
                     End If
                     sourceCode &= $"  End Property{vbCrLf}"
@@ -238,18 +295,65 @@ FoundField:
 
                   Dim found = False
                   Dim what As String = Nothing
+                  Dim parameters As String = Nothing
+                  Dim pass As String = Nothing
 
                   For Each method In receiver.CandidateMethods
-                    ' Determine which class...
+                    Dim stuff = method.ToString
                     Dim findClassName = CType(method.Parent.Parent, ClassBlockSyntax).ClassStatement.Identifier.Text
+                    ' Does the class name match...
                     If className = findClassName Then
                       Dim methodName = method.Identifier.Text
+                      ' Does the method name match...
                       If methodName = entry.Name Then
+                        ' Does the return (if a Function) type match...
                         If method.AsClause Is Nothing AndAlso entry.ReturnType.ToString = "Void" OrElse
                            method.AsClause?.Type.ToString = entry.ReturnType?.ToString Then
-                          found = True
-                          what = methodName
-                          Exit For
+                          ' Does the param count match...
+                          If method.ParameterList.Parameters.Count = entry.Parameters.Length Then
+                            ' Do each of the parameter modifiers/types match (align)?
+                            Dim success = True ' Assumed
+                            For index = 0 To entry.Parameters.Length - 1
+                              Dim isByref = HasByrefModifier(method.ParameterList.Parameters(index).Modifiers)
+                              If (entry.Parameters(index).RefKind = RefKind.Ref AndAlso isByref) OrElse
+                                 (entry.Parameters(index).RefKind <> RefKind.Ref AndAlso Not isByref) Then
+                                If entry.Parameters(index).Type.ToString <> method.ParameterList.Parameters(index).AsClause.Type.ToString Then
+                                  success = False
+                                  Exit For
+                                End If
+                              End If
+                            Next
+                            If success Then
+                              found = True
+                              what = methodName
+                              parameters = ""
+                              pass = ""
+                              For Each param In entry.Parameters
+                                If parameters <> "" Then parameters &= ", "
+                                If param.IsOptional Then
+                                  parameters &= "Optional "
+                                End If
+                                If param.RefKind = RefKind.Ref Then
+                                  parameters &= "Byref "
+                                End If
+                                parameters &= $"{param.Name} As {param.Type}"
+                                If param.IsOptional Then
+                                  If param.HasExplicitDefaultValue Then
+                                    If param.Type.ToString = "String" Then
+                                      parameters &= $" = ""{param.ExplicitDefaultValue}"""
+                                    Else
+                                      parameters &= $" = {param.ExplicitDefaultValue}"
+                                    End If
+                                  Else
+                                    parameters &= " = Nothing"
+                                  End If
+                                End If
+                                If pass <> "" Then pass &= ", "
+                                pass &= $"{param.Name}"
+                              Next
+                              Exit For
+                            End If
+                          End If
                         End If
                       End If
                     End If
@@ -257,12 +361,12 @@ FoundField:
 
                   If found Then
                     If $"{entry.ReturnType}" = "Void" Then ' Sub
-                      sourceCode &= $"  Private Sub {entry.InterfaceName}_{entry.Name}() Implements {entry.FullyQualifiedName}.{entry.Name}{vbCrLf}"
-                      sourceCode &= $"    Call {what}(){vbCrLf}"
+                      sourceCode &= $"  Private Sub {entry.InterfaceName}_{entry.Name}({parameters}) Implements {entry.FullyQualifiedName}.{entry.Name}{vbCrLf}"
+                      sourceCode &= $"    Call {what}({pass}){vbCrLf}"
                       sourceCode &= $"  End Sub{vbCrLf}"
                     Else ' Function
-                      sourceCode &= $"  Private Function {entry.InterfaceName}_{entry.Name}() As {entry.ReturnType} Implements {entry.FullyQualifiedName}.{entry.Name}{vbCrLf}"
-                      sourceCode &= $"    Return {what}(){vbCrLf}"
+                      sourceCode &= $"  Private Function {entry.InterfaceName}_{entry.Name}({parameters}) As {entry.ReturnType} Implements {entry.FullyQualifiedName}.{entry.Name}{vbCrLf}"
+                      sourceCode &= $"    Return {what}({pass}){vbCrLf}"
                       sourceCode &= $"  End Function{vbCrLf}"
                     End If
                     sourceCode &= $"{vbCrLf}"
@@ -271,7 +375,7 @@ FoundField:
 #End Region
                 Case InterfaceType.Event
 #Region "Event"
-                  Stop
+                  'Stop
 #End Region
                 Case Else
               End Select
@@ -289,6 +393,17 @@ FoundField:
       Next
 
     End Sub
+
+    Private Function HasByrefModifier(modifiers As SyntaxTokenList) As Boolean
+      If modifiers.Count > 0 Then
+        For Each entry In modifiers
+          If entry.ToString = "Byref" Then
+            Return True
+          End If
+        Next
+      End If
+      Return False
+    End Function
 
     Private Shared Function ToCamelCase(value As String) As String
       Return value(0).ToString.ToLower & value.Substring(1)

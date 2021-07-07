@@ -12,6 +12,21 @@ Imports Microsoft.CodeAnalysis.VisualBasic
 
 'Imports TestConsoleApp.PersonX.WithPositions
 
+'Interface Test
+'  Property Whatever1(index As Integer) As Long
+'  Property Whatever2(index As Integer, anotherThing As String) As Long
+
+'End Interface
+
+'Interface ITestClass
+'  Event OurEvent As EventHandler(Of EventArgs)
+'End Interface
+
+'Class TestClass
+'  Implements ITestClass
+'  Public Event OurEvent As EventHandler(Of EventArgs) Implements ITestClass.OurEvent
+'End Class
+
 Module Program
 
   Public Sub Main() 'args As String())
@@ -44,9 +59,23 @@ Module Program
 Namespace TopOne.LevelTwo
 
 Public Interface IJob
+
+  Event OurEvent As EventHandler(Of EventArgs)
+
   Property Description As String
   Property Pay As Currency
   Sub WishHappyBirthday()
+  Function SampleFunction() As Integer
+
+  Property SamplePropertyWithParam(param1 As Integer) As Integer
+  Property SamplePropertyWithParams(param1 As Integer, param2 As Integer) As Integer
+
+  Function SampleFunctionWithParam(param1 As String) As Integer
+  Function SampleFunctionWithParam(Byref param1 As Integer) As Integer
+  Function SampleFunctionWithParams(param1 As Integer, param2 As String) As Integer
+
+  Sub Something(ByRef test1 As Integer)
+
 End Interface
 
 Public Interface IPerson
@@ -60,7 +89,12 @@ End Interface
 Public Class Boss
   Implements IPerson, IJob
 
+  Public Event OurEvent As EventHandler(Of EventArgs)
+
   Private m_birth As Date
+
+  Public Property SamplePropertyWithParam(param1 As Integer) As Integer
+  Public Property SamplePropertyWithParams(param1 As Integer, param2 As Integer) As Integer
 
   Public Property FirstName As String Implements IPerson.FirstName
   Public Property LastName As String
@@ -75,6 +109,25 @@ Public Class Boss
   Public Function Age() As Integer
     Return m_birth.Year
   End Function
+
+  Public Function SampleFunctionWithParam(param1 As String) As Integer
+    Return CInt(param1?.Length)
+  End Function
+
+  Function SampleFunctionWithParam(param1 As Integer) As Integer
+    Return param1
+  End Function
+
+  Function SampleFunctionWithParams(Optional Byref byrefParam1 as Long = 5) As Integer
+    return 0
+  End Function
+
+  Function SampleFunctionWithParams(param1 As Integer, param2 As String) As Integer
+    Return param1 + CInt(param2?.Length)
+  End Function
+
+  Sub Something(Optional ByRef something1 As Integer = 5)
+  End Sub
 
 End Class
 

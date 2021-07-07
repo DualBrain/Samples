@@ -8,17 +8,20 @@ End Module
 
 Public Interface IPerson
   Property Name As String
-
+  Function Test1(a As Integer, b As Integer, byref c As integer) As Integer
   Property Title As string
 End Interface
 
 Public Class Employee
   Implements IPerson
 
-  'Private _Title As string
+  Public Property Name() As String
 
-  Public Property Name As String
+  Public Property Title() As String
 
-  Public property Title As String Implements IPerson.title
+  Public shared Function Test1(a As Integer, b As Integer, byref c As Integer) As Integer
+    c=a+b
+    Return c
+  End Function
 
 End Class

@@ -50,12 +50,15 @@ End Class
 The implicit implementation follows these rules:
 
 - If the interface is explicity defined, skip.
-- A method will map to a similarly named method.
-- A property will first attempt to map to a similarly named property.
-- If a property can't be determined, will attempt to map to a similarly named field.
-- A event will map to a similarly named event.
+- A method will map to a similarly named method with matching param signature.
+- A property will first attempt to map to a similarly named property with matching param signature.
+- If a property can't be determined, will attempt to map to a similarly named field; but only if it doesn't have params.
 
 If unable to determine a map, that mapping will not be generated; which results in Visual Studio notifying the user that the interface has not been defined.
+
+## Events
+
+Events are not handled as I haven't figured out a way to not cause double raising of events by "wrapping" an event.  So, for the time being, Events must be interfaced explicitly.
 
 ## More
 
