@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>DualBrain</RootNamespace>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Version>1.0.0-alpha1</Version>
+		<FileVersion>1.0.0</FileVersion>
+		<Authors>Cory Smith</Authors>
+		<Product>FormEx Generator</Product>
+		<Copyright>(c) 2021, Cory Smith</Copyright>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="README.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="README.md">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="3.10.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<PackageId>DualBrain.FormExGenerator</PackageId>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<Company>Shiny Stone Digital</Company>
+		<PackageTags>VB VisualBasic VB.NET FormEx generator</PackageTags>
+		<Title>DualBrain's FormEx Generator</Title>
+		<Description>A VB Source Generator that extends WinForms with common behaviors.</Description>
+		<Summary>Provides FormEx support in VB.</Summary>
+		<PackageProjectUrl>https://github.com/dualbrain/samples</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/dualbrain/samples</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Package the generator in the analyzer directory of the nuget package -->
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+</Project>

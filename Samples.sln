@@ -53,9 +53,15 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "ReparentWinForms", "WinForm
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ReparentWinformsFx", "WinFormBugs\ReparentWinformsFx\ReparentWinformsFx.vbproj", "{C5D3D87D-33F5-4A76-9CC7-77681A94D5A8}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ImplicitInterfaceGenerator", "SourceGenerators\ImplicitInterfaceGenerator\ImplicitInterfaceGenerator.vbproj", "{4CE17C0C-B164-4C54-971B-9EBEF4053808}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "ImplicitInterfaceGenerator", "SourceGenerators\ImplicitInterfaceGenerator\ImplicitInterfaceGenerator.vbproj", "{4CE17C0C-B164-4C54-971B-9EBEF4053808}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestNuGetPackages", "TestNuGetPackages\TestNuGetPackages.vbproj", "{700FDD12-E652-4372-AB1D-A3E281648B3C}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "TestNuGetPackages", "TestNuGetPackages\TestNuGetPackages.vbproj", "{700FDD12-E652-4372-AB1D-A3E281648B3C}"
+EndProject
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "FormExGenerator", "FormExGenerator\FormExGenerator.vbproj", "{E6C3EF02-ACCB-4511-8B60-9DBEEED09615}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestFormsApp", "TestFormsApp\TestFormsApp.vbproj", "{857807E4-97AF-4165-BC8A-8EDA93E41AEE}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "GameLoop2", "GameLoop2\GameLoop2.vbproj", "{0ADFE9A6-1508-4AE1-9A17-E407AC96F970}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -155,6 +161,18 @@ Global
 		{700FDD12-E652-4372-AB1D-A3E281648B3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{700FDD12-E652-4372-AB1D-A3E281648B3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{700FDD12-E652-4372-AB1D-A3E281648B3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6C3EF02-ACCB-4511-8B60-9DBEEED09615}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6C3EF02-ACCB-4511-8B60-9DBEEED09615}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6C3EF02-ACCB-4511-8B60-9DBEEED09615}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6C3EF02-ACCB-4511-8B60-9DBEEED09615}.Release|Any CPU.Build.0 = Release|Any CPU
+		{857807E4-97AF-4165-BC8A-8EDA93E41AEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{857807E4-97AF-4165-BC8A-8EDA93E41AEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{857807E4-97AF-4165-BC8A-8EDA93E41AEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{857807E4-97AF-4165-BC8A-8EDA93E41AEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0ADFE9A6-1508-4AE1-9A17-E407AC96F970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0ADFE9A6-1508-4AE1-9A17-E407AC96F970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0ADFE9A6-1508-4AE1-9A17-E407AC96F970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0ADFE9A6-1508-4AE1-9A17-E407AC96F970}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -169,6 +187,8 @@ Global
 		{168A7106-C5A9-448B-A5B1-DD030CA190ED} = {717A6900-9192-4DCA-A8DC-1353196E3657}
 		{C5D3D87D-33F5-4A76-9CC7-77681A94D5A8} = {717A6900-9192-4DCA-A8DC-1353196E3657}
 		{4CE17C0C-B164-4C54-971B-9EBEF4053808} = {22AEE70F-B724-4682-B5CD-40C03E903966}
+		{E6C3EF02-ACCB-4511-8B60-9DBEEED09615} = {22AEE70F-B724-4682-B5CD-40C03E903966}
+		{857807E4-97AF-4165-BC8A-8EDA93E41AEE} = {22AEE70F-B724-4682-B5CD-40C03E903966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDAC410C-0901-447E-8121-BF33A670D583}

@@ -29,25 +29,29 @@ Public Class Form1
 
     Init(Me, PictureBox1, True)
 
-    If False Then
+    If True Then
 
       Await Task.Delay(100) ' HACK: Let WinForms "do it's thing..." for 100ms
 
-      Screen(9)
-      Color(14)
+      SCREEN(9)
+      COLOR(14)
 
       LOCATE(1, 1)
-      Print("Hello world!")
+      PRINT("Hello world!")
 
       CIRCLE(200, 200, 50)
-      Color(10)
+      COLOR(10)
       QB.Video.PAINT(200, 200)
 
       LINE(50, 50, 100, 100, 9, QB.LineOption.BF)
 
-      LOCATE(2, 1) : Print($"{Point(51, 51)}")
+      LOCATE(2, 1) : PRINT($"{POINT(51, 51)}")
 
       Render() ' Draw scene...
+
+      Label1.Visible = True
+      Timer1.Enabled = True
+
     Else
       Label1.Visible = True
       Screen(9)
@@ -196,9 +200,9 @@ Public Class Form1
 
       m_stopwatch.Start()
 
-      Dim rectCount = 20000
+      Dim rectCount = 10000
 
-      LINE(0, 0, 639, 349, 0, QB.LineOption.BF)
+      'LINE(0, 0, 639, 349, 0, QB.LineOption.BF) ' clear the drawing area
       'draw stuff  eg...
       For f = 1 To rectCount
         Dim x = (640 >> 1) + m_random.Next(-450, 451)
@@ -209,7 +213,9 @@ Public Class Form1
       Render()
 
       m_stopwatch.Stop()
-      Label1.Text = $"{rectCount} rectangles per frame @ {1000 \ m_stopwatch.ElapsedMilliseconds} FPS"
+      Dim elapsed = m_stopwatch.ElapsedMilliseconds
+      If elapsed < 1 Then elapsed = 1
+      Label1.Text = $"{rectCount} rectangles per frame @ {1000 \ elapsed} FPS"
       m_stopwatch.Reset()
 
     Finally
