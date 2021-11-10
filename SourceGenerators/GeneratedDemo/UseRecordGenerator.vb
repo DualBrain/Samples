@@ -8,8 +8,8 @@ Imports RecordGenerator
 Public Class Person
   Public Property FirstName As String
   Public Property LastName As String
-  Public Property Birth As Date
-  Public Property Test As string
+  Public Property Birth As String
+  Public Property Test As String
 End Class
 
 <Record>
@@ -26,7 +26,7 @@ Public Module UseRecordGenerator
 
     Dim p3 = p2.Clone()
 
-    Dim p4 = New Person() With {.FirstName = "Bill", .LastName = "Gates", .Birth = Today}
+    Dim p4 = New Person() With {.FirstName = "Bill", .LastName = "Gates"} ', .Birth = Today}
 
     'Dim p5 = New Person()
     'With p5

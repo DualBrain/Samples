@@ -863,15 +863,14 @@ Module Nibbles
 
   End Sub
 
-  Private m_stack As New Stack(Of String)
+  Private ReadOnly m_stack As New Stack(Of String)
   Private m_playing As Boolean
 
   Private Async Sub Timer1_Elapsed(sender As Object, e As EventArgs) Handles Timer1.Elapsed
 
     If m_playing Then Return
-    If m_stack.Count = 0 Then Return
-
     m_playing = True
+    If m_stack.Count = 0 Then Return
     Try
 
       Dim macro = m_stack.Pop

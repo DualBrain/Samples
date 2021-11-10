@@ -7,6 +7,10 @@ Module Program
   ' pass 1 - parse/tokenize
   ' pass 2 - execute tokens
 
+#If NET6_0_OR_GREATER Then
+
+#End If
+
   Sub Main() 'args As String())
 
     Dim a%, b%, charIndex%, d%, errorLine%, lineCount%, number%, stackIndex%, t%, variableIndex%, TICKS%, TICKSPERSEC%
