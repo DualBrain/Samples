@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30104.148
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.vbproj", "{D915A372-FBE7-4DF4-AB7C-B50D2FA24706}"
 EndProject
@@ -59,9 +59,11 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "TestNuGetPackages", "TestNu
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "FormExGenerator", "FormExGenerator\FormExGenerator.vbproj", "{E6C3EF02-ACCB-4511-8B60-9DBEEED09615}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestFormsApp", "TestFormsApp\TestFormsApp.vbproj", "{857807E4-97AF-4165-BC8A-8EDA93E41AEE}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "TestFormsApp", "TestFormsApp\TestFormsApp.vbproj", "{857807E4-97AF-4165-BC8A-8EDA93E41AEE}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "GameLoop2", "GameLoop2\GameLoop2.vbproj", "{0ADFE9A6-1508-4AE1-9A17-E407AC96F970}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "GameLoop2", "GameLoop2\GameLoop2.vbproj", "{0ADFE9A6-1508-4AE1-9A17-E407AC96F970}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "UacPrompt", "UacPrompt\UacPrompt.vbproj", "{7B277243-6FFC-40D6-B28E-B68D7FA3FCE0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -173,6 +175,10 @@ Global
 		{0ADFE9A6-1508-4AE1-9A17-E407AC96F970}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0ADFE9A6-1508-4AE1-9A17-E407AC96F970}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0ADFE9A6-1508-4AE1-9A17-E407AC96F970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B277243-6FFC-40D6-B28E-B68D7FA3FCE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B277243-6FFC-40D6-B28E-B68D7FA3FCE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B277243-6FFC-40D6-B28E-B68D7FA3FCE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B277243-6FFC-40D6-B28E-B68D7FA3FCE0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
