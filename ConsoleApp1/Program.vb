@@ -4,6 +4,7 @@ Option Infer On
 
 Imports System
 Imports System.Runtime.CompilerServices
+Imports System.Threading
 Imports Community.VisualBasic.Inline
 
 ' Because Visual Studio 2019 changed how you create "temporary project";
@@ -11,7 +12,21 @@ Imports Community.VisualBasic.Inline
 
 Module Program
 
-  Sub Main() 'args As String())
+  Public Sub Main(args As String())
+    ' The following is from a sample by Lucian... so I'll take it as the gospel. ;-)
+    MainAsync(args).GetAwaiter().GetResult()
+  End Sub
+
+  Private Async Function MainAsync(args As String()) As Task
+
+    Dim tmr = New PeriodicTimer(period:=TimeSpan.FromMilliseconds(100))
+
+    Dim howLong = Now.AddSeconds(10)
+
+    While Await tmr.WaitForNextTickAsync()
+      Console.WriteLine(Now)
+      If Now > howLong Then tmr.Dispose()
+    End While
 
     ' tab+tab
     'Dim l = New ArrayList
@@ -60,6 +75,30 @@ Module Program
 
     Dim result1 = TestingOptional("abc")
     Dim result2 = TestingOptional("xyz", result1)
+
+  End Function
+
+  Private Sub DateTimeTestingInNet6()
+
+    Dim dt As DateTime = Now
+    Dim tm As DateTime = Now
+
+    Dim d1 As New DateOnly(Now.Year, Now.Month, Now.Day)
+    Dim d2 = d1.AddDays(30)
+    If d1 = d2 Then
+
+    End If
+
+  End Sub
+
+  Private Sub NewLinqStuffNet6()
+
+    ' 6 element indexed from 0 to 5
+    Dim arr = {0, 1, 2, 3, 4, 5}
+    Dim value = arr.ElementAt(arr.Length - 2)
+    If value = 4 Then
+
+    End If
 
   End Sub
 
