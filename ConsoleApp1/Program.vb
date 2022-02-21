@@ -14,7 +14,8 @@ Module Program
 
   Public Sub Main(args As String())
     ' The following is from a sample by Lucian... so I'll take it as the gospel. ;-)
-    MainAsync(args).GetAwaiter().GetResult()
+    'MainAsync(args).GetAwaiter().GetResult()
+    ByrefTest.Main1()
   End Sub
 
   Private Async Function MainAsync(args As String()) As Task
