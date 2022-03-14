@@ -14,11 +14,26 @@ Module Program
 
   Public Sub Main(args As String())
     ' The following is from a sample by Lucian... so I'll take it as the gospel. ;-)
-    'MainAsync(args).GetAwaiter().GetResult()
-    ByrefTest.Main1()
+    MainAsync(args).GetAwaiter().GetResult()
+    'ByrefTest.Main1()
   End Sub
 
+  Private Async Function TestHttpClientDownloadAsync() As Task
+    Dim downloadFileUrl As String = "http://www.shinystone.com/install/athena_178.zip"
+    Dim destinationFilePath = IO.Path.GetFullPath("athena_178.zip")
+    Using client As New HttpClientDownloadWithProgress(downloadFileUrl, destinationFilePath)
+      AddHandler client.ProgressChanged, Sub(totalFileSize, totalBytesDownloaded, progressPercentage)
+                                           Console.WriteLine($"{progressPercentage}% ({totalBytesDownloaded}/{totalFileSize})")
+                                         End Sub
+      Await client.StartDownload()
+    End Using
+  End Function
+
   Private Async Function MainAsync(args As String()) As Task
+
+    Await TestHttpClientDownloadAsync()
+
+    Return
 
     Dim tmr = New PeriodicTimer(period:=TimeSpan.FromMilliseconds(100))
 
