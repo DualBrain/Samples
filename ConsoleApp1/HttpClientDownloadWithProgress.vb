@@ -5,6 +5,8 @@ Option Infer On
 Imports System.IO
 Imports System.Net.Http
 
+' https://newbedev.com/progress-bar-with-httpclient#:~:text=You%20can%20write%20an%20extension%20method%20for%20downloading,data%20using%20%28var%20client%20%3D%20new%20HttpClient%28%29%29%20%7B
+
 Public NotInheritable Class HttpClientDownloadWithProgress
   Implements IDisposable
 

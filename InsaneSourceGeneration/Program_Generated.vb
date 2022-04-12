@@ -1,8 +1,14 @@
-﻿Partial Module Program
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
+Partial Module Program
 
   Sub Main()
-    Dim Name As String = "Cory"
-    Console.Write(Name & " Hello World!")
+    'Name$ = "Cory"
+    Dim Name = "Cory"
+    'Print Name$ + " HELLO WORLD";
+    Console.Write(Name + " HELLO WORLD")
   End Sub
 
 End Module
