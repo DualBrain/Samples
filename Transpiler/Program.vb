@@ -15,7 +15,7 @@ Imports Microsoft.CodeAnalysis.Formatting
 
 Module Program
 
-  Private m_sourceCode As New List(Of (File As String, Text As String))
+  'Private m_sourceCode As New List(Of (File As String, Text As String))
 
   Sub Main(args As String())
     'Console.WriteLine("Hello World!")
@@ -98,21 +98,143 @@ End Module
 
   End Sub
 
-  Private Sub Walk(parentNode As SyntaxNode)
+  'Private Sub Walk(parentNode As SyntaxNode)
 
-    Return
+  '  For Each node In parentNode.ChildNodes
+  '    Console.WriteLine("---")
+  '    Console.WriteLine($"{node.Kind} {node}")
+  '    If node.ContainsDiagnostics Then
+  '      For Each diag In node.GetDiagnostics
+  '        Console.WriteLine($"DIAG: {diag}")
+  '      Next
+  '    End If
+  '    Walk(node)
+  '  Next
 
-    For Each node In parentNode.ChildNodes
-      Console.WriteLine("---")
-      Console.WriteLine($"{node.Kind} {node}")
-      If node.ContainsDiagnostics Then
-        For Each diag In node.GetDiagnostics
-          Console.WriteLine($"DIAG: {diag}")
-        Next
-      End If
-      Walk(node)
-    Next
-
-  End Sub
+  'End Sub
 
 End Module
+
+#Disable Warning IDE1006 ' Naming Styles
+Namespace QB64
+
+  Public Module Functions
+
+    Public Function _PI#(Optional multiplier# = 1.0)
+      Return Math.PI * multiplier
+    End Function
+
+    Public Function _R2D#(radian#)
+      Return radian# / (_PI() / 180)
+    End Function
+
+    Public Function _R2G#(radian#)
+      Return radian# * 0.01571
+    End Function
+
+    Public Function _RED&(rgbaColorIndex&, Optional imageHandle& = -1)
+      If imageHandle& <> -1 Then
+        Throw New NotImplementedException
+      Else
+        Return System.Drawing.Color.FromArgb(CInt(rgbaColorIndex)).R
+      End If
+    End Function
+
+    Public Function _RED32&(rgbaColor&)
+      Return System.Drawing.Color.FromArgb(CInt(rgbaColor&)).R
+    End Function
+
+    Public Function _READBIT(numericalVariable As Byte, numericalvalue%) As Boolean
+      Return (numericalVariable And (1 << numericalvalue%)) <> 0
+    End Function
+
+    Public Function _READBIT(numericalVariable As Short, numericalvalue%) As Boolean
+      Return (numericalVariable And (1 << numericalvalue%)) <> 0
+    End Function
+
+    Public Function _READBIT(numericalVariable As Integer, numericalvalue%) As Boolean
+      Return (numericalVariable And (1 << numericalvalue%)) <> 0
+    End Function
+
+    Public Function _READBIT(numericalVariable As Long, numericalvalue%) As Boolean
+      Return (numericalVariable And (1 << numericalvalue%)) <> 0
+    End Function
+
+    Public Function _RESETBIT(numericalVariable As Byte, numericalvalue%) As Byte
+      Return CByte(numericalVariable Xor (1 << numericalvalue%))
+    End Function
+
+    Public Function _RESETBIT(numericalVariable As Short, numericalvalue%) As Short
+      Return CShort(numericalVariable Xor (1 << numericalvalue%))
+    End Function
+
+    Public Function _RESETBIT(numericalVariable As Integer, numericalvalue%) As Integer
+      Return CInt(numericalVariable Xor (1 << numericalvalue%))
+    End Function
+
+    Public Function _RESETBIT(numericalVariable As Long, numericalvalue%) As Long
+      Return numericalVariable Xor (1 << numericalvalue%)
+    End Function
+
+    Public Enum OnOff
+      [ON]
+      OFF
+    End Enum
+
+    Public Enum StretchSmooth
+      _STRETCH
+      _SMOOTH
+    End Enum
+
+    Public Sub _RESIZE(Optional onOff As OnOff = OnOff.ON, Optional stretchSmooth As StretchSmooth = StretchSmooth._STRETCH)
+      Throw New NotImplementedException
+    End Sub
+
+    Public Function _RESIZE() As Boolean
+      Throw New NotImplementedException
+    End Function
+
+    Public Function _RESIZEHEIGHT%()
+      Throw New NotImplementedException
+    End Function
+
+    Public Function _RESIZEWIDTH%()
+      Throw New NotImplementedException
+    End Function
+
+    Public Function _RGB&(red&, green&, blue&, Optional imageHandle& = -1)
+      Throw New NotImplementedException
+    End Function
+
+    Public Function _RGB32(red&, green&, blue&, Optional alpha& = 255) As ULong
+      Return _RGBA32(red&, green&, blue&, alpha&)
+    End Function
+
+    Public Function _RGB32(intensity&, Optional alpha& = 255) As ULong
+      Return _RGB32(intensity&, intensity&, intensity&, alpha&)
+    End Function
+
+    Public Function _RGBA&(red&, green&, blue&, alpha&, Optional imageHandle& = -1)
+      Throw New NotImplementedException
+    End Function
+
+    Public Function _RGBA32(red&, green&, blue&, alpha&) As ULong
+      red& = red& And &HFF
+      green& = green& And &HFF
+      blue& = blue& And &HFF
+      alpha& = alpha& And &HFF
+      Return CULng((red& << 24) + (green& << 16) + (blue& << 8) + alpha&)
+    End Function
+
+    Public Function _ROUND&(number#)
+      Return CLng(Math.Round(number#))
+    End Function
+
+    Public Function _TRIM$(text$)
+      Return text$.Trim
+    End Function
+
+  End Module
+
+End Namespace
+#Enable Warning IDE1006 ' Naming Styles

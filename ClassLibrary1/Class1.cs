@@ -9,10 +9,16 @@ namespace ClassLibrary1
 
         public bool Blah(bool value) {
             _blah = value;
-            return _blah;
-        }
 
-        public static void InlineIncrementTest()
+      //string a = "2.5";
+      //int b = (int)a;
+
+      return _blah;
+
+
+    }
+
+    public static void InlineIncrementTest()
         {
 
             int value = 1;

@@ -16,7 +16,8 @@ Module Program
     ' The following is from a sample by Lucian... so I'll take it as the gospel. ;-)
     'MainAsync(args).GetAwaiter().GetResult()
     'ByrefTest.Main1()
-    Module1.Main1()
+    'Module1.Main1()
+    Module2.Main2()
   End Sub
 
   Private Async Function TestHttpClientDownloadAsync() As Task
