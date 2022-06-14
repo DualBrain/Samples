@@ -283,6 +283,10 @@ Module Program
     '| ---------------------------------------------------------------------- | ------------------------------:|
     '"
 
+    Dim qbjsList = {"American Flag",
+                    "Tile Demo",
+                    "Turtle Graphics"}
+
     Dim exclusionList = {"Flappy Bird"}
 
     For Each folder In Directory.GetDirectories(path)
@@ -304,6 +308,11 @@ Module Program
       If exclusionList.Contains(folderName) Then Continue For
 
       Dim tags = SplitCommaValues(ReadData(tagsFilespec))
+
+      If qbjsList.Contains(folderName) AndAlso
+         Not tags.Contains("qbjs") Then
+        tags.Add("qbjs")
+      End If
 
       Dim title = folderName 'ReadData(titleFilespec)
       Dim authors = SplitCommaValues(ReadData(authorFilespec))
