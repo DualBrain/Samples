@@ -75,7 +75,9 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Transpiler", "Transpiler\Tr
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "PeToWiki", "PeToWiki\PeToWiki.vbproj", "{C7A6A0D1-3B2F-40D2-8117-DAF794E5A0C0}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Qb64SamplesToMarkdown", "Qb64SamplesToMarkdown\Qb64SamplesToMarkdown.vbproj", "{E87D1D89-4333-4F80-88F7-20215F65C7DB}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Qb64SamplesToMarkdown", "Qb64SamplesToMarkdown\Qb64SamplesToMarkdown.vbproj", "{E87D1D89-4333-4F80-88F7-20215F65C7DB}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ParseWiki", "ParseWiki\ParseWiki.vbproj", "{D418C6B7-7448-440A-8249-D07D636642B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -211,6 +213,10 @@ Global
 		{E87D1D89-4333-4F80-88F7-20215F65C7DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E87D1D89-4333-4F80-88F7-20215F65C7DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E87D1D89-4333-4F80-88F7-20215F65C7DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D418C6B7-7448-440A-8249-D07D636642B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D418C6B7-7448-440A-8249-D07D636642B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D418C6B7-7448-440A-8249-D07D636642B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D418C6B7-7448-440A-8249-D07D636642B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,6 +7,9 @@ Imports System.IO.Path
 
 Module Program
 
+  'Private rootQbjsUrl = "https://v6p9d9t4.ssl.hwcdn.net/html/5963335/index.html?"
+  Private m_rootQbjsUrl As String = "https://v6p9d9t4.ssl.hwcdn.net/html/6022890/index.html?"
+
   Private Class Page
 
     Public Sub New(pageTitle As String, depth As Integer)
@@ -105,10 +108,9 @@ Module Program
           Content &= $"> Please note that QBjs is still in early development and support for these examples is extremely experimental (meaning will most likely not work). With that out of the way, give it a try!{vbCrLf}{vbCrLf}"
 
           Dim filename = IO.Path.GetFileName(basFile)
-          Dim rootUrl = "https://v6p9d9t4.ssl.hwcdn.net/html/5963335/index.html?"
-          Content &= $"* [LOAD ""{filename}""]({rootUrl}src=https://qb64.com/samples/{Path.GetFileName(folder)}/src/{filename}){vbCrLf}"
-          Content &= $"* [RUN ""{filename}""]({rootUrl}mode=auto&src=https://qb64.com/samples/{Path.GetFileName(folder)}/src/{filename}){vbCrLf}"
-          Content &= $"* [PLAY ""{filename}""]({rootUrl}mode=play&src=https://qb64.com/samples/{Path.GetFileName(folder)}/src/{filename}){vbCrLf}"
+          Content &= $"* [LOAD ""{filename}""]({m_rootQbjsUrl}src=https://qb64.com/samples/{Path.GetFileName(folder)}/src/{filename}){vbCrLf}"
+          Content &= $"* [RUN ""{filename}""]({m_rootQbjsUrl}mode=auto&src=https://qb64.com/samples/{Path.GetFileName(folder)}/src/{filename}){vbCrLf}"
+          Content &= $"* [PLAY ""{filename}""]({m_rootQbjsUrl}mode=play&src=https://qb64.com/samples/{Path.GetFileName(folder)}/src/{filename}){vbCrLf}"
 
           Content &= $"{vbCrLf}"
 
@@ -285,6 +287,8 @@ Module Program
 
     Dim qbjsList = {"American Flag",
                     "Tile Demo",
+                    "Plumeria",
+                    "Chaotic Scattering",
                     "Turtle Graphics"}
 
     Dim exclusionList = {"Flappy Bird"}
@@ -574,7 +578,8 @@ Module Program
         Stop
     End Select
 
-    Dim navigation = $"[Home](https://qb64.com) • [News]({dots}news.md) • [GitHub]({dots}github.md) • [Wiki]({dots}wiki.md) • [Samples]({dots}samples.md) • [Media]({dots}media.md) • [Community]({dots}community.md) • [Rolodex]({dots}rolodex.md) • [More...]({dots}more.md)"
+    Dim navigation = $"[Home](https://qb64.com) • [News]({dots}news.md) • [GitHub](https://github.com/QB64Official/qb64) • [Wiki](https://github.com/QB64Official/qb64/wiki) • [Samples]({dots}samples.md) • [InForm]({dots}inform.md) • [GX]({dots}gx.md) • [QBjs]({dots}qbjs.md) • [Community]({dots}community.md) • [More...]({dots}more.md)"
+    'Dim navigation = $"[Home](https://qb64.com) • [News]({dots}news.md) • [GitHub]({dots}github.md) • [Wiki]({dots}wiki.md) • [Samples]({dots}samples.md) • [Media]({dots}media.md) • [Community]({dots}community.md) • [Rolodex]({dots}rolodex.md) • [More...]({dots}more.md)"
 
     If Not String.IsNullOrWhiteSpace(pageName) Then
       Return $"{navigation}
