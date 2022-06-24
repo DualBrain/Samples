@@ -7,8 +7,12 @@ Imports System.IO.Path
 
 Module Program
 
-  'Private rootQbjsUrl = "https://v6p9d9t4.ssl.hwcdn.net/html/5963335/index.html?"
-  Private m_rootQbjsUrl As String = "https://v6p9d9t4.ssl.hwcdn.net/html/6022890/index.html?"
+  'Private ReadOnly m_rootQbjsUrl = "https://v6p9d9t4.ssl.hwcdn.net/html/5963335/index.html?"
+  'Private ReadOnly m_rootQbjsUrl As String = "https://v6p9d9t4.ssl.hwcdn.net/html/6022890/index.html?"
+  Private ReadOnly m_rootQbjsUrl As String = "https://v6p9d9t4.ssl.hwcdn.net/html/6029471/index.html?"
+
+  Private ReadOnly m_inputPath As String = "D:\github\qb64.samples\Samples"
+  Private ReadOnly m_outputPath As String = "D:\github\qb64"
 
   Private Class Page
 
@@ -90,7 +94,7 @@ Module Program
         Dim filteredCount = 0
         Dim basFile As String = Nothing
         For Each file In files
-          Select Case Path.GetExtension(file).ToLower
+          Select Case path.GetExtension(file).ToLower
             Case ".bas" : filteredCount += 1 : basFile = file
             Case ".zip", ".7z"
               ' exclude from this count...
@@ -108,9 +112,9 @@ Module Program
           Content &= $"> Please note that QBjs is still in early development and support for these examples is extremely experimental (meaning will most likely not work). With that out of the way, give it a try!{vbCrLf}{vbCrLf}"
 
           Dim filename = IO.Path.GetFileName(basFile)
-          Content &= $"* [LOAD ""{filename}""]({m_rootQbjsUrl}src=https://qb64.com/samples/{Path.GetFileName(folder)}/src/{filename}){vbCrLf}"
-          Content &= $"* [RUN ""{filename}""]({m_rootQbjsUrl}mode=auto&src=https://qb64.com/samples/{Path.GetFileName(folder)}/src/{filename}){vbCrLf}"
-          Content &= $"* [PLAY ""{filename}""]({m_rootQbjsUrl}mode=play&src=https://qb64.com/samples/{Path.GetFileName(folder)}/src/{filename}){vbCrLf}"
+          Content &= $"* [LOAD ""{filename}""]({m_rootQbjsUrl}src=https://qb64.com/samples/{path.GetFileName(folder)}/src/{filename}){vbCrLf}"
+          Content &= $"* [RUN ""{filename}""]({m_rootQbjsUrl}mode=auto&src=https://qb64.com/samples/{path.GetFileName(folder)}/src/{filename}){vbCrLf}"
+          Content &= $"* [PLAY ""{filename}""]({m_rootQbjsUrl}mode=play&src=https://qb64.com/samples/{path.GetFileName(folder)}/src/{filename}){vbCrLf}"
 
           Content &= $"{vbCrLf}"
 
@@ -242,7 +246,7 @@ Module Program
         End If
       Next
 
-      Content &= $"**[{title}]({Path.GetFileNameWithoutExtension(folder).ToLower.Replace(" ", "-")}/index.md)**{If(Not String.IsNullOrEmpty(version), $" <sup>v{version}</sup>", "")}
+      Content &= $"**[{title}]({path.GetFileNameWithoutExtension(folder).ToLower.Replace(" ", "-")}/index.md)**{If(Not String.IsNullOrEmpty(version), $" <sup>v{version}</sup>", "")}
 
 {authorSegment}🔗 {TagsToString(tags, 0)}
 
@@ -277,9 +281,6 @@ Module Program
     Dim globalAuthors As New Dictionary(Of String, Page)
     Dim globalTags As New Dictionary(Of String, Page)
 
-    Dim path = "D:\github\qb64.samples\Samples"
-    Dim outputPath = "D:\test"
-
     Dim indexPage = PageHeader("SAMPLES", 0)
     '| Samples                                                                |                                |
     '| ---------------------------------------------------------------------- | ------------------------------:|
@@ -293,7 +294,7 @@ Module Program
 
     Dim exclusionList = {"Flappy Bird"}
 
-    For Each folder In Directory.GetDirectories(path)
+    For Each folder In Directory.GetDirectories(m_inputPath)
 
       'Dim titleFilespec = Combine(folder, "title.txt")
       Dim authorFilespec = Combine(folder, "author.txt")
@@ -367,7 +368,7 @@ Module Program
 
       ' Copy all images and source files to target...
 
-      Dim targetPath = Combine(outputPath, "samples", folderName.ToLower.Replace(" ", "-"))
+      Dim targetPath = Combine(m_outputPath, "samples", folderName.ToLower.Replace(" ", "-"))
       If Not IO.Directory.Exists(targetPath) Then
         Directory.CreateDirectory(targetPath)
       End If
@@ -468,7 +469,7 @@ Module Program
     ' *****************************************
 
     Dim content = indexPage
-    File.WriteAllText(Combine(outputPath, "samples.md"), content)
+    File.WriteAllText(Combine(m_outputPath, "samples.md"), content)
 
     ' *****************************************
     ' * samples/tag_cloud.md
@@ -481,7 +482,7 @@ Module Program
     Next
 
     content = PageHeader("TAGS", 1) & tagCloud
-    File.WriteAllText(Combine(outputPath, "samples", "tag-cloud.md"), content)
+    File.WriteAllText(Combine(m_outputPath, "samples", "tag-cloud.md"), content)
 
     ' *****************************************
     ' * samples/author_cloud.md
@@ -500,7 +501,7 @@ Module Program
     Next
 
     content = PageHeader("AUTHORS", 1) & authorCloud
-    File.WriteAllText(Combine(outputPath, "samples", "author-cloud.md"), content)
+    File.WriteAllText(Combine(m_outputPath, "samples", "author-cloud.md"), content)
 
     ' *****************************************
     ' * samples/*author_page*.md
@@ -510,7 +511,7 @@ Module Program
       Dim page = entry.Value
       Dim pageName = entry.Key
       If String.IsNullOrWhiteSpace(pageName) Then pageName = "author-missing"
-      File.WriteAllText(Combine(outputPath, "samples", $"{pageName.ToLower.Replace(" ", "-")}.md"), page.Content)
+      File.WriteAllText(Combine(m_outputPath, "samples", $"{pageName.ToLower.Replace(" ", "-")}.md"), page.Content)
     Next
 
     ' *****************************************
@@ -520,7 +521,7 @@ Module Program
     For Each entry In globalTags
       Dim filename = entry.Key
       Dim page = entry.Value
-      File.WriteAllText(Combine(outputPath, "samples", $"{filename.Replace(" ", "-")}.md"), page.Content)
+      File.WriteAllText(Combine(m_outputPath, "samples", $"{filename.Replace(" ", "-")}.md"), page.Content)
     Next
 
   End Sub
