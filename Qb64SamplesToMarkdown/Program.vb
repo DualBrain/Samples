@@ -7,9 +7,33 @@ Imports System.IO.Path
 
 Module Program
 
+  Private ReadOnly m_qbjsList As New List(Of String) From {"American Flag",
+                                                           "Binary Counter",
+                                                           "Bubbles",
+                                                           "Chaotic Scattering",
+                                                           "Circle Intersecting Circle",
+                                                           "Dec to Frac",
+                                                           "Diceit",
+                                                           "Ellipse Intersecting Line",
+                                                           "Globs 0",
+                                                           "Globs 1",
+                                                           "InYrFace",
+                                                           "Julia Rings",
+                                                           "Lines Intersecting",
+                                                           "MakeBig",
+                                                           "Plumeria",
+                                                           "Relief 3D",
+                                                           "SSaver",
+                                                           "Sierpinski Fractal",
+                                                           "Tile Demo",
+                                                           "Turtle Graphics",
+                                                           "Vector Field",
+                                                           "VSphere"}
+
   'Private ReadOnly m_rootQbjsUrl = "https://v6p9d9t4.ssl.hwcdn.net/html/5963335/index.html?"
   'Private ReadOnly m_rootQbjsUrl As String = "https://v6p9d9t4.ssl.hwcdn.net/html/6022890/index.html?"
-  Private ReadOnly m_rootQbjsUrl As String = "https://v6p9d9t4.ssl.hwcdn.net/html/6029471/index.html?"
+  'Private ReadOnly m_rootQbjsUrl As String = "https://v6p9d9t4.ssl.hwcdn.net/html/6029471/index.html?"
+  Private ReadOnly m_rootQbjsUrl As String = "https://qbjs.org/index.html?"
 
   Private ReadOnly m_inputPath As String = "D:\github\qb64.samples\Samples"
   Private ReadOnly m_outputPath As String = "D:\github\qb64"
@@ -286,12 +310,6 @@ Module Program
     '| ---------------------------------------------------------------------- | ------------------------------:|
     '"
 
-    Dim qbjsList = {"American Flag",
-                    "Tile Demo",
-                    "Plumeria",
-                    "Chaotic Scattering",
-                    "Turtle Graphics"}
-
     Dim exclusionList = {"Flappy Bird"}
 
     For Each folder In Directory.GetDirectories(m_inputPath)
@@ -314,7 +332,7 @@ Module Program
 
       Dim tags = SplitCommaValues(ReadData(tagsFilespec))
 
-      If qbjsList.Contains(folderName) AndAlso
+      If m_qbjsList.Contains(folderName) AndAlso
          Not tags.Contains("qbjs") Then
         tags.Add("qbjs")
       End If
