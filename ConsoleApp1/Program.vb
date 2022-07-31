@@ -1,6 +1,6 @@
-Option Explicit On
-Option Strict On
-Option Infer On
+Option Explicit Off
+Option Strict Off
+Option Infer Off
 
 Imports System
 Imports System.Runtime.CompilerServices
@@ -17,7 +17,16 @@ Module Program
     'MainAsync(args).GetAwaiter().GetResult()
     'ByrefTest.Main1()
     'Module1.Main1()
-    Module2.Main2()
+    'Module2.Main2()
+
+    a = 10
+    bb = 3
+    System.Console.Write("a = 10 : b = 3 : a \ b = ")
+    System.Console.Write(a \ bb)
+    System.Console.WriteLine()
+    Return
+
+
   End Sub
 
   Private Async Function TestHttpClientDownloadAsync() As Task

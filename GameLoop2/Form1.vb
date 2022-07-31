@@ -29,7 +29,7 @@
 
     Dim elapsed = Timer.ElapsedMilliseconds
 
-    Dim value = 50 '16
+    Dim value = 16 '50 '16
     If elapsed >= value Then
       Execute(e.Graphics, elapsed / 1000)
       Timer.Restart()
