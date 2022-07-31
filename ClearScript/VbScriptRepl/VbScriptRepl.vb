@@ -4,11 +4,11 @@
 Imports Microsoft.ClearScript
 Imports Microsoft.ClearScript.Windows.Core
 
-Module ClearScriptRepl
+Module VbScriptRepl
 
   Public Sub Main() 'args As String())
 
-    Using engine = New VBScriptEngine(NameOf(ClearScriptRepl), Windows.WindowsScriptEngineFlags.EnableDebugging, NullSyncInvoker.Instance)
+    Using engine = New VBScriptEngine(NameOf(VbScriptRepl), Windows.WindowsScriptEngineFlags.EnableDebugging, NullSyncInvoker.Instance)
 
       engine.AddHostType("Api", GetType(Api))
       engine.AddHostObject("Host", New ExtendedHostFunctions())

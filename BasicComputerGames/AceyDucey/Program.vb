@@ -1,3 +1,6 @@
+' Copyright (c) Cory Smith. All rights reserved.
+' Licensed under the MIT license.
+
 Imports System.Console
 
 Module Program

@@ -24,9 +24,9 @@
     <PackageReference Include="NAudio" Version="1.10.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\QB.Compatibility\QB.Compatibility\QB.Compatibility.vbproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\QB.Compatibility\QB.Compatibility\QB.Compatibility.vbproj" />
+	</ItemGroup>
 
   <ItemGroup>
     <Compile Update="My Project\Application.Designer.vb">
