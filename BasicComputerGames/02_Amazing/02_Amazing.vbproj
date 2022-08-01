@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SDL2</RootNamespace>
+    <RootNamespace>Amazing</RootNamespace>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 

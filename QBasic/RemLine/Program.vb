@@ -237,7 +237,7 @@ FileErr2:
     If InputFile$ = "" Then End
     INPUT("      Output file name (ENTER to print to screen): ", OutputFile$)
     PRINT()
-    If (OutputFile$ = "") Then OutputFile$ = "CON"
+    If OutputFile$ = "" Then OutputFile$ = "CON"
 
     If InStr(InputFile$, ".") = 0 Then
       InputFile$ &= ".BAS"
