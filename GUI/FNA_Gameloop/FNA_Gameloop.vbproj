@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>FNA_Gameloop</RootNamespace>
+    <TargetFramework>net6.0</TargetFramework>
+    <OptionStrict>On</OptionStrict>
+    <StartupObject>Sub Main</StartupObject>
+    <AssemblyName>FNA_Gameloop</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Content\FNATexture.png" />
+    <None Remove="FAudio.dll" />
+    <None Remove="FNA3D.dll" />
+    <None Remove="libtheorafile.dll" />
+    <None Remove="SDL2.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Content\FNATexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FAudio.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FNA3D.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libtheorafile.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SDL2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\FNA\FNA.Core.csproj" />
+  </ItemGroup>
+
+</Project>
