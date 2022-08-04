@@ -7,10 +7,10 @@ Option Infer On
 
 Public Class Form1
 
-  Private m_rectangle As New Rectangle()
-  Private ReadOnly m_rectangleBrush As New SolidBrush(System.Drawing.Color.Black)
-  Private ReadOnly m_colorBrush As New SolidBrush(System.Drawing.Color.Aqua)
-  Private ReadOnly m_random As New Random
+  'Private m_rectangle As New Rectangle()
+  'Private ReadOnly m_rectangleBrush As New SolidBrush(System.Drawing.Color.Black)
+  'Private ReadOnly m_colorBrush As New SolidBrush(System.Drawing.Color.Aqua)
+  'Private ReadOnly m_random As New Random
   Private ReadOnly m_context As New BufferedGraphicsContext
   Private mybuff As BufferedGraphics
 
@@ -25,20 +25,19 @@ Public Class Form1
 
   Private Async Sub Me_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-    Cursor.Hide()
-
-    ' adjust the form to be full screen
-    WindowState = FormWindowState.Normal
-    BackColor = Color.Black
-    FormBorderStyle = Windows.Forms.FormBorderStyle.None
-    Left = Screen.AllScreens(0).Bounds.Left
-    Top = Screen.AllScreens(0).Bounds.Top
-    Width = Screen.AllScreens(0).Bounds.Width 'twidth
-    Height = SystemInformation.VirtualScreen.Height
-    BringToFront()
-    TopMost = True
-
-    m_gscr = New QbScreen(Width, Height, 1.0)
+    If False Then
+      Cursor.Hide()
+      ' adjust the form to be full screen
+      WindowState = FormWindowState.Normal
+      BackColor = Color.Black
+      FormBorderStyle = Windows.Forms.FormBorderStyle.None
+      Left = Screen.AllScreens(0).Bounds.Left
+      Top = Screen.AllScreens(0).Bounds.Top
+      Width = Screen.AllScreens(0).Bounds.Width 'twidth
+      Height = SystemInformation.VirtualScreen.Height
+      BringToFront()
+      TopMost = True
+    End If
 
     Await BootStrapAsync()
 
@@ -59,11 +58,16 @@ Public Class Form1
   Private Async Function BootStrapAsync() As Task
     'mousepos = Cursor.HotSpot
 
-    ' Create drawing rectangle...
-    m_rectangle.Width = PictureBox1.Width
-    m_rectangle.Height = PictureBox1.Height
+    Dim sx = 160 'PictureBox1.Width
+    Dim sy = 100 'PictureBox1.Height
 
-    mybuff = m_context.Allocate(PictureBox1.CreateGraphics, m_rectangle)
+    m_gscr = New QbScreen(sx, sy, 14.0)
+
+    ' Create drawing rectangle...
+    'm_rectangle.Width = PictureBox1.Width
+    'm_rectangle.Height = PictureBox1.Height
+
+    mybuff = m_context.Allocate(PictureBox1.CreateGraphics, New Rectangle(0, 0, PictureBox1.Width, PictureBox1.Height)) 'm_rectangle)
 
     ' Set some optimization drawing "stuff"...
     mybuff.Graphics.CompositingMode = Drawing2D.CompositingMode.SourceOver
@@ -73,17 +77,14 @@ Public Class Form1
     mybuff.Graphics.PixelOffsetMode = Drawing2D.PixelOffsetMode.None
 
     ' Create a "black" brush...
-    m_rectangleBrush.Color = System.Drawing.Color.Black
-
-    Dim sx = PictureBox1.Width
-    Dim sy = PictureBox1.Height
+    'm_rectangleBrush.Color = System.Drawing.Color.Black
 
     Randomize()
     Dim rnd = New Random(0)
 
-    Dim start As Double = 0
-    Dim [end] As Double = Math.PI * 2
-    Dim aspect = 4.0 * (sy / sx) / 3.0
+    'Dim start As Double = 0
+    'Dim [end] As Double = Math.PI * 2
+    'Dim aspect = 4.0 * (sy / sx) / 3.0
 
     Do
 
@@ -103,8 +104,8 @@ Public Class Form1
         Dim a = 255
         Dim c = Drawing.Color.FromArgb(a, r, g, b)
         Select Case mode
-          Case 1 : m_gscr.Line(x1, y1, x2, y2, c, True, False, Nothing)
-          Case 2 : m_gscr.Circle(x1, y1, radius, c, start, [end], aspect)
+          Case 1 : m_gscr.Line(x1, y1, x2, y2, c, True) ', False, Nothing)
+          Case 2 : m_gscr.Circle(x1, y1, radius, c) ', start, [end]) ', aspect)
           Case 3 : m_gscr.Pset(x1, y1, c)
           Case Else
         End Select

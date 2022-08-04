@@ -14,7 +14,7 @@
   Public Sub New(sx As Integer, sy As Integer, scale As Single)
     m_width = sx
     m_height = sy
-    m_height = scale
+    m_scale = scale
   End Sub
 
   Public Sub Render(buffer As BufferedGraphics, pb As PictureBox)
@@ -23,7 +23,7 @@
         buffer.Graphics.FillRectangle(brush, New Rectangle(0, 0, pb.Width, pb.Height))
         For Each p In m_points
           brush.Color = p.C
-          buffer.Graphics.FillRectangle(brush, p.X, p.Y, 1, 1)
+          buffer.Graphics.FillRectangle(brush, p.X * m_scale, p.Y * m_scale, m_scale, m_scale)
         Next
       End Using
       buffer.Render(pb.CreateGraphics)
@@ -120,7 +120,9 @@
     m_points.Clear()
   End Sub
 
-  Friend Sub Line(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, attribute As Drawing.Color, box As Boolean, fill As Boolean, style As Short?, Optional ByRef styleBit As Integer = 0)
+  Friend Sub Line(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, Optional attribute As Drawing.Color? = Nothing, Optional box As Boolean = False, Optional fill As Boolean = False, Optional style As Short? = Nothing, Optional ByRef styleBit As Integer = 0)
+
+    If attribute Is Nothing Then attribute = m_foregroundColor
 
     'If attribute = -1 Then
     '  attribute = Me.m_foreColor
@@ -226,7 +228,7 @@
 
   End Sub
 
-  Public Sub Circle(xcenter As Integer, ycenter As Integer, radius As Double, attribute As Drawing.Color, start As Double, [end] As Double, aspect As Double)
+  Public Sub Circle(xcenter As Integer, ycenter As Integer, radius As Double, Optional attribute As Drawing.Color? = Nothing, Optional start As Double = Double.MaxValue, Optional [end] As Double = Double.MaxValue, Optional aspect As Double = Double.MaxValue)
 
     '                                     1                                  2               4                 8               16
     ' passed is used to notify the routine whether or not the optional values are actually provided or not.
@@ -250,6 +252,15 @@
     '  Case Else
     '    Stop
     'End Select
+
+    Dim defaultStart As Double = 0
+    Dim defaultEnd As Double = Math.PI * 2
+    Dim defaultAspect = 4.0 * (m_height / m_width) / 3.0
+
+    If attribute Is Nothing Then attribute = m_foregroundColor
+    If start = Double.MaxValue Then start = defaultStart
+    If [end] = Double.MaxValue Then [end] = defaultEnd
+    If aspect = Double.MaxValue Then aspect = defaultAspect
 
     Static pi As Double = 3.1415926535897931
     Static pi2 As Double = 6.2831853071795862
