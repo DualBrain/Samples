@@ -31,8 +31,9 @@ Partial Class Form1
     '
     Me.PictureBox1.Dock = System.Windows.Forms.DockStyle.Fill
     Me.PictureBox1.Location = New System.Drawing.Point(0, 0)
+    Me.PictureBox1.Margin = New System.Windows.Forms.Padding(9, 10, 9, 10)
     Me.PictureBox1.Name = "PictureBox1"
-    Me.PictureBox1.Size = New System.Drawing.Size(800, 450)
+    Me.PictureBox1.Size = New System.Drawing.Size(2286, 1440)
     Me.PictureBox1.TabIndex = 0
     Me.PictureBox1.TabStop = False
     '
@@ -41,19 +42,22 @@ Partial Class Form1
     Me.Label1.AutoSize = True
     Me.Label1.BackColor = System.Drawing.Color.Black
     Me.Label1.ForeColor = System.Drawing.Color.White
-    Me.Label1.Location = New System.Drawing.Point(24, 15)
+    Me.Label1.Location = New System.Drawing.Point(69, 48)
+    Me.Label1.Margin = New System.Windows.Forms.Padding(9, 0, 9, 0)
     Me.Label1.Name = "Label1"
-    Me.Label1.Size = New System.Drawing.Size(41, 15)
+    Me.Label1.Size = New System.Drawing.Size(123, 48)
     Me.Label1.TabIndex = 1
     Me.Label1.Text = "Label1"
     '
     'Form1
     '
-    Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
+    Me.AutoScaleDimensions = New System.Drawing.SizeF(20.0!, 48.0!)
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-    Me.ClientSize = New System.Drawing.Size(800, 450)
+    Me.ClientSize = New System.Drawing.Size(2286, 1440)
     Me.Controls.Add(Me.Label1)
     Me.Controls.Add(Me.PictureBox1)
+    Me.KeyPreview = True
+    Me.Margin = New System.Windows.Forms.Padding(9, 10, 9, 10)
     Me.Name = "Form1"
     Me.Text = "Form1"
     CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
