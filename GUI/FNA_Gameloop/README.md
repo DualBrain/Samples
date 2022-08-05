@@ -14,3 +14,8 @@ It also requires a several additional DLLs (included) to either be with the
 produced executable or in the appropriate DLL path(s).
 
 You can find the latest versions of these at: https://fna.flibitijibibo.com/archive/fnalibs.tar.bz2
+
+## More
+
+- [FNA WASM](https://github.com/wattsyart/fna-wasm)
+- [FNA WASM Builds](https://github.com/clarvalon/FNA-WASM-Build/actions)
