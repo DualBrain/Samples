@@ -114,7 +114,9 @@ Public Class Form1
       m_gscr.Render(mybuff, PictureBox1)
 
       m_stopwatch.Stop()
-      Label1.Text = $"frame @ {1000 \ m_stopwatch.ElapsedMilliseconds} FPS"
+      Dim value = m_stopwatch.ElapsedMilliseconds
+      If value = 0 Then value = 1
+      Label1.Text = $"frame @ {1000 \ value} FPS"
 
       'Application.DoEvents() ' This is bad, but it's quick and easy to use...
       Await Task.Delay(1) ' So, instead, let's take advantage of a "state machine" approach to the same thing.
