@@ -1,6 +1,6 @@
-Option Explicit Off
-Option Strict Off
-Option Infer Off
+Option Explicit On
+Option Strict On
+Option Infer On
 
 Imports System
 Imports System.Runtime.CompilerServices
@@ -19,13 +19,66 @@ Module Program
     'Module1.Main1()
     'Module2.Main2()
 
-    a = 10
-    bb = 3
-    System.Console.Write("a = 10 : b = 3 : a \ b = ")
-    System.Console.Write(a \ bb)
-    System.Console.WriteLine()
-    Return
+    'a = 10
+    'bb = 3
+    'System.Console.Write("a = 10 : b = 3 : a \ b = ")
+    'System.Console.Write(a \ bb)
+    'System.Console.WriteLine()
+    'Return
 
+    ConvertFiles()
+
+  End Sub
+
+  Private Sub ConvertFiles()
+
+    Dim basePath = "Cxbx Reloaded\xiso"
+    Dim targetPath = "Xemu\iso"
+
+    Dim files = IO.Directory.GetFiles(basePath, "*.iso")
+
+    IO.Directory.SetCurrentDirectory(basePath)
+
+    For Each file In files
+
+      Dim iso = IO.Path.GetFileName(file)
+      Dim name = IO.Path.GetFileNameWithoutExtension(file)
+
+      Console.WriteLine($"Processing {name}")
+      Console.WriteLine($"========================================")
+      Dim filename = "extract-xiso.exe"
+      Dim arguments = $"-x ""{iso}"""
+      Dim startInfo = New ProcessStartInfo(filename, arguments)
+      startInfo.WorkingDirectory = basePath
+      startInfo.WindowStyle = ProcessWindowStyle.Normal
+      Dim p = Process.Start(startInfo)
+      Dim exitCode = -1
+      Do
+        If p.HasExited Then
+          exitCode = p.ExitCode ' 0 success 1 failed
+          Exit Do
+        End If
+      Loop
+      If exitCode = 0 Then
+        IO.File.Delete(iso)
+        filename = "extract-xiso.exe"
+        arguments = $"-c ""{name}"""
+        startInfo = New ProcessStartInfo(filename, arguments)
+        startInfo.WorkingDirectory = basePath
+        startInfo.WindowStyle = ProcessWindowStyle.Normal
+        p = Process.Start(startInfo)
+        exitCode = -1
+        Do
+          If p.HasExited Then
+            exitCode = p.ExitCode ' 0 success 1 failed
+            Exit Do
+          End If
+        Loop
+        If exitCode = 0 Then
+          IO.File.Move(file, IO.Path.Combine(targetPath, IO.Path.GetFileName(file)))
+        End If
+      End If
+    Next
 
   End Sub
 

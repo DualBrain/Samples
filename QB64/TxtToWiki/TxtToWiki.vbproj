@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>PeToWiki</RootNamespace>
+    <RootNamespace>TxtToWiki</RootNamespace>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 

@@ -19,37 +19,46 @@ Module Program
     Document
   End Enum
 
+  Private ReadOnly m_links As New Dictionary(Of String, String)
+  Private ReadOnly m_alphaIndex As New Dictionary(Of Char, Integer)
+
   Sub Main() 'args As String())
 
-    Dim mdPath = "D:\github\qb64.wiki\Keyword-Reference-(Alphabetical).md"
-    Dim content = IO.File.ReadAllText(mdPath)
+    Dim csrLeft = 1
+    Dim csrTop = 2
 
-    Dim st = SourceText.From(content)
-    'Dim lexer = New Lexer(st)
+    If False Then
 
-    Dim lxr = New Lexer(st)
-    Dim tokens = New List(Of SyntaxToken)
-    Do
-      Dim token = lxr.Lex
-      If token.Kind = SyntaxKind.EndOfFileToken Then
-        'root = New CompilationUnitSyntax(st, ImmutableArray(Of MemberSyntax).Empty, token)
-      End If
-      If token.Kind <> SyntaxKind.EndOfFileToken Then 'OrElse m_includeEndOfFile Then
-        tokens.Add(token)
-      End If
-      If token.Kind = SyntaxKind.EndOfFileToken Then Exit Do
-    Loop
-    'd = l.Diagnostics.ToImmutableArray
+      Dim mdPath = "D:\github\qb64.wiki\Keyword-Reference-(Alphabetical).md"
+      Dim content = IO.File.ReadAllText(mdPath)
 
-    Dim prsr = New Parser(tokens)
-    prsr.Parse()
+      Dim st = SourceText.From(content)
+      'Dim lexer = New Lexer(st)
 
-    'For Each token In tokens
-    '  Console.Write(token)
-    'Next
+      Dim lxr = New Lexer(st)
+      Dim tokens = New List(Of SyntaxToken)
+      Do
+        Dim token = lxr.Lex
+        If token.Kind = SyntaxKind.EndOfFileToken Then
+          'root = New CompilationUnitSyntax(st, ImmutableArray(Of MemberSyntax).Empty, token)
+        End If
+        If token.Kind <> SyntaxKind.EndOfFileToken Then 'OrElse m_includeEndOfFile Then
+          tokens.Add(token)
+        End If
+        If token.Kind = SyntaxKind.EndOfFileToken Then Exit Do
+      Loop
+      'd = l.Diagnostics.ToImmutableArray
 
-    Return
+      Dim prsr = New Parser(tokens)
+      prsr.Parse()
 
+      'For Each token In tokens
+      '  Console.Write(token)
+      'Next
+
+      Return
+
+    End If
 
     Dim keywords = {"ABSOLUTE", "ACCESS", "ANY", "APPEND", "AS",
                     "BASE", "BINARY",
@@ -174,34 +183,204 @@ Module Program
           workingId = line.Substring(4)?.Trim
           m_lines.Add($"{Space(65)}╔═{New String("═"c, workingId.Length)}═╗")
           m_lines.Add($"{New String("═"c, 65)}╣ {workingId} ║")
+          If workingId.Length = 1 Then
+            m_alphaIndex.Add(workingId, m_lines.Count - 1)
+          End If
           m_lines.Add($"{Space(65)}╚═{New String("═"c, workingId.Length)}═╝")
-        ElseIf line.StartsWith("* ") Then
+        ElseIf line.StartsWith("* [") Then
+
           ' bullet entry.
-          Dim text = line.Substring(2)
-          Dim keyword = text.Substring(1, text.IndexOf("]"c) - 1)
-          If functions.Contains(keyword) Then
-            keyword &= " Function"
-          ElseIf statements.Contains(keyword) Then
-            keyword &= " Statement"
-          ElseIf keywords.Contains(keyword) Then
-            keyword &= " Keyword"
-          ElseIf operators.Contains(keyword) Then
-            keyword &= " Operator"
-          Else
-            If keyword.Contains("(statement)") Then
-              keyword = keyword.Replace("(statement)", "Statement")
-            Else
-              If text.Contains("(function)") Then
-                keyword &= " Function"
-              ElseIf text.Contains("statement)") Then
-                keyword &= " Statement"
+
+          Dim category = ""
+
+          ' Start with this...
+          '* [ALIAS](ALIAS) (QB64 [DECLARE LIBRARY](DECLARE-LIBRARY) statement) denotes the actual name of an imported [FUNCTION](FUNCTION) or [SUB](SUB) procedure.
+          ' Transform into...
+          ' ALIAS Keyword
+          ' Track "document name"?
+          ' Track offset, length (for color).
+
+          'Dim text = line.Substring(3)
+
+          ' Determine text in the initial brackets...
+
+          Dim offset = 3
+          Dim parenCount = 0
+          Dim accumulator = ""
+          Do
+            Dim ch = line(offset)
+            Select Case ch
+              'Case "["c
+              Case "("c : parenCount += 1 : accumulator &= ch
+              Case ")"c : parenCount -= 1 : accumulator &= ch
+              Case "]"c
+                If parenCount = 0 Then offset += 1 : Exit Do
+              Case Else
+                accumulator &= ch
+            End Select
+            offset += 1
+          Loop
+
+          If line(offset) = "("c Then
+
+            Dim name = accumulator
+
+            Select Case name
+              Case "AS" : category = "Keyword"
+              Case "CALL ABSOLUTE" : name = "ABSOLUTE"
+              Case "AND (boolean)" : name = "AND" : category = "Operator"
+              Case "ASC (statement)" : name = "ASC" : category = "Statement"
+              Case "CASE ELSE", "CASE IS" : name = "CASE"
+              Case "DATE$ (statement)" : name = "DATE$" : category = "Statement"
+              Case "DECLARE LIBRARY", "DECLARE DYNAMIC LIBRARY" : name = "DECLARE"
+              Case "FOR (file statement)" : name = "FOR" : category = "Statement"
+              Case "FREE (QB64 TIMER statement)" : name = "FREE" : category = "Statement"
+              Case "GET (TCP/IP statement)", "GET (graphics statement)" : name = "GET" : category = "Statement"
+              Case "INPUT (file mode)", "INPUT (file statement)" : name = "INPUT" : category = "Statement"
+              Case "LINE INPUT (file statement)" : name = "LINE INPUT" : category = "Statement"
+              Case "MID$ (statement)" : name = "MID$" : category = "Statement"
+              Case "OPTION BASE" : name = "OPTION"
+              Case "OR (boolean)" : name = "OR" : category = "Operator"
+              Case "PEN (statement)" : name = "PEN" : category = "Statement"
+              Case "PRINT (file statement)" : name = "PRINT" : category = "Statement"
+              Case "PRINT USING (file statement)" : name = "PRINT" : category = "Statement"
+              Case "PUT (TCP/IP statement)", "PUT (graphics statement)" : name = "PUT" : category = "Statement"
+              Case "SCREEN (function)" : name = "SCREEN" : category = "Function"
+              Case "SEEK (statement)" : name = "SEEK" : category = "Statement"
+              Case "SELECT CASE" : name = "SELECT"
+              Case "SHELL (function)" : name = "SHELL" : category = "Function"
+              Case "TIMER (statement)" : name = "TIMER" : category = "Statement"
+              Case "WRITE (file statement)" : name = "WRITE" : category = "Statement"
+              Case Else
+            End Select
+
+            offset += 1
+            accumulator = ""
+
+            Do
+              Dim ch = line(offset)
+              Select Case ch
+                Case "("c : parenCount += 1 : accumulator &= ch
+                Case ")"c
+                  If parenCount = 0 Then
+                    offset += 1
+                    Exit Do
+                  Else
+                    parenCount -= 1 : accumulator &= ch
+                  End If
+                Case Else
+                  accumulator &= ch
+              End Select
+              offset += 1
+            Loop
+
+            Dim document = accumulator
+
+            Do
+              If offset < line.Length AndAlso line(offset) = " "c Then
+                offset += 1
               Else
-                'keyword &= " Keyword"
+                Exit Do
+              End If
+            Loop
+
+            accumulator = ""
+
+            If offset < line.Length AndAlso line(offset) = "(" Then
+
+              offset += 1
+
+              Do
+                Dim ch = line(offset)
+                Select Case ch
+                  Case "("c : parenCount += 1 : accumulator &= ch
+                  Case ")"c
+                    If parenCount = 0 Then
+                      offset += 1
+                      Exit Do
+                    Else
+                      parenCount -= 1 : accumulator &= ch
+                    End If
+                  Case Else
+                    accumulator &= ch
+                End Select
+                offset += 1
+              Loop
+
+            End If
+
+            If String.IsNullOrWhiteSpace(category) AndAlso
+               Not String.IsNullOrWhiteSpace(accumulator) Then
+              If Not name.StartsWith("_") Then
+                Select Case accumulator
+                  Case "file mode" : category = "Keyword"
+                  Case "[SELECT CASE](SELECT-CASE) condition", "condition" : category = "Condition"
+                  Case "numerical type #" : category = "????"
+                  Case "% numerical type" : category = "????"
+                  Case "& numerical type" : category = "????"
+                  Case "! numerical type" : category = "????"
+                  Case "$ variable type" : category = "????"
+                  Case "` numerical type" : category = "????"
+                  Case "%% numerical type" : category = "????"
+                  Case "numerical type ##" : category = "????"
+                  Case "&& numerical type" : category = "????"
+                  Case "variable type" : category = "????"
+                  Case "floating decimal point" : category = "????"
+                  Case "OS 2 event" : category = "????"
+                  Case "procedure block" : category = "????"
+                  Case "definition" : category = "????"
+                  Case "[SHELL](SHELL) action" : category = "????"
+                  Case "Pre-compiler directive", "QB64 C++ [Metacommand](Metacommand)", "QB64 [Metacommand](Metacommand)", "precompiler [metacommand](metacommand)", "Pre-Compiler [Metacommand](Metacommand)", "[Metacommand](Metacommand)", "metacommand", "[QB64 [Metacommand]]", "[Metacommand](Metacommand) - Deprecated" : category = "Metacommand"
+                  Case Else
+                    If accumulator.EndsWith("statement") Then
+                      category = "Statement"
+                    ElseIf accumulator.EndsWith("function") Then
+                      category = "Function"
+                    ElseIf accumulator.EndsWith("operator") Then
+                      category = "Operator"
+                    ElseIf accumulator.EndsWith("keyword") Then
+                      category = "Keyword"
+                    Else
+                      category = accumulator
+                    End If
+                End Select
               End If
             End If
+
+            Dim key = $"{name} {category}"
+              If Not m_links.ContainsKey(key) Then
+                m_links.Add(key, document)
+              End If
+
+              m_lines.Add($"  {name} ({category})")
+
+            End If
+
+            'Dim keyword = text.Substring(1, text.IndexOf("]"c) - 1)
+            'If functions.Contains(keyword) Then
+            '  keyword &= " Function"
+            'ElseIf statements.Contains(keyword) Then
+            '  keyword &= " Statement"
+            'ElseIf keywords.Contains(keyword) Then
+            '  keyword &= " Keyword"
+            'ElseIf operators.Contains(keyword) Then
+            '  keyword &= " Operator"
+            'Else
+            '  If keyword.Contains("(statement)") Then
+            '    keyword = keyword.Replace("(statement)", "Statement")
+            '  Else
+            '    If text.Contains("(function)") Then
+            '      keyword &= " Function"
+            '    ElseIf text.Contains("statement)") Then
+            '      keyword &= " Statement"
+            '    Else
+            '      'keyword &= " Keyword"
+            '    End If
+            '  End If
+            'End If
+            'm_lines.Add($"  {name}")
+
           End If
-          m_lines.Add($"  {keyword}")
-        End If
       Next
 
       'For alpha = 65 To 90
@@ -301,62 +480,108 @@ Redraw:
     If w <> Console.WindowWidth Then GoTo FullRedraw
     If h <> Console.WindowHeight Then GoTo FullRedraw
 
-    Dim top = 2
-    Dim n = 0
-    For l = index To index + h - 3
-      'If top + n > h - 2 Then Exit For
-      Dim text As String
-      If l > m_lines.Count - 1 Then
-        text = ""
-      Else
-        text = m_lines(l)
-      End If
-      If text.Length < w - 2 Then text &= Space((w - 2) - text.Length)
-      If text.Length > w - 2 Then text = text.Substring(0, w - 2)
-      PrintEx(text, 1, top + n) : n += 1
-    Next
+    Console.CursorVisible = False
+    Try
 
-    ' ║╚╝╣╗╔═
+      Dim top = 2
+      Dim n = 0
+      For l = index To index + h - 3
+        'If top + n > h - 2 Then Exit For
+        Dim text As String
+        If l > m_lines.Count - 1 Then
+          text = ""
+        Else
+          text = m_lines(l)
+        End If
+        If text.Length < w - 2 Then text &= Space((w - 2) - text.Length)
+        If text.Length > w - 2 Then text = text.Substring(0, w - 2)
 
-    'PrintEx("ABS Function", 3, 11) : PrintEx("APPEND Keyword", 40, 11)
-    'PrintEx("ABSOLUTE Keyword", 3, 12) : PrintEx("AS Keyword", 40, 12)
-    'PrintEx("ACCESS Keyword", 3, 13) : PrintEx("ASCKeyword", 40, 13)
-    'PrintEx("AND Operator", 3, 14) : PrintEx("ATN Keyword", 40, 14)
-    'PrintEx("ANY Keyword", 3, 15) : PrintEx("", 40, 15)
+        'PrintEx(text, 1, top + n)
+        Dim nav = False
+        Dim isKeyword = False
+        Dim inWord = False
 
-    'PrintEx("╔═══╗", 66, 16)
-    'PrintEx(New String("═"c, 65), 1, 17)
-    'Console.Write("╣ B ║")
-    'PrintEx("╚═══╝", 66, 18)
+        Dim clr = Gray
 
-    'PrintEx("BASE Keyword", 3, 19) : PrintEx("BLOAD Statement", 40, 19)
-    'PrintEx("Basic Character Set", 3, 20) : PrintEx("Boolean Operators", 40, 20)
-    'PrintEx("BEEP Statement", 3, 21) : PrintEx("BSAVE Statement", 40, 21)
-    'PrintEx("BINARY Keyword", 3, 22) : PrintEx("", 40, 22)
+        For c = 0 To text.Length - 1
 
-    'PrintEx("╔═══╗", 66, 23)
-    'PrintEx(New String("═"c, 65), 1, 24)
-    'Console.Write("╣ C ║")
-    'PrintEx("╚═══╝", 66, 25)
+          Select Case text(c)
+            Case "◄"c : clr = White : nav = True
+            Case "►"c : clr = White : nav = False
+            Case "╔"c, "═"c, "╗"c, "╚"c, "╝"c, "╣"c, "║"c, "─"c
+              clr = DarkGray
+            Case "_"c, "$"c
+              If inWord Then
+                ' do nothing
+              Else
+                Dim word = PeekWord(text, c)
+                If word.Length > 1 Then inWord = True
+                If metacommands.Contains(word) Then
+                  isKeyword = True
+                  clr = Blue
+                End If
+              End If
+            Case "A"c To "Z"c
+              If Not nav Then
+                If Not inWord Then
+                  inWord = True
+                  Dim word = PeekWord(text, c)
+                  If keywords.Contains(word) OrElse
+                     statements.Contains(word) OrElse
+                     functions.Contains(word) OrElse
+                     operators.Contains(word) OrElse
+                     metacommands.Contains(word) Then
+                    isKeyword = True
+                    clr = Blue
+                  End If
+                End If
+              Else
+                clr = ConsoleColor.Green
+              End If
+            Case "a"c To "z"c, "'"c, "?"c
+            Case "."c
+              If Not inWord Then
+                inWord = False : isKeyword = False : nav = False
+                clr = ConsoleColor.Gray
+              End If
+            Case ":"c, " "c, "1"c, "2"c, "3"c, "4"c, "5"c, "6"c, "7"c, "8"c, "9"c, "("c, ")"c, "["c, "]"c, "/"c, "+"c, "&"c, "-"c, "*"c, "\"c, "^"c
+              inWord = False : isKeyword = False : nav = False
+              clr = ConsoleColor.Gray
+            Case "<"c, ">"c, "`"c
+            Case Else
+              clr = ConsoleColor.Gray
+          End Select
+          PrintEx(text(c), 1 + c, top + n, clr)
+        Next
 
-    For r = 2 To h - 2
-      PrintEx("│", 0, r)
-      'PrintEx("│", w - 1, r)
-      If r = 2 Then
-        PrintEx("↑", w - 1, r, Black, Gray)
-      ElseIf r = h - 2 Then
-        PrintEx("↓", w - 1, r, Black, Gray)
-      Else
-        'PrintEx("░", w - 1, r, Black, Gray)
-        'PrintEx("▒", w - 1, r, Black, Gray)
-        PrintEx("▓", w - 1, r, Black, Gray)
-        'PrintEx("X", w - 1, r)
-      End If
-    Next
+        n += 1
 
-    Console.Write("└"c)
-    Console.Write(New String("─"c, w - 2))
-    Console.Write("┘"c)
+      Next
+
+      ' ║╚╝╣╗╔═
+
+      For r = 2 To h - 2
+        PrintEx("│", 0, r)
+        'PrintEx("│", w - 1, r)
+        If r = 2 Then
+          PrintEx("↑", w - 1, r, Black, Gray)
+        ElseIf r = h - 2 Then
+          PrintEx("↓", w - 1, r, Black, Gray)
+        Else
+          'PrintEx("░", w - 1, r, Black, Gray)
+          'PrintEx("▒", w - 1, r, Black, Gray)
+          PrintEx("▓", w - 1, r, Black, Gray)
+        End If
+      Next
+
+      Console.Write("└"c)
+      Console.Write(New String("─"c, w - 2))
+      Console.Write("┘"c)
+
+    Finally
+      Console.CursorVisible = True
+      Console.SetCursorPosition(csrLeft, csrTop)
+    End Try
 
     Do
 
@@ -368,14 +593,95 @@ Redraw:
 
       Try
         If Console.KeyAvailable Then
-          Dim cki = Console.ReadKey()
+          Dim cki = Console.ReadKey(True)
           Select Case cki.Key
+
+            Case ConsoleKey.PageUp
+              index -= (h - 3) : If index < 0 Then index = 0
+              GoTo Redraw
+            Case ConsoleKey.PageDown
+              index += (h - 3) : If index > m_lines.Count - 1 Then index = m_lines.Count - 1
+              GoTo Redraw
+
+            Case ConsoleKey.Home
+              If cki.Modifiers = ConsoleModifiers.Control Then
+                index = 0
+                GoTo Redraw
+              Else
+                'TODO: what about empty lines?
+                For i = 0 To m_lines(index + csrTop - 2).Length - 1
+                  If m_lines(index + csrTop - 2)(i) <> " "c Then
+                    csrLeft = 1 + i : Exit For
+                  End If
+                Next
+                SetCursorPosition(csrLeft, csrTop)
+              End If
+            Case ConsoleKey.End
+              If cki.Modifiers = ConsoleModifiers.Control Then
+                index = m_lines.Count - 1
+                GoTo Redraw
+              Else
+                'TODO: what about empty lines?
+                For i = m_lines(index + csrTop - 2).Length - 1 To 0 Step -1
+                  If m_lines(index + csrTop - 2)(i) <> " "c Then
+                    csrLeft = 1 + (i + 1) : Exit For
+                  End If
+                Next
+                SetCursorPosition(csrLeft, csrTop)
+              End If
+            Case ConsoleKey.RightArrow
+              csrLeft += 1 : SetCursorPosition(csrLeft, csrTop)
+            Case ConsoleKey.LeftArrow
+              csrLeft -= 1 : SetCursorPosition(csrLeft, csrTop)
             Case ConsoleKey.UpArrow
-              index -= 1 : If index < 0 Then index = 0
-              GoTo Redraw
+              If csrTop = 2 OrElse cki.Modifiers = ConsoleModifiers.Control Then
+                index -= 1 : If index < 0 Then index = 0
+                If cki.Modifiers = ConsoleModifiers.Control Then csrTop += 1 : SetCursorPosition(csrLeft, csrTop)
+                GoTo Redraw
+              Else
+                csrTop -= 1 : SetCursorPosition(csrLeft, csrTop)
+              End If
             Case ConsoleKey.DownArrow
-              index += 1 : If index > m_lines.Count - 1 Then index = m_lines.Count - 1
-              GoTo Redraw
+              If csrTop = h - 2 OrElse cki.Modifiers = ConsoleModifiers.Control Then
+                index += 1 : If index > m_lines.Count - 1 Then index = m_lines.Count - 1
+                If cki.Modifiers = ConsoleModifiers.Control Then csrTop -= 1 : SetCursorPosition(csrLeft, csrTop)
+                GoTo Redraw
+              Else
+                csrTop += 1 : SetCursorPosition(csrLeft, csrTop)
+              End If
+
+            Case ConsoleKey.Tab
+
+              If cki.Modifiers = ConsoleModifiers.Shift Then
+                'TODO: Navigate to the previous keyword.
+              Else
+                'TODO: Navigate to the next keyword.
+              End If
+
+            Case ConsoleKey.F1, ConsoleKey.Enter
+
+              'TODO: Navigate to the select keyword document "link".
+              ' Note: This includes the "category".
+
+              Dim line = m_lines(index + (csrTop - 2))
+              Debug.WriteLine(line)
+
+            Case ConsoleKey.A To ConsoleKey.Z
+
+              'TODO: Jump to letter section.
+
+              ' If cursor is already on a keyword starting with this letter, "tab" to the next word in the section.
+              ' If on the last keyword in this section, loop to the first keyword.
+              ' If section is partially off-screen, but currently one a keyword for this letter, "tab".
+              ' If section is not visible (or partially visible) and cursor is not on a keyword for this letter, 
+              '   scroll into view the first word of the section and set cursor accordingly.
+
+              Dim key = ChrW(cki.Key)
+              If m_alphaIndex.ContainsKey(key) Then
+                index = m_alphaIndex(key)
+                GoTo Redraw
+              End If
+
             Case ConsoleKey.Escape
               Exit Do
             Case Else
@@ -398,6 +704,19 @@ Redraw:
     ' Color coding?
 
   End Sub
+
+  Private Function PeekWord(text As String, index As Integer) As String
+    Dim word As String = ""
+    For i = index To text.Length - 1
+      Select Case text(i)
+        Case " "c, ","
+          Exit For
+        Case Else
+          word &= text(i)
+      End Select
+    Next
+    Return word
+  End Function
 
   Private Sub PrintEx(text As String, column As Integer, row As Integer, Optional foregroundColor As ConsoleColor? = Nothing, Optional backgroundColor As ConsoleColor? = Nothing)
     Dim cfg = Console.ForegroundColor
