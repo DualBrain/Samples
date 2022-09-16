@@ -18,6 +18,11 @@
   End Sub
 
   Public Sub Render(buffer As BufferedGraphics, pb As PictureBox)
+    If m_width <> pb.Width OrElse
+       m_height <> pb.Height Then
+      m_width = pb.Width
+      m_height = pb.Height
+    End If
     If buffer IsNot Nothing Then
       Using brush = New SolidBrush(Drawing.Color.Black)
         buffer.Graphics.FillRectangle(brush, New Rectangle(0, 0, pb.Width, pb.Height))

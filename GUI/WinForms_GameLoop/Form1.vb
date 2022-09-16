@@ -53,15 +53,15 @@ Public Class Form1
     Loop
   End Sub
 
-  Private mode As Integer = 1
+  Private mode As Integer = 2
 
   Private Async Function BootStrapAsync() As Task
     'mousepos = Cursor.HotSpot
 
-    Dim sx = 160 'PictureBox1.Width
-    Dim sy = 100 'PictureBox1.Height
+    Dim sx = PictureBox1.Width
+    Dim sy = PictureBox1.Height
 
-    m_gscr = New QbScreen(sx, sy, 14.0)
+    m_gscr = New QbScreen(sx, sy, 1.0)
 
     ' Create drawing rectangle...
     'm_rectangle.Width = PictureBox1.Width
@@ -87,6 +87,23 @@ Public Class Form1
     'Dim aspect = 4.0 * (sy / sx) / 3.0
 
     Do
+
+      If sx <> PictureBox1.Width OrElse
+         sy <> PictureBox1.Height Then
+
+        sx = PictureBox1.Width
+        sy = PictureBox1.Height
+
+        mybuff = m_context.Allocate(PictureBox1.CreateGraphics, New Rectangle(0, 0, PictureBox1.Width, PictureBox1.Height)) 'm_rectangle)
+
+        ' Set some optimization drawing "stuff"...
+        mybuff.Graphics.CompositingMode = Drawing2D.CompositingMode.SourceOver
+        mybuff.Graphics.CompositingQuality = Drawing2D.CompositingQuality.AssumeLinear
+        mybuff.Graphics.SmoothingMode = Drawing2D.SmoothingMode.None
+        mybuff.Graphics.InterpolationMode = CType(Drawing2D.QualityMode.Low, Drawing2D.InterpolationMode)
+        mybuff.Graphics.PixelOffsetMode = Drawing2D.PixelOffsetMode.None
+
+      End If
 
       m_stopwatch.Reset()
       m_stopwatch.Start()
