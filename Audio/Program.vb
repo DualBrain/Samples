@@ -27,17 +27,19 @@ Module Program
 
     Console.WriteLine("******* Using WaveOut ******* ")
 
-    For n = -1 To WaveOut.DeviceCount - 1
-      Dim caps = WaveOut.GetCapabilities(n)
-      Console.WriteLine($"{n}: {caps.ProductName}")
-    Next
+    'NOTE: The following appears to have been removed between NAudio 1.x and 2.x.
+    'For n = -1 To WaveOut.DeviceCount - 1
+    '  Dim caps = WaveOut.GetCapabilities(n)
+    '  Console.WriteLine($"{n}: {caps.ProductName}")
+    'Next
 
     Console.WriteLine("******* Using WaveIn ******* ")
 
-    For n = -1 To WaveIn.DeviceCount - 1
-      Dim caps = WaveIn.GetCapabilities(n)
-      Console.WriteLine($"{n}: {caps.ProductName}")
-    Next
+    'NOTE: The following appears to have been removed between NAudio 1.x and 2.x.
+    'For n = -1 To WaveIn.DeviceCount - 1
+    '  Dim caps = WaveIn.GetCapabilities(n)
+    '  Console.WriteLine($"{n}: {caps.ProductName}")
+    'Next
 
     Console.WriteLine("******* Using DirectSound ******* ")
 

@@ -353,20 +353,20 @@ Namespace Global.PlayString
       Dim blockAlign = CUShort((numChannels * (bitsPerSample / 8)))
 
       Using sw As New MemoryStream()
-        sw.Write(Encoding.ASCII.GetBytes("RIFF"))
-        sw.Write(BitConverter.GetBytes(chunkSize))
-        sw.Write(Encoding.ASCII.GetBytes("WAVE"))
-        sw.Write(Encoding.ASCII.GetBytes("fmt "))
-        sw.Write(BitConverter.GetBytes(subChunk1Size))
-        sw.Write(BitConverter.GetBytes(audioFormat))
-        sw.Write(BitConverter.GetBytes(numChannels))
-        sw.Write(BitConverter.GetBytes(sampleRate))
-        sw.Write(BitConverter.GetBytes(byteRate))
-        sw.Write(BitConverter.GetBytes(blockAlign))
-        sw.Write(BitConverter.GetBytes(bitsPerSample))
-        sw.Write(Encoding.ASCII.GetBytes("data"))
+        MemoryStreamWriter(sw, Encoding.ASCII.GetBytes("RIFF"))
+        MemoryStreamWriter(sw, BitConverter.GetBytes(chunkSize))
+        MemoryStreamWriter(sw, Encoding.ASCII.GetBytes("WAVE"))
+        MemoryStreamWriter(sw, Encoding.ASCII.GetBytes("fmt "))
+        MemoryStreamWriter(sw, BitConverter.GetBytes(subChunk1Size))
+        MemoryStreamWriter(sw, BitConverter.GetBytes(audioFormat))
+        MemoryStreamWriter(sw, BitConverter.GetBytes(numChannels))
+        MemoryStreamWriter(sw, BitConverter.GetBytes(sampleRate))
+        MemoryStreamWriter(sw, BitConverter.GetBytes(byteRate))
+        MemoryStreamWriter(sw, BitConverter.GetBytes(blockAlign))
+        MemoryStreamWriter(sw, BitConverter.GetBytes(bitsPerSample))
+        MemoryStreamWriter(sw, Encoding.ASCII.GetBytes("data"))
         For Each d As Byte() In m_data
-          sw.Write(d)
+          MemoryStreamWriter(sw, d)
         Next
         sw.Seek(0, SeekOrigin.Begin)
         Using player As New WaveOutEvent
@@ -381,6 +381,12 @@ Namespace Global.PlayString
       End Using
 
     End Function
+
+    Private Shared Sub MemoryStreamWriter(sw As MemoryStream, bytes As Byte())
+      For Each b In bytes
+        sw.WriteByte(b)
+      Next
+    End Sub
 
     Friend Sub PlayOrSaveWav(Optional filespec As String = Nothing)
 
@@ -397,20 +403,20 @@ Namespace Global.PlayString
       If filespec Is Nothing Then
 
         Using sw As New MemoryStream()
-          sw.Write(Encoding.ASCII.GetBytes("RIFF"))
-          sw.Write(BitConverter.GetBytes(chunkSize))
-          sw.Write(Encoding.ASCII.GetBytes("WAVE"))
-          sw.Write(Encoding.ASCII.GetBytes("fmt "))
-          sw.Write(BitConverter.GetBytes(subChunk1Size))
-          sw.Write(BitConverter.GetBytes(audioFormat))
-          sw.Write(BitConverter.GetBytes(numChannels))
-          sw.Write(BitConverter.GetBytes(sampleRate))
-          sw.Write(BitConverter.GetBytes(byteRate))
-          sw.Write(BitConverter.GetBytes(blockAlign))
-          sw.Write(BitConverter.GetBytes(bitsPerSample))
-          sw.Write(Encoding.ASCII.GetBytes("data"))
+          MemoryStreamWriter(sw, Encoding.ASCII.GetBytes("RIFF"))
+          MemoryStreamWriter(sw, BitConverter.GetBytes(chunkSize))
+          MemoryStreamWriter(sw, Encoding.ASCII.GetBytes("WAVE"))
+          MemoryStreamWriter(sw, Encoding.ASCII.GetBytes("fmt "))
+          MemoryStreamWriter(sw, BitConverter.GetBytes(subChunk1Size))
+          MemoryStreamWriter(sw, BitConverter.GetBytes(audioFormat))
+          MemoryStreamWriter(sw, BitConverter.GetBytes(numChannels))
+          MemoryStreamWriter(sw, BitConverter.GetBytes(sampleRate))
+          MemoryStreamWriter(sw, BitConverter.GetBytes(byteRate))
+          MemoryStreamWriter(sw, BitConverter.GetBytes(blockAlign))
+          MemoryStreamWriter(sw, BitConverter.GetBytes(bitsPerSample))
+          MemoryStreamWriter(sw, Encoding.ASCII.GetBytes("data"))
           For Each d As Byte() In m_data
-            sw.Write(d)
+            MemoryStreamWriter(sw, d)
           Next
           sw.Seek(0, SeekOrigin.Begin)
           Using player As New WaveOutEvent
