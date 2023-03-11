@@ -18,11 +18,11 @@ Module Program
     End Sub
   End Structure
 
-  Private Declare Function CreateConsoleScreenBuffer Lib "kernel32.dll" (ByVal dwDesiredAccess As Integer, ByVal dwShareMode As UInteger, ByVal lpSecurityAttributes As IntPtr, ByVal dwFlags As UInteger, ByVal lpScreenBufferData As IntPtr) As IntPtr
-  Private Declare Function SetConsoleActiveScreenBuffer Lib "kernel32.dll" (ByVal hConsoleOutput As IntPtr) As Boolean
-  Private Declare Function WriteConsoleOutputCharacter Lib "kernel32.dll" Alias "WriteConsoleOutputCharacterA" (ByVal hConsoleOutput As IntPtr, ByVal lpCharacter As String, ByVal nLength As UInteger, ByVal dwWriteCoord As Coord, ByRef lpNumberOfCharsWritten As UInteger) As Boolean
-  Private Declare Function GetAsyncKeyState Lib "user32.dll" (ByVal virtualKeyCode As Integer) As Short
-  Private Declare Function CloseHandle Lib "kernel32.dll" (ByVal hObject As Long) As Long
+  Private Declare Function CreateConsoleScreenBuffer Lib "kernel32.dll" (dwDesiredAccess As Integer, dwShareMode As UInteger, lpSecurityAttributes As IntPtr, dwFlags As UInteger, lpScreenBufferData As IntPtr) As IntPtr
+  Private Declare Function SetConsoleActiveScreenBuffer Lib "kernel32.dll" (hConsoleOutput As IntPtr) As Boolean
+  Private Declare Function WriteConsoleOutputCharacter Lib "kernel32.dll" Alias "WriteConsoleOutputCharacterA" (hConsoleOutput As IntPtr, lpCharacter As String, nLength As UInteger, dwWriteCoord As Coord, ByRef lpNumberOfCharsWritten As UInteger) As Boolean
+  Private Declare Function GetAsyncKeyState Lib "user32.dll" (virtualKeyCode As Integer) As Short
+  Private Declare Function CloseHandle Lib "kernel32.dll" (hObject As Long) As Long
 
   Private Const GENERIC_READ As Integer = &H80000000
   Private Const GENERIC_WRITE As Integer = &H40000000
