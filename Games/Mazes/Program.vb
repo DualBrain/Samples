@@ -1,10 +1,12 @@
+' Inspired by: "Programming Mazes -- @javidx9"
+' https://youtu.be/Y37-gB83HKE
+
 Option Explicit On
 Option Strict On
 Option Infer On
 
 Imports ConsoleGameEngine.PIXEL_TYPE
 Imports ConsoleGameEngine.Colour
-Imports ConsoleGameEngine
 
 Module Program
   Sub Main() 'args As String())

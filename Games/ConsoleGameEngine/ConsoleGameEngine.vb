@@ -365,10 +365,11 @@ Public MustInherit Class ConsoleGameEngine
 
 #Region "VK"
 
-  Friend Const VK_LEFT As Integer = &H25
-  Friend Const VK_RIGHT As Integer = &H27
-  Friend Const VK_UP As Integer = &H26
-  Friend Const VK_DOWN As Integer = &H28
+  Public Const VK_SPACE As Integer = &H20
+  Public Const VK_LEFT As Integer = &H25
+  Public Const VK_RIGHT As Integer = &H27
+  Public Const VK_UP As Integer = &H26
+  Public Const VK_DOWN As Integer = &H28
 
 #End Region
 
@@ -389,8 +390,8 @@ Public MustInherit Class ConsoleGameEngine
     Public bHeld As Boolean
   End Structure
 
-  Friend ReadOnly m_keys(255) As sKeyState
-  Friend ReadOnly m_mouse(4) As sKeyState
+  Public ReadOnly m_keys(255) As sKeyState
+  Public ReadOnly m_mouse(4) As sKeyState
 
   Private ReadOnly m_hOriginalConsole As IntPtr
   Private m_mousePosX As Integer
