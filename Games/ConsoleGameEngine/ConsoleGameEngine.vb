@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.Threading
+Imports System.Xml
 
 Public Structure WAVEFORMATEX
   Public wFormatTag As Short
@@ -593,7 +594,11 @@ Public MustInherit Class ConsoleGameEngine
   '  End If
   'End Sub
 
-  Public Overridable Sub Draw(x As Integer, y As Integer, Optional c As Short = &H2588S, Optional col As Short = &HFS)
+  Public Sub Draw(x As Double, y As Double, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
+    Draw(CInt(x), CInt(y), c, col)
+  End Sub
+
+  Public Overridable Sub Draw(x As Integer, y As Integer, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
     'Public Overridable Sub Draw(x As Integer, y As Integer, c As Short, Optional col As Short = &HFS)
     If x >= 0 AndAlso x < m_nScreenWidth AndAlso y >= 0 AndAlso y < m_nScreenHeight Then
       m_bufScreen(y * m_nScreenWidth + x).CharUnion.UnicodeChar = ChrW(c)
@@ -601,7 +606,19 @@ Public MustInherit Class ConsoleGameEngine
     End If
   End Sub
 
-  Public Sub Fill(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, Optional c As Short = &H2588S, Optional col As Short = &HFS)
+  Public Sub Cls()
+    Fill(0, 0, ScreenWidth, ScreenHeight, AscW(" "), Colour.FG_BLACK)
+  End Sub
+
+  Public Sub Fill(x1 As Double, y1 As Double, x2 As Double, y2 As Double, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
+    Fill(CInt(x1), CInt(y1), CInt(x2), CInt(y2), c, col)
+  End Sub
+
+  Public Sub Fill(x1 As Short, y1 As Short, x2 As Short, y2 As Short, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
+    Fill(CInt(x1), CInt(y1), CInt(x2), CInt(y2), c, col)
+  End Sub
+
+  Public Sub Fill(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
     Clip(x1, y1)
     Clip(x2, y2)
     For x = x1 To x2 - 1
@@ -609,6 +626,10 @@ Public MustInherit Class ConsoleGameEngine
         Draw(x, y, c, col)
       Next
     Next
+  End Sub
+
+  Public Sub DrawString(x As Double, y As Double, c As String, Optional col As Short = &HFS)
+    DrawString(CInt(x), CInt(y), c, col)
   End Sub
 
   Public Sub DrawString(x As Integer, y As Integer, c As String, Optional col As Short = &HFS)
@@ -634,7 +655,11 @@ Public MustInherit Class ConsoleGameEngine
     If y >= m_nScreenHeight Then y = m_nScreenHeight
   End Sub
 
-  Private Sub DrawLine(ByVal x1 As Integer, ByVal y1 As Integer, ByVal x2 As Integer, ByVal y2 As Integer, Optional ByVal c As Short = &H2588, Optional ByVal col As Short = &HF)
+  Public Sub DrawLine(x1 As Double, y1 As Double, x2 As Double, y2 As Double, Optional c As Integer = &H2588, Optional col As Integer = &HF)
+    DrawLine(CInt(x1), CInt(y1), CInt(x2), CInt(y2), c, col)
+  End Sub
+
+  Public Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, Optional c As Integer = &H2588, Optional col As Integer = &HF)
     Dim x, y, dx, dy, dx1, dy1, px, py, xe, ye, i As Integer
     dx = x2 - x1
     dy = y2 - y1
@@ -1264,7 +1289,7 @@ next2:
 
       ' Prepare block for processing
       If m_pWaveHeaders(m_nBlockCurrent).dwFlags And WHDR_PREPARED Then
-        WaveOutUnprepareHeader(m_hwDevice, m_pWaveHeaders(m_nBlockCurrent), CUInt(Marshal.SizeOf(m_pWaveHeaders(m_nBlockCurrent))))
+        waveOutUnprepareHeader(m_hwDevice, m_pWaveHeaders(m_nBlockCurrent), CUInt(Marshal.SizeOf(m_pWaveHeaders(m_nBlockCurrent))))
       End If
 
       Dim nNewSample As Short = 0
