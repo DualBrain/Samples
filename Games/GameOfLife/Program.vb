@@ -1,4 +1,4 @@
-' Inspired by: "What are Cellular Automata? -- @javidx9"
+' Inspired by: "What are Cellular Automata?" -- @javidx9
 ' https://youtu.be/E7CxMHsYzSs
 
 Option Explicit On

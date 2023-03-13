@@ -1,4 +1,4 @@
-' Inspired by: "Code-It-Yourself! Retro Arcade Racing Game - Programming from Scratch (Quick and Simple C++) -- @javidx9"
+' Inspired by: "Code-It-Yourself! Retro Arcade Racing Game - Programming from Scratch (Quick and Simple C++)" -- @javidx9
 ' https://youtu.be/KkMZI5Jbf18
 
 Option Explicit On

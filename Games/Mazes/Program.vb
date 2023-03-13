@@ -1,4 +1,4 @@
-' Inspired by: "Programming Mazes -- @javidx9"
+' Inspired by: "Programming Mazes" -- @javidx9
 ' https://youtu.be/Y37-gB83HKE
 
 Option Explicit On

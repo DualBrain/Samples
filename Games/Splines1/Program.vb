@@ -1,4 +1,4 @@
-' Inspired by: "Programming & Using Splines - Part#1 -- @javidx9"
+' Inspired by: "Programming & Using Splines - Part#1" -- @javidx9
 ' https://youtu.be/9_aJGUTePYo
 
 Option Explicit On

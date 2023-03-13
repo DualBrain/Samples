@@ -152,7 +152,7 @@ Public Class Sprite
           bw.Write(m_colours(i))
         Next
         For i As Integer = 0 To (Width * Height) - 1
-          bw.Write(m_glyphs(i))
+          bw.Write(CShort(AscW(m_glyphs(i))))
         Next
       End Using
 
@@ -186,7 +186,7 @@ Public Class Sprite
           m_colours(i) = br.ReadInt16()
         Next
         For i As Integer = 0 To (Width * Height) - 1
-          m_glyphs(i) = br.ReadChar ' br.ReadInt16()
+          m_glyphs(i) = BitConverter.ToChar(BitConverter.GetBytes(br.ReadInt16))
         Next
 
       End Using
@@ -366,11 +366,25 @@ Public MustInherit Class ConsoleGameEngine
 
 #Region "VK"
 
+  Public Const VK_SHIFT As Integer = &H10
   Public Const VK_SPACE As Integer = &H20
   Public Const VK_LEFT As Integer = &H25
   Public Const VK_RIGHT As Integer = &H27
   Public Const VK_UP As Integer = &H26
   Public Const VK_DOWN As Integer = &H28
+  Public Const VK_PRIOR As Integer = &H21
+  Public Const VK_NEXT As Integer = &H22
+  Public Const VK_DELETE As Integer = &H2E
+  Public Const VK_F1 As Integer = &H70
+  Public Const VK_F2 As Integer = &H71
+  Public Const VK_F3 As Integer = &H72
+  Public Const VK_F4 As Integer = &H73
+  Public Const VK_F5 As Integer = &H74
+  Public Const VK_F6 As Integer = &H75
+  Public Const VK_F7 As Integer = &H76
+  Public Const VK_F8 As Integer = &H77
+  Public Const VK_F9 As Integer = &H78
+  Public Const VK_F10 As Integer = &H79
 
 #End Region
 
@@ -844,6 +858,10 @@ next2:
     End While
   End Sub
 
+  Sub DrawSprite(x As Double, y As Double, sprite As Sprite)
+    DrawSprite(CInt(x), CInt(y), sprite)
+  End Sub
+
   Sub DrawSprite(x As Integer, y As Integer, sprite As Sprite)
     If sprite Is Nothing Then
       Return
@@ -857,7 +875,12 @@ next2:
     Next
   End Sub
 
-  Sub DrawPartialSprite(x As Integer, y As Integer, sprite As Sprite, ox As Integer, oy As Integer, w As Integer, h As Integer)
+  Public Sub DrawPartialSprite(x As Double, y As Double, sprite As Sprite, ox As Double, oy As Double, w As Double, h As Double)
+    DrawPartialSprite(CInt(x), CInt(y), sprite, CInt(ox), CInt(oy), CInt(w), CInt(h))
+
+  End Sub
+
+  Public Sub DrawPartialSprite(x As Integer, y As Integer, sprite As Sprite, ox As Integer, oy As Integer, w As Integer, h As Integer)
     If sprite Is Nothing Then
       Return
     End If
