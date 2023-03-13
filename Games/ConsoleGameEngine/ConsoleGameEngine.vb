@@ -409,8 +409,8 @@ Public MustInherit Class ConsoleGameEngine
   Public ReadOnly m_mouse(4) As sKeyState
 
   Private ReadOnly m_hOriginalConsole As IntPtr
-  Private m_mousePosX As Integer
-  Private m_mousePosY As Integer
+  Public m_mousePosX As Integer
+  Public m_mousePosY As Integer
   Private m_bEnableSound As Boolean
   Private ReadOnly m_sAppName As String
   Private m_rectWindow As SMALL_RECT
