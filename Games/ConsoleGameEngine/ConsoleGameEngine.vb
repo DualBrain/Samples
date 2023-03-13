@@ -613,7 +613,6 @@ Public MustInherit Class ConsoleGameEngine
   End Sub
 
   Public Overridable Sub Draw(x As Integer, y As Integer, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
-    'Public Overridable Sub Draw(x As Integer, y As Integer, c As Short, Optional col As Short = &HFS)
     If x >= 0 AndAlso x < m_nScreenWidth AndAlso y >= 0 AndAlso y < m_nScreenHeight Then
       m_bufScreen(y * m_nScreenWidth + x).CharUnion.UnicodeChar = ChrW(c)
       m_bufScreen(y * m_nScreenWidth + x).Attributes = col
@@ -893,7 +892,7 @@ next2:
     Next
   End Sub
 
-  Sub DrawWireFrameModel(vecModelCoordinates As List(Of (x As Single, y As Single)), x As Single, y As Single, Optional r As Single = 0.0F, Optional s As Single = 1.0F, Optional col As Short = Colour.FG_WHITE, Optional c As Short = PIXEL_TYPE.PIXEL_SOLID)
+  Sub DrawWireFrameModel(vecModelCoordinates As List(Of (X As Double, Y As Double)), x As Double, y As Double, Optional r As Double = 0.0F, Optional s As Double = 1.0F, Optional col As Integer = Colour.FG_WHITE, Optional c As Integer = PIXEL_TYPE.PIXEL_SOLID)
     ' Tuple.Item1 = x coordinate
     ' Tuple.Item2 = y coordinate
     ' Create translated model vector of coordinate pairs
@@ -903,8 +902,8 @@ next2:
 
     ' Rotate
     For i As Integer = 0 To verts - 1
-      Dim coordX As Single = vecModelCoordinates(i).x
-      Dim coordY As Single = vecModelCoordinates(i).y
+      Dim coordX As Single = vecModelCoordinates(i).X
+      Dim coordY As Single = vecModelCoordinates(i).Y
       vecTransformedCoordinates.Add((coordX * Math.Cos(r) - coordY * Math.Sin(r), coordX * Math.Sin(r) + coordY * Math.Cos(r)))
     Next
 
