@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Webcam</RootNamespace>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenCvSharp4" Version="4.7.0.20230115" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.7.0.20230115" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConsoleGameEngine\ConsoleGameEngine.vbproj" />
+  </ItemGroup>
+
+</Project>

@@ -4,7 +4,7 @@ Imports ConsoleGameEngine.Colour
 Module Program
   Sub Main() 'args As String())
     Dim game As New Demo
-    game.ConstructConsole(160, 100, 8, 8)
+    game.ConstructConsole(160, 100, 4, 4)
     game.Start()
   End Sub
 

@@ -186,7 +186,7 @@ Public Class Sprite
           m_colours(i) = br.ReadInt16()
         Next
         For i As Integer = 0 To (Width * Height) - 1
-          m_glyphs(i) = BitConverter.ToChar(BitConverter.GetBytes(br.ReadInt16))
+          m_glyphs(i) = BitConverter.ToChar(BitConverter.GetBytes(br.ReadInt16), 0)
         Next
 
       End Using
