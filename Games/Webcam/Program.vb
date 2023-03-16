@@ -11,7 +11,7 @@ Module Program
 
   Sub Main() 'args As String())
     Dim game As New Webcam
-    game.ConstructConsole(320, 240, 4, 4)
+    game.ConstructConsole(640, 480, 2, 2)
     game.Start()
   End Sub
 
@@ -30,7 +30,7 @@ Class Webcam
     m_capture = New VideoCapture(0)
     m_capture.FrameHeight = ScreenHeight()
     m_capture.FrameWidth = ScreenWidth()
-    m_capture.Open(0)
+    m_capture?.Open(0)
 
     Return True
 
@@ -38,7 +38,7 @@ Class Webcam
 
   Public Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
-    If m_capture.IsOpened() Then
+    If m_capture?.IsOpened() Then
       m_capture.Read(m_frame)
       m_image = MatToBitmap(m_frame)
       For x = 0 To ScreenWidth() - 1
@@ -57,9 +57,9 @@ Class Webcam
           Dim bg_col = 0
           Dim fg_col = 0
 
-          'ClassifyPixel_Grey(r, g, b, sym, bg_col, fg_col)
+          ClassifyPixel_Grey(r, g, b, sym, bg_col, fg_col)
           'ClassifyPixel_HSL(r, g, b, sym, bg_col, fg_col)
-          ClassifyPixel_OLC(r, g, b, sym, bg_col, fg_col)
+          'ClassifyPixel_OLC(r, g, b, sym, bg_col, fg_col)
 
           ' Draw Pixel
           Draw(x, y, sym, bg_col Or fg_col)

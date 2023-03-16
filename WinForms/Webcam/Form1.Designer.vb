@@ -22,41 +22,43 @@ Partial Class Form1
   'Do not modify it using the code editor.
   <System.Diagnostics.DebuggerStepThrough()>
   Private Sub InitializeComponent()
-    Me.Button1 = New System.Windows.Forms.Button()
-    Me.PictureBox1 = New System.Windows.Forms.PictureBox()
-    CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.SuspendLayout()
-    '
-    'Button1
-    '
-    Me.Button1.Location = New System.Drawing.Point(82, 61)
-    Me.Button1.Name = "Button1"
-    Me.Button1.Size = New System.Drawing.Size(225, 69)
-    Me.Button1.TabIndex = 0
-    Me.Button1.Text = "Button1"
-    Me.Button1.UseVisualStyleBackColor = True
-    '
-    'PictureBox1
-    '
-    Me.PictureBox1.Location = New System.Drawing.Point(776, 140)
-    Me.PictureBox1.Name = "PictureBox1"
-    Me.PictureBox1.Size = New System.Drawing.Size(1028, 509)
-    Me.PictureBox1.TabIndex = 1
-    Me.PictureBox1.TabStop = False
-    '
-    'Form1
-    '
-    Me.AutoScaleDimensions = New System.Drawing.SizeF(20.0!, 48.0!)
-    Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-    Me.ClientSize = New System.Drawing.Size(2667, 1662)
-    Me.Controls.Add(Me.Button1)
-    Me.Controls.Add(Me.PictureBox1)
-    Me.Margin = New System.Windows.Forms.Padding(10, 11, 10, 11)
-    Me.Name = "Form1"
-    Me.Text = "Webcam Example"
-    CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.ResumeLayout(False)
-
+    Button1 = New Button()
+    PictureBox1 = New PictureBox()
+    CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
+    SuspendLayout()
+    ' 
+    ' Button1
+    ' 
+    Button1.Location = New Point(29, 19)
+    Button1.Margin = New Padding(1, 1, 1, 1)
+    Button1.Name = "Button1"
+    Button1.Size = New Size(79, 22)
+    Button1.TabIndex = 0
+    Button1.Text = "Button1"
+    Button1.UseVisualStyleBackColor = True
+    ' 
+    ' PictureBox1
+    ' 
+    PictureBox1.Dock = DockStyle.Fill
+    PictureBox1.Location = New Point(0, 0)
+    PictureBox1.Margin = New Padding(1, 1, 1, 1)
+    PictureBox1.Name = "PictureBox1"
+    PictureBox1.Size = New Size(933, 444)
+    PictureBox1.TabIndex = 1
+    PictureBox1.TabStop = False
+    ' 
+    ' Form1
+    ' 
+    AutoScaleDimensions = New SizeF(7F, 15F)
+    AutoScaleMode = AutoScaleMode.Font
+    ClientSize = New Size(933, 444)
+    Controls.Add(Button1)
+    Controls.Add(PictureBox1)
+    Margin = New Padding(4, 3, 4, 3)
+    Name = "Form1"
+    Text = "Webcam Example"
+    CType(PictureBox1, ComponentModel.ISupportInitialize).EndInit()
+    ResumeLayout(False)
   End Sub
 
   Friend WithEvents Button1 As Button
