@@ -367,6 +367,7 @@ Public MustInherit Class ConsoleGameEngine
 #Region "VK"
 
   Public Const VK_SHIFT As Integer = &H10
+  Public Const VK_CONTROL As Integer = &H11
   Public Const VK_SPACE As Integer = &H20
   Public Const VK_LEFT As Integer = &H25
   Public Const VK_RIGHT As Integer = &H27
