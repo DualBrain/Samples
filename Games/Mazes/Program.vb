@@ -45,8 +45,8 @@ Class Mazes
     m_pathWidth = 3
 
     ' Choose a starting cell
-    Dim x = Rand.Next(0, m_mazeWidth - 1)
-    Dim y = Rand.Next(0, m_mazeHeight - 1)
+    Dim x = m_random.Next(0, m_mazeWidth - 1)
+    Dim y = m_random.Next(0, m_mazeHeight - 1)
     m_stack.Push((x, y))
     m_maze(y * m_mazeWidth + x) = CellPath.Visited
     m_visitedCells = 1
@@ -88,7 +88,7 @@ Class Mazes
       ' Are there any neighbours available?
       If neighbours.Any() Then
         ' Choose one available neighbour at random
-        Dim next_cell_dir As Integer = neighbours(Rand.Next(neighbours.Count))
+        Dim next_cell_dir As Integer = neighbours(m_random.Next(neighbours.Count))
 
         ' Create a path between the neighbour and the current cell
         Select Case next_cell_dir

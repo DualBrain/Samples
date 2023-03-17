@@ -57,7 +57,7 @@ Class GameOfLife
 
     ' Random
     For i = 0 To (ScreenWidth() * ScreenHeight()) - 1
-      m_state(i) = If(Rand.Next(0, 2) = 0, 0, 1)
+      m_state(i) = If(m_random.Next(0, 2) = 0, 0, 1)
     Next
 
     Return True

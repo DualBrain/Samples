@@ -60,7 +60,7 @@ Class Asteroids
     m_modelAstroid = New List(Of (Double, Double))
     Dim verts = 20
     For i = 0 To verts - 1
-      Dim radius = (Me.Rand.NextDouble * 0.4) + 0.8
+      Dim radius = ((Rand / RAND_MAX) * 0.4) + 0.8
       Dim a = (i / verts) * 6.28318
       m_modelAstroid.Add((radius * Math.Sin(a), radius * Math.Cos(a)))
     Next
@@ -133,8 +133,8 @@ Class Asteroids
           b.X = -100 ' set to off screen coord so it will be removed (below, outside of iterator)
           If a.Size > 4 Then
             ' Create two child astroids
-            Dim angle1 = Me.Rand.NextDouble * 6.283185
-            Dim angle2 = Me.Rand.NextDouble * 6.283185
+            Dim angle1 = (Rand / RAND_MAX) * 6.283185
+            Dim angle2 = (Rand / RAND_MAX) * 6.283185
             newAstroids.Add(New SpaceObject(a.X, a.Y, 10 * Math.Sin(angle1), 10 * Math.Cos(angle1), a.Size >> 1, 0.0))
             newAstroids.Add(New SpaceObject(a.X, a.Y, 10 * Math.Sin(angle2), 10 * Math.Cos(angle2), a.Size >> 1, 0.0))
           End If

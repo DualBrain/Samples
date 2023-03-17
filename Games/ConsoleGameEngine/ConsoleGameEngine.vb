@@ -129,9 +129,19 @@ Public Class Sprite
     End If
   End Function
 
-  Public Function SampleColour(x As Single, y As Single) As Colour
-    Dim sx = CInt(x * Width)
-    Dim sy = CInt(y * Height - 1.0)
+  Public Function SampleGlyph(x As Double, y As Double) As Integer
+    Dim sx = CInt(Fix(x * Width))
+    Dim sy = CInt(Fix(y * Height - 1))
+    If sx < 0 OrElse sx >= Width OrElse sy < 0 OrElse sy >= Height Then
+      Return AscW(" "c)
+    Else
+      Return AscW(m_glyphs(sy * Width + sx))
+    End If
+  End Function
+
+  Public Function SampleColour(x As Double, y As Double) As Colour
+    Dim sx = CInt(Fix(x * Width))
+    Dim sy = CInt(Fix(y * Height - 1))
     If sx < 0 OrElse sx >= Width OrElse sy < 0 OrElse sy >= Height Then
       Return Colour.BG_BLACK
     Else
@@ -389,7 +399,16 @@ Public MustInherit Class ConsoleGameEngine
 
 #End Region
 
-  Public Property Rand As New Random
+  Public ReadOnly m_random As New Random
+
+  Public Const RAND_MAX As Integer = 2147483647
+
+  ' Provide for something *similar* to C++.
+  Public ReadOnly Property Rand As Integer
+    Get
+      Return CInt(Fix(m_random.NextDouble * RAND_MAX))
+    End Get
+  End Property
 
   Private m_nScreenWidth As Integer
   Private m_nScreenHeight As Integer
