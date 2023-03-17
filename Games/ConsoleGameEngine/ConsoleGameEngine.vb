@@ -440,7 +440,7 @@ Public MustInherit Class ConsoleGameEngine
   Private m_bEnableSound As Boolean
   Private ReadOnly m_sAppName As String
   Private m_rectWindow As SMALL_RECT
-  Private m_bufScreen As CharInfo()
+  Public m_bufScreen As CharInfo()
   Private m_bConsoleInFocus = True
 
   Shared m_bAtomActive = False

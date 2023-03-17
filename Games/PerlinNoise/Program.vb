@@ -22,36 +22,36 @@ Class PerlinNoise
   Inherits ConsoleGameEngine.ConsoleGameEngine
 
   ' 2D noise variables
-  Private nOutputWidth As Integer = 256
-  Private nOutputHeight As Integer = 256
-  Private fNoiseSeed2D As Double() = Nothing
-  Private fPerlinNoise2D As Double() = Nothing
+  Private m_outputWidth As Integer = 256
+  Private m_utputHeight As Integer = 256
+  Private m_noiseSeed2D As Double() = Nothing
+  Private m_perlinNoise2D As Double() = Nothing
 
   ' 1D noise variables
-  Private fNoiseSeed1D As Double() = Nothing
-  Private fPerlinNoise1D As Double() = Nothing
-  Private nOutputSize As Integer = 256
+  Private m_noiseSeed1D As Double() = Nothing
+  Private m_perlinNoise1D As Double() = Nothing
+  Private m_outputSize As Integer = 256
 
-  Private nOctaveCount As Integer = 1
-  Private fScalingBias As Double = 2.0
-  Private nMode As Integer = 1
+  Private m_octaveCount As Integer = 1
+  Private m_scalingBias As Double = 2.0
+  Private m_mode As Integer = 1
 
   Public Overrides Function OnUserCreate() As Boolean
 
-    nOutputWidth = ScreenWidth()
-    nOutputHeight = ScreenHeight()
+    m_outputWidth = ScreenWidth()
+    m_utputHeight = ScreenHeight()
 
-    fNoiseSeed2D = New Double(nOutputWidth * nOutputHeight - 1) {}
-    fPerlinNoise2D = New Double(nOutputWidth * nOutputHeight - 1) {}
-    For i = 0 To nOutputWidth * nOutputHeight - 1
-      fNoiseSeed2D(i) = Rand / RAND_MAX
+    m_noiseSeed2D = New Double(m_outputWidth * m_utputHeight - 1) {}
+    m_perlinNoise2D = New Double(m_outputWidth * m_utputHeight - 1) {}
+    For i = 0 To m_outputWidth * m_utputHeight - 1
+      m_noiseSeed2D(i) = Rand / RAND_MAX
     Next
 
-    nOutputSize = ScreenWidth()
-    fNoiseSeed1D = New Double(nOutputSize - 1) {}
-    fPerlinNoise1D = New Double(nOutputSize - 1) {}
-    For i = 0 To nOutputSize - 1
-      fNoiseSeed1D(i) = Rand / RAND_MAX
+    m_outputSize = ScreenWidth()
+    m_noiseSeed1D = New Double(m_outputSize - 1) {}
+    m_perlinNoise1D = New Double(m_outputSize - 1) {}
+    For i = 0 To m_outputSize - 1
+      m_noiseSeed1D(i) = Rand / RAND_MAX
     Next
 
     Return True
@@ -62,35 +62,35 @@ Class PerlinNoise
 
     Cls()
 
-    If m_keys(VK_SPACE).bReleased Then nOctaveCount += 1
-    If m_keys(AscW("1"c)).bReleased Then nMode = 1
-    If m_keys(AscW("2"c)).bReleased Then nMode = 2
-    If m_keys(AscW("3"c)).bReleased Then nMode = 3
-    If m_keys(AscW("Q"c)).bReleased Then fScalingBias += 0.2
-    If m_keys(AscW("A"c)).bReleased Then fScalingBias -= 0.2
+    If m_keys(VK_SPACE).bReleased Then m_octaveCount += 1
+    If m_keys(AscW("1"c)).bReleased Then m_mode = 1
+    If m_keys(AscW("2"c)).bReleased Then m_mode = 2
+    If m_keys(AscW("3"c)).bReleased Then m_mode = 3
+    If m_keys(AscW("Q"c)).bReleased Then m_scalingBias += 0.2
+    If m_keys(AscW("A"c)).bReleased Then m_scalingBias -= 0.2
 
-    If fScalingBias < 0.2 Then fScalingBias = 0.2
-    If nOctaveCount = 9 Then nOctaveCount = 1
+    If m_scalingBias < 0.2 Then m_scalingBias = 0.2
+    If m_octaveCount = 9 Then m_octaveCount = 1
 
-    If nMode = 1 Then ' 1D Noise
+    If m_mode = 1 Then ' 1D Noise
 
       If m_keys(AscW("Z"c)).bReleased Then ' Noise Between 0 and +1
-        For i = 0 To nOutputSize - 1
-          fNoiseSeed1D(i) = Rand / RAND_MAX
+        For i = 0 To m_outputSize - 1
+          m_noiseSeed1D(i) = Rand / RAND_MAX
         Next
       End If
 
       If m_keys(AscW("X"c)).bReleased Then ' Noise Between -1 and +1
-        For i = 0 To nOutputSize - 1
-          fNoiseSeed1D(i) = 2.0F * (Rand / RAND_MAX) - 1.0F
+        For i = 0 To m_outputSize - 1
+          m_noiseSeed1D(i) = 2.0F * (Rand / RAND_MAX) - 1.0F
         Next
       End If
 
-      PerlinNoise1D(nOutputSize, fNoiseSeed1D, nOctaveCount, fScalingBias, fPerlinNoise1D)
+      PerlinNoise1D(m_outputSize, m_noiseSeed1D, m_octaveCount, m_scalingBias, m_perlinNoise1D)
 
-      For x = 0 To nOutputSize - 1
+      For x = 0 To m_outputSize - 1
 
-        Dim y = -CInt(Fix((fPerlinNoise1D(x) * (ScreenHeight() / 2)))) + (ScreenHeight() / 2)
+        Dim y = -CInt(Fix((m_perlinNoise1D(x) * (ScreenHeight() / 2)))) + (ScreenHeight() / 2)
 
         If y < ScreenHeight() \ 2 Then
           For f = y To CInt(Fix(ScreenHeight() / 2)) - 1
@@ -106,22 +106,22 @@ Class PerlinNoise
 
     End If
 
-    If nMode = 2 Then ' 2D Noise
+    If m_mode = 2 Then ' 2D Noise
 
       If m_keys(AscW("Z"c)).bReleased Then ' Noise Between 0 and +1
-        For i = 0 To nOutputWidth * nOutputHeight - 1
-          fNoiseSeed2D(i) = Rand / RAND_MAX
+        For i = 0 To m_outputWidth * m_utputHeight - 1
+          m_noiseSeed2D(i) = Rand / RAND_MAX
         Next
       End If
 
-      PerlinNoise2D(nOutputWidth, nOutputHeight, fNoiseSeed2D, nOctaveCount, fScalingBias, fPerlinNoise2D)
+      PerlinNoise2D(m_outputWidth, m_utputHeight, m_noiseSeed2D, m_octaveCount, m_scalingBias, m_perlinNoise2D)
 
-      For x = 0 To nOutputWidth - 1
-        For y = 0 To nOutputHeight - 1
+      For x = 0 To m_outputWidth - 1
+        For y = 0 To m_utputHeight - 1
 
           Dim bg_col, fg_col As Short
           Dim sym As Integer
-          Dim pixel_bw = CInt(Fix(fPerlinNoise2D(y * nOutputWidth + x) * 12.0))
+          Dim pixel_bw = CInt(Fix(m_perlinNoise2D(y * m_outputWidth + x) * 12.0))
 
           Select Case pixel_bw
             Case 0 : bg_col = BG_BLACK : fg_col = FG_BLACK : sym = PIXEL_SOLID
@@ -146,22 +146,22 @@ Class PerlinNoise
 
     End If
 
-    If nMode = 3 Then ' 2D Noise - colourised
+    If m_mode = 3 Then ' 2D Noise - colourised
 
       If m_keys(AscW("Z"c)).bReleased Then ' Noise Between 0 and +1
-        For i = 0 To nOutputWidth * nOutputHeight - 1
-          fNoiseSeed2D(i) = Rand / RAND_MAX
+        For i = 0 To m_outputWidth * m_utputHeight - 1
+          m_noiseSeed2D(i) = Rand / RAND_MAX
         Next
       End If
 
-      PerlinNoise2D(nOutputWidth, nOutputHeight, fNoiseSeed2D, nOctaveCount, fScalingBias, fPerlinNoise2D)
+      PerlinNoise2D(m_outputWidth, m_utputHeight, m_noiseSeed2D, m_octaveCount, m_scalingBias, m_perlinNoise2D)
 
-      For x = 0 To nOutputWidth - 1
-        For y = 0 To nOutputHeight - 1
+      For x = 0 To m_outputWidth - 1
+        For y = 0 To m_utputHeight - 1
 
           Dim bg_col, fg_col As Short
           Dim sym As Integer
-          Dim pixel_bw = CInt(fPerlinNoise2D(y * nOutputWidth + x) * 16.0)
+          Dim pixel_bw = CInt(m_perlinNoise2D(y * m_outputWidth + x) * 16.0)
 
           Select Case pixel_bw
             Case 0 : bg_col = BG_DARK_BLUE : fg_col = FG_DARK_BLUE : sym = PIXEL_SOLID
