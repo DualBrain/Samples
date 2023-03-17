@@ -403,6 +403,12 @@ Public MustInherit Class ConsoleGameEngine
 
   Public Const RAND_MAX As Integer = 2147483647
 
+  Public ReadOnly Property Rnd As Double
+    Get
+      Return m_random.NextDouble
+    End Get
+  End Property
+
   ' Provide for something *similar* to C++.
   Public ReadOnly Property Rand As Integer
     Get
