@@ -173,7 +173,7 @@ Class PathFinding_AStar
     Dim selectedNodeX = m_mousePosX \ nodeSize
     Dim selectedNodeY = m_mousePosY \ nodeSize
 
-    If m_mouse(0).bReleased Then ' Use mouse to draw maze, shift and ctrl to place start and end
+    If m_mouse(0).Released Then ' Use mouse to draw maze, shift and ctrl to place start and end
       If selectedNodeX >= 0 AndAlso selectedNodeX < m_mapWidth Then
         If selectedNodeY >= 0 AndAlso selectedNodeY < m_mapHeight Then
 

@@ -79,10 +79,10 @@ Class Frogger
     'Cls()
 
     ' Handle input
-    If m_keys(VK_UP).bReleased Then m_frogY -= 1.0!
-    If m_keys(VK_DOWN).bReleased Then m_frogY += 1.0!
-    If m_keys(VK_LEFT).bReleased Then m_frogX -= 1.0!
-    If m_keys(VK_RIGHT).bReleased Then m_frogX += 1.0!
+    If m_keys(VK_UP).Released Then m_frogY -= 1.0!
+    If m_keys(VK_DOWN).Released Then m_frogY += 1.0!
+    If m_keys(VK_LEFT).Released Then m_frogX -= 1.0!
+    If m_keys(VK_RIGHT).Released Then m_frogX += 1.0!
 
     ' Frog is moved by platforms
     If m_frogY <= 3 Then m_frogX -= elapsedTime * m_lanes(CInt(m_frogY)).Velocity

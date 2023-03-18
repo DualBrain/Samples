@@ -427,7 +427,7 @@ Public MustInherit Class ConsoleGameEngine
 
   Public Structure sKeyState
     Public bPressed As Boolean
-    Public bReleased As Boolean
+    Public Released As Boolean
     Public bHeld As Boolean
   End Structure
 
@@ -918,12 +918,12 @@ next2:
     Next
   End Sub
 
-  Sub DrawWireFrameModel(vecModelCoordinates As List(Of (X As Double, Y As Double)), x As Double, y As Double, Optional r As Double = 0.0F, Optional s As Double = 1.0F, Optional col As Integer = Colour.FG_WHITE, Optional c As Integer = PIXEL_TYPE.PIXEL_SOLID)
+  Sub DrawWireFrameModel(vecModelCoordinates As List(Of (X As Single, Y As Single)), x As Single, y As Single, Optional r As Single = 0.0F, Optional s As Single = 1.0F, Optional col As Integer = Colour.FG_WHITE, Optional c As Integer = PIXEL_TYPE.PIXEL_SOLID)
     ' Tuple.Item1 = x coordinate
     ' Tuple.Item2 = y coordinate
     ' Create translated model vector of coordinate pairs
     Dim vecTransformedCoordinates As New List(Of (x As Single, y As Single))
-    Dim verts As Integer = vecModelCoordinates.Count()
+    Dim verts As Integer = vecModelCoordinates.Count
     vecTransformedCoordinates.Capacity = verts
 
     ' Rotate
@@ -998,14 +998,14 @@ next2:
           m_keyNewState(i) = GetAsyncKeyState(i)
 
           m_keys(i).bPressed = False
-          m_keys(i).bReleased = False
+          m_keys(i).Released = False
 
           If m_keyNewState(i) <> m_keyOldState(i) Then
             If (m_keyNewState(i) And &H8000) <> 0 Then
               m_keys(i).bPressed = Not m_keys(i).bHeld
               m_keys(i).bHeld = True
             Else
-              m_keys(i).bReleased = True
+              m_keys(i).Released = True
               m_keys(i).bHeld = False
             End If
           End If
@@ -1046,14 +1046,14 @@ next2:
 
         For m As Integer = 0 To 4
           m_mouse(m).bPressed = False
-          m_mouse(m).bReleased = False
+          m_mouse(m).Released = False
 
           If m_mouseNewState(m) <> m_mouseOldState(m) Then
             If m_mouseNewState(m) Then
               m_mouse(m).bPressed = True
               m_mouse(m).bHeld = True
             Else
-              m_mouse(m).bReleased = True
+              m_mouse(m).Released = True
               m_mouse(m).bHeld = False
             End If
           End If

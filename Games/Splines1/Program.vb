@@ -48,13 +48,13 @@ Class Splines1
     Cls()
 
     ' Handle input
-    If m_keys(AscW("X")).bReleased Then
+    If m_keys(AscW("X")).Released Then
       m_selectedPoint += 1
       If m_selectedPoint > m_path.Points.Count - 1 Then
         m_selectedPoint = 0
       End If
     End If
-    If m_keys(AscW("Z")).bReleased Then
+    If m_keys(AscW("Z")).Released Then
       m_selectedPoint -= 1
       If m_selectedPoint < 0 Then
         m_selectedPoint = m_path.Points.Count - 1

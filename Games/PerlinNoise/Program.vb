@@ -62,25 +62,25 @@ Class PerlinNoise
 
     Cls()
 
-    If m_keys(VK_SPACE).bReleased Then m_octaveCount += 1
-    If m_keys(AscW("1"c)).bReleased Then m_mode = 1
-    If m_keys(AscW("2"c)).bReleased Then m_mode = 2
-    If m_keys(AscW("3"c)).bReleased Then m_mode = 3
-    If m_keys(AscW("Q"c)).bReleased Then m_scalingBias += 0.2
-    If m_keys(AscW("A"c)).bReleased Then m_scalingBias -= 0.2
+    If m_keys(VK_SPACE).Released Then m_octaveCount += 1
+    If m_keys(AscW("1"c)).Released Then m_mode = 1
+    If m_keys(AscW("2"c)).Released Then m_mode = 2
+    If m_keys(AscW("3"c)).Released Then m_mode = 3
+    If m_keys(AscW("Q"c)).Released Then m_scalingBias += 0.2
+    If m_keys(AscW("A"c)).Released Then m_scalingBias -= 0.2
 
     If m_scalingBias < 0.2 Then m_scalingBias = 0.2
     If m_octaveCount = 9 Then m_octaveCount = 1
 
     If m_mode = 1 Then ' 1D Noise
 
-      If m_keys(AscW("Z"c)).bReleased Then ' Noise Between 0 and +1
+      If m_keys(AscW("Z"c)).Released Then ' Noise Between 0 and +1
         For i = 0 To m_outputSize - 1
           m_noiseSeed1D(i) = Rand / RAND_MAX
         Next
       End If
 
-      If m_keys(AscW("X"c)).bReleased Then ' Noise Between -1 and +1
+      If m_keys(AscW("X"c)).Released Then ' Noise Between -1 and +1
         For i = 0 To m_outputSize - 1
           m_noiseSeed1D(i) = 2.0F * (Rand / RAND_MAX) - 1.0F
         Next
@@ -108,7 +108,7 @@ Class PerlinNoise
 
     If m_mode = 2 Then ' 2D Noise
 
-      If m_keys(AscW("Z"c)).bReleased Then ' Noise Between 0 and +1
+      If m_keys(AscW("Z"c)).Released Then ' Noise Between 0 and +1
         For i = 0 To m_outputWidth * m_utputHeight - 1
           m_noiseSeed2D(i) = Rand / RAND_MAX
         Next
@@ -148,7 +148,7 @@ Class PerlinNoise
 
     If m_mode = 3 Then ' 2D Noise - colourised
 
-      If m_keys(AscW("Z"c)).bReleased Then ' Noise Between 0 and +1
+      If m_keys(AscW("Z"c)).Released Then ' Noise Between 0 and +1
         For i = 0 To m_outputWidth * m_utputHeight - 1
           m_noiseSeed2D(i) = Rand / RAND_MAX
         Next

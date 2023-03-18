@@ -47,21 +47,21 @@ Class SpriteEditor
   Public Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
     ' Zooming 
-    If m_keys(VK_PRIOR).bReleased Then m_zoom <<= 1
-    If m_keys(VK_NEXT).bReleased Then m_zoom >>= 1
+    If m_keys(VK_PRIOR).Released Then m_zoom <<= 1
+    If m_keys(VK_NEXT).Released Then m_zoom >>= 1
 
     If m_zoom > 32 Then m_zoom = 32
     If m_zoom < 2 Then m_zoom = 2
 
     ' Brushes
-    If m_keys(VK_F1).bReleased Then m_currentGlyph = PIXEL_SOLID
-    If m_keys(VK_F2).bReleased Then m_currentGlyph = PIXEL_THREEQUARTERS
-    If m_keys(VK_F3).bReleased Then m_currentGlyph = PIXEL_HALF
-    If m_keys(VK_F4).bReleased Then m_currentGlyph = PIXEL_QUARTER
+    If m_keys(VK_F1).Released Then m_currentGlyph = PIXEL_SOLID
+    If m_keys(VK_F2).Released Then m_currentGlyph = PIXEL_THREEQUARTERS
+    If m_keys(VK_F3).Released Then m_currentGlyph = PIXEL_HALF
+    If m_keys(VK_F4).Released Then m_currentGlyph = PIXEL_QUARTER
 
     ' Colours
     For i = 0 To 7
-      If m_keys(AscW("01234567".Chars(i))).bReleased Then
+      If m_keys(AscW("01234567".Chars(i))).Released Then
         If m_keys(VK_SHIFT).bHeld Then
           m_currentColourFG = i + 8
         Else
@@ -70,23 +70,23 @@ Class SpriteEditor
       End If
     Next
 
-    If m_keys(VK_F7).bReleased Then m_currentColourBG -= 1
-    If m_keys(VK_F8).bReleased Then m_currentColourBG += 1
+    If m_keys(VK_F7).Released Then m_currentColourBG -= 1
+    If m_keys(VK_F8).Released Then m_currentColourBG += 1
 
     If m_currentColourBG < 0 Then m_currentColourBG = 15
     If m_currentColourBG > 15 Then m_currentColourBG = 0
 
     ' Cursing -)
     If m_keys(VK_SHIFT).bHeld Then
-      If (m_keys(VK_UP).bReleased) Then m_offsetY += 1
-      If (m_keys(VK_DOWN).bReleased) Then m_offsetY -= 1
-      If (m_keys(VK_LEFT).bReleased) Then m_offsetX += 1
-      If (m_keys(VK_RIGHT).bReleased) Then m_offsetX -= 1
+      If (m_keys(VK_UP).Released) Then m_offsetY += 1
+      If (m_keys(VK_DOWN).Released) Then m_offsetY -= 1
+      If (m_keys(VK_LEFT).Released) Then m_offsetX += 1
+      If (m_keys(VK_RIGHT).Released) Then m_offsetX -= 1
     Else
-      If (m_keys(VK_UP).bReleased) Then m_posY -= 1
-      If (m_keys(VK_DOWN).bReleased) Then m_posY += 1
-      If (m_keys(VK_LEFT).bReleased) Then m_posX -= 1
-      If (m_keys(VK_RIGHT).bReleased) Then m_posX += 1
+      If (m_keys(VK_UP).Released) Then m_posY -= 1
+      If (m_keys(VK_DOWN).Released) Then m_posY += 1
+      If (m_keys(VK_LEFT).Released) Then m_posX -= 1
+      If (m_keys(VK_RIGHT).Released) Then m_posX += 1
     End If
 
     If m_sprite IsNot Nothing Then
@@ -96,21 +96,21 @@ Class SpriteEditor
       If m_posY < 0 Then m_posY = 0
       If m_posY >= m_sprite.Height Then m_posY = m_sprite.Height - 1
 
-      If m_keys(VK_SPACE).bReleased Then
+      If m_keys(VK_SPACE).Released Then
         m_sprite.SetGlyph(m_posX - 0, m_posY - 0, ChrW(m_currentGlyph))
         m_sprite.SetColour(m_posX - 0, m_posY - 0, CType(m_currentColourFG Or (m_currentColourBG << 4), Colour))
       End If
 
-      If m_keys(VK_DELETE).bReleased Then
+      If m_keys(VK_DELETE).Released Then
         m_sprite.SetGlyph(m_posX - 0, m_posY - 0, " "c)
         m_sprite.SetColour(m_posX - 0, m_posY - 0, 0)
       End If
 
-      If m_keys(VK_F9).bReleased Then
+      If m_keys(VK_F9).Released Then
         m_sprite.Load(m_currentSpriteFile)
       End If
 
-      If m_keys(VK_F10).bReleased Then
+      If m_keys(VK_F10).Released Then
         m_sprite.Save(m_currentSpriteFile)
       End If
 

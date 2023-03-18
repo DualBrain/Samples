@@ -20,15 +20,15 @@ Module Program
 End Module
 
 Class SpaceObject
-  Public Property X As Double
-  Public Property Y As Double
-  Public Property Dx As Double
-  Public Property Dy As Double
+  Public Property X As Single
+  Public Property Y As Single
+  Public Property Dx As Single
+  Public Property Dy As Single
   Public Property Size As Integer
-  Public Property Angle As Double
+  Public Property Angle As Single
   Public Sub New()
   End Sub
-  Public Sub New(x As Double, y As Double, dx As Double, dy As Double, Optional size As Integer = 1, Optional angle As Double = 0.0)
+  Public Sub New(x As Single, y As Single, dx As Single, dy As Single, Optional size As Integer = 1, Optional angle As Single = 0.0)
     Me.X = x
     Me.Y = y
     Me.Dx = dx
@@ -46,23 +46,23 @@ Class Asteroids
   Private m_player As SpaceObject
   Private m_score As Integer
 
-  Private m_modelShip As List(Of (Double, Double))
-  Private m_modelAstroid As List(Of (Double, Double))
+  Private m_modelShip As List(Of (Single, Single))
+  Private m_modelAstroid As List(Of (Single, Single))
 
   Private m_dead As Boolean = False
 
   Public Overrides Function OnUserCreate() As Boolean
 
-    m_modelShip = New List(Of (Double, Double)) From {(0.0F, -5.0F),
+    m_modelShip = New List(Of (Single, Single)) From {(0.0F, -5.0F),
                                                       (-2.5F, +2.5F),
                                                       (+2.5F, +2.5F)} ' A simple Isoceles Triangle
 
-    m_modelAstroid = New List(Of (Double, Double))
+    m_modelAstroid = New List(Of (Single, Single))
     Dim verts = 20
     For i = 0 To verts - 1
-      Dim radius = ((Rand / RAND_MAX) * 0.4) + 0.8
+      Dim radius = CSng(((Rand / RAND_MAX) * 0.4) + 0.8)
       Dim a = (i / verts) * 6.28318
-      m_modelAstroid.Add((radius * Math.Sin(a), radius * Math.Cos(a)))
+      m_modelAstroid.Add((CSng(radius * Math.Sin(a)), CSng(radius * Math.Cos(a))))
     Next
 
     ResetGame()
@@ -80,14 +80,14 @@ Class Asteroids
     Cls()
 
     ' Steer
-    If m_keys(VK_LEFT).bHeld Then m_player.Angle -= 5.0 * elapsedTime
-    If m_keys(VK_RIGHT).bHeld Then m_player.Angle += 5.0 * elapsedTime
+    If m_keys(VK_LEFT).bHeld Then m_player.Angle -= 5.0F * elapsedTime
+    If m_keys(VK_RIGHT).bHeld Then m_player.Angle += 5.0F * elapsedTime
 
     ' Thrust
     If m_keys(VK_UP).bHeld Then
       ' ACCELERATION changes VELOCITY (with respect to time)
-      m_player.Dx += Math.Sin(m_player.Angle) * 20 * elapsedTime
-      m_player.Dy += -Math.Cos(m_player.Angle) * 20 * elapsedTime
+      m_player.Dx += CSng(Math.Sin(m_player.Angle) * 20 * elapsedTime)
+      m_player.Dy += -CSng(Math.Cos(m_player.Angle) * 20 * elapsedTime)
     End If
 
     ' VELOCITY changes POSITION (with respect to time)
@@ -105,15 +105,15 @@ Class Asteroids
     Next
 
     ' Fire Bullet in direction of player
-    If m_keys(VK_SPACE).bReleased Then
-      m_bullets.Add(New SpaceObject(m_player.X, m_player.Y, 50.0 * Math.Sin(m_player.Angle), -50.0 * Math.Cos(m_player.Angle)))
+    If m_keys(VK_SPACE).Released Then
+      m_bullets.Add(New SpaceObject(m_player.X, m_player.Y, 50.0F * CSng(Math.Sin(m_player.Angle)), -50.0F * CSng(Math.Cos(m_player.Angle))))
     End If
 
     ' Update and draw asteroids
     For Each a In m_asteroids
       a.X += a.Dx * elapsedTime
       a.Y += a.Dy * elapsedTime
-      a.Angle += 0.5 * elapsedTime
+      a.Angle += 0.5F * elapsedTime
       WrapCoordinates(a.X, a.Y, a.X, a.Y)
       DrawWireFrameModel(m_modelAstroid, a.X, a.Y, a.Angle, a.Size, FG_YELLOW)
     Next
@@ -135,8 +135,8 @@ Class Asteroids
             ' Create two child astroids
             Dim angle1 = (Rand / RAND_MAX) * 6.283185
             Dim angle2 = (Rand / RAND_MAX) * 6.283185
-            newAstroids.Add(New SpaceObject(a.X, a.Y, 10 * Math.Sin(angle1), 10 * Math.Cos(angle1), a.Size >> 1, 0.0))
-            newAstroids.Add(New SpaceObject(a.X, a.Y, 10 * Math.Sin(angle2), 10 * Math.Cos(angle2), a.Size >> 1, 0.0))
+            newAstroids.Add(New SpaceObject(a.X, a.Y, 10 * CSng(Math.Sin(angle1)), 10 * CSng(Math.Cos(angle1)), a.Size >> 1, 0.0))
+            newAstroids.Add(New SpaceObject(a.X, a.Y, 10 * CSng(Math.Sin(angle2)), 10 * CSng(Math.Cos(angle2)), a.Size >> 1, 0.0))
           End If
           a.X = -100 ' set to off screen coord so it will be removed (below, outside of iterator)
           m_score += 100
@@ -164,15 +164,15 @@ Class Asteroids
 
       ' add them 90 degress left and right to the player, their coordinates
       ' be wrapped by the next astroid update
-      m_asteroids.Add(New SpaceObject(30 * Math.Sin(m_player.Angle - 3.14159 / 2),
-                                           30 * Math.Cos(m_player.Angle - 3.14159 / 2),
-                                           10 * Math.Sin(m_player.Angle),
-                                           10 * Math.Cos(m_player.Angle),
+      m_asteroids.Add(New SpaceObject(30 * CSng(Math.Sin(m_player.Angle - 3.14159 / 2)),
+                                           30 * CSng(Math.Cos(m_player.Angle - 3.14159 / 2)),
+                                           10 * CSng(Math.Sin(m_player.Angle)),
+                                           10 * CSng(Math.Cos(m_player.Angle)),
                                            16, 0))
-      m_asteroids.Add(New SpaceObject(30 * Math.Sin(m_player.Angle + 3.14159 / 2),
-                                           30 * Math.Cos(m_player.Angle + 3.14159 / 2),
-                                           10 * Math.Sin(-m_player.Angle),
-                                           10 * Math.Cos(-m_player.Angle),
+      m_asteroids.Add(New SpaceObject(30 * CSng(Math.Sin(m_player.Angle + 3.14159 / 2)),
+                                           30 * CSng(Math.Cos(m_player.Angle + 3.14159 / 2)),
+                                           10 * CSng(Math.Sin(-m_player.Angle)),
+                                           10 * CSng(Math.Cos(-m_player.Angle)),
                                            16, 0))
 
     End If
@@ -235,7 +235,7 @@ Class Asteroids
     Return Math.Sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) < radius
   End Function
 
-  Private Sub WrapCoordinates(ix As Double, iy As Double, ByRef ox As Double, ByRef oy As Double)
+  Private Sub WrapCoordinates(ix As Single, iy As Single, ByRef ox As Single, ByRef oy As Single)
     ox = ix
     oy = iy
     If ix < 0.0 Then ox = ix + ScreenWidth()
@@ -245,7 +245,7 @@ Class Asteroids
   End Sub
 
   Public Overrides Sub Draw(x As Integer, y As Integer, Optional c As Integer = 9608, Optional col As Integer = 15)
-    Dim fx, fy As Double
+    Dim fx, fy As Single
     WrapCoordinates(x, y, fx, fy)
     x = CInt(fx) : y = CInt(fy)
     MyBase.Draw(x, y, c, col)

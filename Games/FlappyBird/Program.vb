@@ -63,7 +63,7 @@ Class FlappyBird
     ' Game
     If m_hasCollided Then
       ' Do nothing until user releases space
-      If m_keys(VK_SPACE).bReleased Then m_resetGame = True
+      If m_keys(VK_SPACE).Released Then m_resetGame = True
     Else
 
       If m_keys(VK_SPACE).bPressed AndAlso m_birdVelocity >= m_gravity / 10.0 Then

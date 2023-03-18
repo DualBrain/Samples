@@ -25,7 +25,7 @@ Class Splines2
   Private m_selectedPoint As Integer
   Private m_marker As Double
 
-  Private m_modelCar As List(Of (Double, Double))
+  Private m_modelCar As List(Of (Single, Single))
 
   Public Overrides Function OnUserCreate() As Boolean
 
@@ -34,7 +34,7 @@ Class Splines2
                                        30 * Math.Cos(i / 10 * 3.14159 * 2) + ScreenHeight() / 2))
     Next
 
-    m_modelCar = New List(Of (Double, Double)) From {(1, 1), (1, 3), (3, 0), (0, -3), (-3, 0), (-1, 3), (-1, 1)}
+    m_modelCar = New List(Of (Single, Single)) From {(1, 1), (1, 3), (3, 0), (0, -3), (-3, 0), (-1, 3), (-1, 1)}
 
     Return True
 
@@ -46,13 +46,13 @@ Class Splines2
     Cls()
 
     ' Handle input
-    If m_keys(AscW("X")).bReleased Then
+    If m_keys(AscW("X")).Released Then
       m_selectedPoint += 1
       If m_selectedPoint > m_path.Points.Count - 1 Then
         m_selectedPoint = 0
       End If
     End If
-    If m_keys(AscW("Z")).bReleased Then
+    If m_keys(AscW("Z")).Released Then
       m_selectedPoint -= 1
       If m_selectedPoint < 0 Then
         m_selectedPoint = m_path.Points.Count - 1

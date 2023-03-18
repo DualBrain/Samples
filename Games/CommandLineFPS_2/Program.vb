@@ -158,7 +158,7 @@ Class CommandLineFps
     End If
 
     ' Fire Bullets
-    If m_keys(VK_SPACE).bReleased Then
+    If m_keys(VK_SPACE).Released Then
       Dim o As New ScreenObject()
       o.X = CSng(m_playerX)
       o.Y = CSng(m_playerY)
