@@ -1,5 +1,4 @@
 ' Inspired by "Code-It-Yourself! Tetris - Programming from Scratch (Quick and Simple C++)"
-'
 ' https://youtu.be/8OK8_tHeCIA
 
 Imports System.Runtime.InteropServices
