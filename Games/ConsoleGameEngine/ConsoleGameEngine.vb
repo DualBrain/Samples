@@ -426,9 +426,9 @@ Public MustInherit Class ConsoleGameEngine
   Private ReadOnly m_mouseNewState(4) As Boolean
 
   Public Structure sKeyState
-    Public bPressed As Boolean
+    Public Pressed As Boolean
     Public Released As Boolean
-    Public bHeld As Boolean
+    Public Held As Boolean
   End Structure
 
   Public ReadOnly m_keys(255) As sKeyState
@@ -997,16 +997,16 @@ next2:
         For i As Integer = 0 To 255
           m_keyNewState(i) = GetAsyncKeyState(i)
 
-          m_keys(i).bPressed = False
+          m_keys(i).Pressed = False
           m_keys(i).Released = False
 
           If m_keyNewState(i) <> m_keyOldState(i) Then
             If (m_keyNewState(i) And &H8000) <> 0 Then
-              m_keys(i).bPressed = Not m_keys(i).bHeld
-              m_keys(i).bHeld = True
+              m_keys(i).Pressed = Not m_keys(i).Held
+              m_keys(i).Held = True
             Else
               m_keys(i).Released = True
-              m_keys(i).bHeld = False
+              m_keys(i).Held = False
             End If
           End If
 
@@ -1045,16 +1045,16 @@ next2:
         Next
 
         For m As Integer = 0 To 4
-          m_mouse(m).bPressed = False
+          m_mouse(m).Pressed = False
           m_mouse(m).Released = False
 
           If m_mouseNewState(m) <> m_mouseOldState(m) Then
             If m_mouseNewState(m) Then
-              m_mouse(m).bPressed = True
-              m_mouse(m).bHeld = True
+              m_mouse(m).Pressed = True
+              m_mouse(m).Held = True
             Else
               m_mouse(m).Released = True
-              m_mouse(m).bHeld = False
+              m_mouse(m).Held = False
             End If
           End If
 

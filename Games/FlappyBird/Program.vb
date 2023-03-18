@@ -66,7 +66,7 @@ Class FlappyBird
       If m_keys(VK_SPACE).Released Then m_resetGame = True
     Else
 
-      If m_keys(VK_SPACE).bPressed AndAlso m_birdVelocity >= m_gravity / 10.0 Then
+      If m_keys(VK_SPACE).Pressed AndAlso m_birdVelocity >= m_gravity / 10.0 Then
         m_birdAcceleration = 0.0
         m_birdVelocity = -m_gravity / 4.0
         m_flapCount += 1

@@ -62,7 +62,7 @@ Class SpriteEditor
     ' Colours
     For i = 0 To 7
       If m_keys(AscW("01234567".Chars(i))).Released Then
-        If m_keys(VK_SHIFT).bHeld Then
+        If m_keys(VK_SHIFT).Held Then
           m_currentColourFG = i + 8
         Else
           m_currentColourFG = i
@@ -77,7 +77,7 @@ Class SpriteEditor
     If m_currentColourBG > 15 Then m_currentColourBG = 0
 
     ' Cursing -)
-    If m_keys(VK_SHIFT).bHeld Then
+    If m_keys(VK_SHIFT).Held Then
       If (m_keys(VK_UP).Released) Then m_offsetY += 1
       If (m_keys(VK_DOWN).Released) Then m_offsetY -= 1
       If (m_keys(VK_LEFT).Released) Then m_offsetX += 1
@@ -123,7 +123,7 @@ Class SpriteEditor
     DrawString(1, 1, "F1 = 100%  F2 = 75%  F3 = 50%  F4 = 25%    F9 = Load File  F10 = Save File")
     For i = 0 To 7
       DrawString(1 + 6 * i, 3, CStr(i) + " = ")
-      If m_keys(VK_SHIFT).bHeld Then
+      If m_keys(VK_SHIFT).Held Then
         Draw(1 + 6 * i + 4, 3, PIXEL_SOLID, i + 8)
       Else
         Draw(1 + 6 * i + 4, 3, PIXEL_SOLID, i)

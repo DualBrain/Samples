@@ -1,5 +1,5 @@
-' Inspired by: "Code-It-Yourself! Worms Part #1" -- @javid
-' https://youtu.be/EHlaJvQpW3U
+' Inspired by: "Code-It-Yourself! Worms Part #2" -- @javid
+' https://youtu.be/pV2qYJjCdxM
 
 Option Explicit On
 Option Strict On
@@ -30,16 +30,45 @@ Class Worms
   ' Camera coordinates
   Private m_cameraPosX As Single = 0.0F
   Private m_cameraPosY As Single = 0.0F
+  Private m_targetCameraPosX As Single = 0.0F
+  Private m_targetCameraPosY As Single = 0.0F
+
+  Private Enum GameState
+    Reset
+    GenerateTerrain
+    GeneratingTerrain
+    AllocateUnits
+    AllocatingUnits
+    StartPlay
+    CameraMode
+  End Enum
+
+  Private m_gameState As GameState
+  Private m_nextState As GameState
+
+  Private m_gameIsStable As Boolean = False
+  Private m_playerHasControl As Boolean = False
+  Private m_playerActionComplete As Boolean = False
 
   ' list of things that exist in game world
   Private ReadOnly m_objects As New List(Of PhysicsObject)()
+
+  Private m_objectUnderControl As PhysicsObject = Nothing
+  Private m_cameraTrackingObject As PhysicsObject = Nothing
+
+  Private m_energizing As Boolean = False
+  Private m_energyLevel As Single = 0.0F
+  Private m_fireWeapon As Boolean = False
 
   Public Overrides Function OnUserCreate() As Boolean
 
     ' Create Map
     m_map = New Byte(m_mapWidth * m_mapHeight - 1) {}
     'Array.Clear(m_map, 0, m_mapWidth * m_mapHeight)
-    CreateMap()
+    'CreateMap()
+
+    m_gameState = GameState.Reset
+    m_nextState = GameState.Reset
 
     Return True
 
@@ -62,7 +91,10 @@ Class Worms
 
     ' Middle click to spawn worm/unit
     If m_mouse(2).Released Then
-      m_objects.Add(New WormObject(m_mousePosX + m_cameraPosX, m_mousePosY + m_cameraPosY))
+      Dim worm = New WormObject(m_mousePosX + m_cameraPosX, m_mousePosY + m_cameraPosY)
+      m_objects.Add(worm)
+      m_objectUnderControl = worm
+      m_cameraTrackingObject = worm
     End If
 
     ' Mouse Edge Map Scroll
@@ -71,6 +103,108 @@ Class Worms
     If m_mousePosX > ScreenWidth() - 5 Then m_cameraPosX += mapScrollSpeed * elapsedTime
     If m_mousePosY < 5 Then m_cameraPosY -= mapScrollSpeed * elapsedTime
     If m_mousePosY > ScreenHeight() - 5 Then m_cameraPosY += mapScrollSpeed * elapsedTime
+
+    ' Control Supervisor
+    Select Case m_gameState
+      Case GameState.Reset : m_playerHasControl = False : m_nextState = GameState.GenerateTerrain
+      Case GameState.GenerateTerrain
+        m_playerHasControl = False
+        CreateMap()
+        m_nextState = GameState.GeneratingTerrain
+      Case GameState.GeneratingTerrain : m_playerHasControl = False : m_nextState = GameState.AllocatingUnits
+      Case GameState.AllocateUnits
+        m_playerHasControl = False
+        Dim worm = New WormObject(32.0F, 1.0F)
+        m_objects.Add(worm)
+        m_objectUnderControl = worm
+        m_cameraTrackingObject = worm
+        m_nextState = GameState.AllocatingUnits
+      Case GameState.AllocatingUnits
+        m_playerHasControl = False
+        If m_gameIsStable Then
+          m_playerActionComplete = False
+          m_nextState = GameState.StartPlay
+        End If
+      Case GameState.StartPlay
+        m_playerHasControl = True
+        If m_playerActionComplete Then m_nextState = GameState.CameraMode
+      Case GameState.CameraMode
+        m_playerHasControl = False
+        m_playerActionComplete = False
+        If m_gameIsStable Then
+          m_cameraTrackingObject = m_objectUnderControl
+          m_nextState = GameState.StartPlay
+        End If
+    End Select
+
+    ' Handle User Input
+    If m_playerHasControl Then
+      If m_objectUnderControl IsNot Nothing Then
+
+        If m_objectUnderControl.Stable Then
+          If m_keys(AscW("Z"c)).Pressed Then
+            Dim a = CType(m_objectUnderControl, WormObject).m_shootAngle
+            m_objectUnderControl.Vx = 4.0F * CSng(Math.Cos(a))
+            m_objectUnderControl.Vy = 8.0F * CSng(Math.Sin(a))
+            m_objectUnderControl.Stable = False
+          End If
+          If m_keys(AscW("A"c)).Held Then
+            Dim worm = CType(m_objectUnderControl, WormObject)
+            worm.m_shootAngle -= 1.0F * elapsedTime
+            If worm.m_shootAngle < -3.14159F Then worm.m_shootAngle += 3.14159F * 2.0F
+          End If
+          If m_keys(AscW("S"c)).Held Then
+            Dim worm = CType(m_objectUnderControl, WormObject)
+            worm.m_shootAngle += 1.0F * elapsedTime
+            If worm.m_shootAngle > 3.14159F Then worm.m_shootAngle -= 3.14159F * 2.0F
+          End If
+          If m_keys(VK_SPACE).Pressed Then
+            m_energizing = True
+            m_fireWeapon = False
+            m_energyLevel = 0.0F
+          End If
+          If m_keys(VK_SPACE).Held Then
+            If m_energizing Then
+              m_energyLevel += 0.75F * elapsedTime
+              If m_energyLevel > 1.0F Then m_energyLevel = 1.0F : m_fireWeapon = True
+            End If
+          End If
+          If m_keys(VK_SPACE).Released Then
+            If m_energizing Then m_fireWeapon = True
+            m_energizing = False
+          End If
+        End If
+
+        If m_fireWeapon Then
+          Dim worm = TryCast(m_objectUnderControl, WormObject)
+          ' Get Weapon Origin
+          Dim ox = worm.Px
+          Dim oy = worm.Py
+          ' Get Weapon Direction
+          Dim dx = CSng(Math.Cos(worm.m_shootAngle))
+          Dim dy = CSng(Math.Sin(worm.m_shootAngle))
+          ' Create Weapon Object
+          Dim m = New MissileObject(ox, oy, dx * 40.0F * m_energyLevel, dy * 40.0F * m_energyLevel)
+          m_objects.Add(m)
+          m_cameraTrackingObject = m
+          ' Reset variables
+          m_fireWeapon = False
+          m_energyLevel = 0.0F
+          m_energizing = False
+          m_playerActionComplete = True
+        End If
+
+      End If
+    End If
+
+    If m_cameraTrackingObject IsNot Nothing Then
+      'm_cameraPosX = m_cameraTrackingObject.Px - CSng(ScreenWidth() / 2)
+      'm_cameraPosY = m_cameraTrackingObject.Py - CSng(ScreenHeight() / 2)
+      m_targetCameraPosX = CSng(m_cameraTrackingObject.Px - ScreenWidth() / 2)
+      m_targetCameraPosY = CSng(m_cameraTrackingObject.Py - ScreenHeight() / 2)
+      m_cameraPosX += (m_targetCameraPosX - m_cameraPosX) * 5.0F * elapsedTime
+      m_cameraPosY += (m_targetCameraPosY - m_cameraPosY) * 5.0F * elapsedTime
+    End If
 
     ' Clamp map boundaries
     If m_cameraPosX < 0 Then m_cameraPosX = 0
@@ -181,6 +315,7 @@ Class Worms
           Boom(b.X, b.Y, b.Radius)
         Next
         boomList.Clear()
+        m_cameraTrackingObject = Nothing 'm_objectUnderControl
       End If
 
       ' Remove dead objects from the list, so they are not processed further. As the object
@@ -205,7 +340,36 @@ Class Worms
     ' Draw Objects
     For Each p In m_objects
       p.Draw(Me, m_cameraPosX, m_cameraPosY)
+      If p Is m_objectUnderControl Then
+
+        Dim worm = CType(p, WormObject)
+        Dim cx = worm.Px + 8.0F * CSng(Math.Cos(worm.m_shootAngle)) - m_cameraPosX
+        Dim cy = worm.Py + 8.0F * CSng(Math.Sin(worm.m_shootAngle)) - m_cameraPosY
+
+        Draw(cx, cy, PIXEL_SOLID, FG_BLACK)
+        Draw(cx + 1, cy, PIXEL_SOLID, FG_BLACK)
+        Draw(cx - 1, cy, PIXEL_SOLID, FG_BLACK)
+        Draw(cx, cy + 1, PIXEL_SOLID, FG_BLACK)
+        Draw(cx, cy - 1, PIXEL_SOLID, FG_BLACK)
+
+        For i = 0 To (11.0F * m_energyLevel) - 1
+          Draw(worm.Px - 5 + i - m_cameraPosX, worm.Py - 12 - m_cameraPosY, PIXEL_SOLID, FG_GREY)
+          Draw(worm.Px - 5 + i - m_cameraPosX, worm.Py - 11 - m_cameraPosY, PIXEL_SOLID, FG_RED)
+        Next
+
+      End If
     Next
+
+    m_gameIsStable = True
+    For Each p In m_objects
+      If Not p.Stable Then m_gameIsStable = False : Exit For
+    Next
+
+    If m_gameIsStable Then
+      Fill(2, 2, 6, 6, PIXEL_SOLID, FG_RED)
+    End If
+
+    m_gameState = m_nextState
 
     Return True
 
@@ -493,6 +657,8 @@ Public Class WormObject
 
   Private Shared m_sprite As Sprite = Nothing
 
+  Public m_shootAngle As Single = 0.0F
+
   Public Sub New(Optional x As Single = 0.0F, Optional y As Single = 0.0F)
     MyBase.New(x, y)
 
@@ -502,9 +668,9 @@ Public Class WormObject
     BounceBeforeDeath = -1
 
     ' load sprite data from sprite file
-    If m_sprite Is Nothing Then
-      m_sprite = New Sprite("worms.spr")
-    End If
+    'If m_sprite Is Nothing Then
+    m_sprite = New Sprite("worms1.spr")
+    'End If
 
   End Sub
 

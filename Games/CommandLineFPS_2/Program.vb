@@ -108,17 +108,17 @@ Class CommandLineFps
   Public Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
     ' Handle CCW Rotation
-    If m_keys(AscW("A"c)).bHeld Then
+    If m_keys(AscW("A"c)).Held Then
       m_playerA -= m_speed * 0.5F * elapsedTime
     End If
 
     ' Handle CW Rotation
-    If m_keys(AscW("D"c)).bHeld Then
+    If m_keys(AscW("D"c)).Held Then
       m_playerA += m_speed * 0.5F * elapsedTime
     End If
 
     ' Handle Forwards movement & collision
-    If m_keys(AscW("W"c)).bHeld Then
+    If m_keys(AscW("W"c)).Held Then
       m_playerX += Math.Sin(m_playerA) * m_speed * elapsedTime
       m_playerY += Math.Cos(m_playerA) * m_speed * elapsedTime
       If m_map.Chars(CInt(Fix(m_playerX)) * m_mapWidth + CInt(Fix(m_playerY))) = "#"c Then
@@ -128,7 +128,7 @@ Class CommandLineFps
     End If
 
     ' Handle backwards movement & collision
-    If m_keys(AscW("S"c)).bHeld Then
+    If m_keys(AscW("S"c)).Held Then
       m_playerX -= Math.Sin(m_playerA) * m_speed * elapsedTime
       m_playerY -= Math.Cos(m_playerA) * m_speed * elapsedTime
       If m_map.Chars(CInt(Fix(m_playerX)) * m_mapWidth + CInt(Fix(m_playerY))) = "#"c Then
@@ -138,7 +138,7 @@ Class CommandLineFps
     End If
 
     ' Handle Strafe Right movement & collision
-    If m_keys(AscW("E"c)).bHeld Then
+    If m_keys(AscW("E"c)).Held Then
       m_playerX += Math.Cos(m_playerA) * m_speed * elapsedTime
       m_playerY -= Math.Sin(m_playerA) * m_speed * elapsedTime
       If m_map.Chars(CInt(Fix(m_playerX)) * m_mapWidth + CInt(Fix(m_playerY))) = "#" Then
@@ -148,7 +148,7 @@ Class CommandLineFps
     End If
 
     ' Handle Strafe Left movement & collision
-    If m_keys(AscW("Q"c)).bHeld Then
+    If m_keys(AscW("Q"c)).Held Then
       m_playerX -= Math.Cos(m_playerA) * m_speed * elapsedTime
       m_playerY += Math.Sin(m_playerA) * m_speed * elapsedTime
       If m_map.Chars(CInt(Fix(m_playerX)) * m_mapWidth + CInt(Fix(m_playerY))) = "#" Then

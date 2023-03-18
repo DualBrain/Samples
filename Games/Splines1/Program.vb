@@ -60,12 +60,12 @@ Class Splines1
         m_selectedPoint = m_path.Points.Count - 1
       End If
     End If
-    If m_keys(VK_LEFT).bHeld Then m_path.Points(m_selectedPoint).X -= 30 * elapsedTime
-    If m_keys(VK_RIGHT).bHeld Then m_path.Points(m_selectedPoint).X += 30 * elapsedTime
-    If m_keys(VK_UP).bHeld Then m_path.Points(m_selectedPoint).Y -= 30 * elapsedTime
-    If m_keys(VK_DOWN).bHeld Then m_path.Points(m_selectedPoint).Y += 30 * elapsedTime
-    If m_keys(AscW("A")).bHeld Then m_marker -= 5.0 * elapsedTime
-    If m_keys(AscW("S")).bHeld Then m_marker += 5.0 * elapsedTime
+    If m_keys(VK_LEFT).Held Then m_path.Points(m_selectedPoint).X -= 30 * elapsedTime
+    If m_keys(VK_RIGHT).Held Then m_path.Points(m_selectedPoint).X += 30 * elapsedTime
+    If m_keys(VK_UP).Held Then m_path.Points(m_selectedPoint).Y -= 30 * elapsedTime
+    If m_keys(VK_DOWN).Held Then m_path.Points(m_selectedPoint).Y += 30 * elapsedTime
+    If m_keys(AscW("A")).Held Then m_marker -= 5.0 * elapsedTime
+    If m_keys(AscW("S")).Held Then m_marker += 5.0 * elapsedTime
 
     If m_marker > m_path.Points.Count - 1 Then m_marker -= m_path.Points.Count
     If m_marker < 0 Then m_marker += m_path.Points.Count

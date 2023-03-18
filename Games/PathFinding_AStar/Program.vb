@@ -177,9 +177,9 @@ Class PathFinding_AStar
       If selectedNodeX >= 0 AndAlso selectedNodeX < m_mapWidth Then
         If selectedNodeY >= 0 AndAlso selectedNodeY < m_mapHeight Then
 
-          If m_keys(VK_SHIFT).bHeld Then
+          If m_keys(VK_SHIFT).Held Then
             m_nodeStart = m_nodes(selectedNodeY * m_mapWidth + selectedNodeX)
-          ElseIf m_keys(VK_CONTROL).bHeld Then
+          ElseIf m_keys(VK_CONTROL).Held Then
             m_nodeEnd = m_nodes(selectedNodeY * m_mapWidth + selectedNodeX)
           Else
             m_nodes(selectedNodeY * m_mapWidth + selectedNodeX).Obstacle = Not m_nodes(selectedNodeY * m_mapWidth + selectedNodeX).Obstacle

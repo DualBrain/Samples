@@ -64,15 +64,15 @@ Class RetroArcadeRacer
 
   Public Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
-    If m_keys(VK_UP).bHeld OrElse m_keys(VK_SPACE).bHeld Then
+    If m_keys(VK_UP).Held OrElse m_keys(VK_SPACE).Held Then
       m_speed += 2.0 * elapsedTime
     Else
       m_speed -= 1.0 * elapsedTime
     End If
 
     Dim carDirection = 0
-    If m_keys(VK_LEFT).bHeld Then m_playerCurvature -= 0.7 * elapsedTime : carDirection = -1
-    If m_keys(VK_RIGHT).bHeld Then m_playerCurvature += 0.7 * elapsedTime : carDirection = 1
+    If m_keys(VK_LEFT).Held Then m_playerCurvature -= 0.7 * elapsedTime : carDirection = -1
+    If m_keys(VK_RIGHT).Held Then m_playerCurvature += 0.7 * elapsedTime : carDirection = 1
 
     If Math.Abs(m_playerCurvature - m_trackCurvature) >= 0.8 Then m_speed -= 5.0
 

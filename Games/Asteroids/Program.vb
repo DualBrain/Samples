@@ -80,11 +80,11 @@ Class Asteroids
     Cls()
 
     ' Steer
-    If m_keys(VK_LEFT).bHeld Then m_player.Angle -= 5.0F * elapsedTime
-    If m_keys(VK_RIGHT).bHeld Then m_player.Angle += 5.0F * elapsedTime
+    If m_keys(VK_LEFT).Held Then m_player.Angle -= 5.0F * elapsedTime
+    If m_keys(VK_RIGHT).Held Then m_player.Angle += 5.0F * elapsedTime
 
     ' Thrust
-    If m_keys(VK_UP).bHeld Then
+    If m_keys(VK_UP).Held Then
       ' ACCELERATION changes VELOCITY (with respect to time)
       m_player.Dx += CSng(Math.Sin(m_player.Angle) * 20 * elapsedTime)
       m_player.Dy += -CSng(Math.Cos(m_player.Angle) * 20 * elapsedTime)

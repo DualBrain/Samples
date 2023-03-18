@@ -78,7 +78,7 @@ Class Demo
     Draw(m_mousePosX, m_mousePosY - 1)
     Draw(m_mousePosX, m_mousePosY + 1)
 
-    If m_mouse(0).bHeld Then
+    If m_mouse(0).Held Then
       Fill(20, 20, 50, 50)
     End If
 
