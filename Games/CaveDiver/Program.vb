@@ -99,7 +99,7 @@ Module Program
 
       ' Draw HUD
       pfxy("===============================================================================", 0, 28)
-      pfxy("Cave Diver - www.onelonecoder.com - Left Arrow / Right Arrow - Survive!", 2, 29)
+      pfxy("Cave Diver - gotBASIC.com and OneLoneCoder.com - Left Arrow / Right Arrow - Survive!", 2, 29)
       Dim dist As Integer = CInt(tt * 100.0F)
       pfxy("Distance Fallen:            ", 2, 30)
       pfxy(dist.ToString(), 19, 30)

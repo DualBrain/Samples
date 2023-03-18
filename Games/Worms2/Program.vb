@@ -111,7 +111,7 @@ Class Worms
         m_playerHasControl = False
         CreateMap()
         m_nextState = GameState.GeneratingTerrain
-      Case GameState.GeneratingTerrain : m_playerHasControl = False : m_nextState = GameState.AllocatingUnits
+      Case GameState.GeneratingTerrain : m_playerHasControl = False : m_nextState = GameState.AllocateUnits
       Case GameState.AllocateUnits
         m_playerHasControl = False
         Dim worm = New WormObject(32.0F, 1.0F)

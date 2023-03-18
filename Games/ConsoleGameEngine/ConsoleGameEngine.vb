@@ -1,7 +1,6 @@
 ﻿Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.Threading
-Imports System.Xml
 
 Public Structure WAVEFORMATEX
   Public wFormatTag As Short
@@ -1067,7 +1066,7 @@ next2:
         End If
 
         ' Update Title & Present Screen Buffer
-        Dim s As String = String.Format("OneLoneCoder.com - Console Game Engine - {0} - FPS: {1:0.00}", m_sAppName, 1.0F / fElapsedTime)
+        Dim s As String = String.Format("gotBASIC.com and OneLoneCoder.com - ConsoleGameEngine - {0} - FPS: {1:0.00}", m_sAppName, 1.0F / fElapsedTime)
         SetConsoleTitle(s)
         WriteConsoleOutput(m_hConsole, m_bufScreen, New COORD(m_nScreenWidth, m_nScreenHeight), New COORD(0, 0), m_rectWindow)
 
