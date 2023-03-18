@@ -284,8 +284,8 @@ Class AR_OpticFlow
     ' === Update Screen =================================================================
 
     ' Draw Camera Image
-    DrawImage(fMotionImage)
-    'DrawImage(fNewCamera)
+    'DrawImage(fMotionImage)
+    DrawImage(fNewCamera)
 
     ' Draw "Ball"
     Fill(fBallX - 4, fBallY - 4, fBallX + 4, fBallY + 4, PIXEL_SOLID, FG_RED)
