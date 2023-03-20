@@ -58,6 +58,10 @@ Module Program
     Dim output = 0.1 * Math.Sin(m_frequencyOutput * 2 * 3.14159 * time)
     Return If(output > 0, 0.2, -0.2)
 
+    ' A cord?
+    'Dim output = 1.0 * Math.Sin(m_frequencyOutput * 2 * 3.14159 * time) + Math.Sin((m_frequencyOutput + 20) * 2.0 * 3.14159 * time)
+    'Return output * 0.4
+
   End Function
 
   Sub Main() 'args As String())
