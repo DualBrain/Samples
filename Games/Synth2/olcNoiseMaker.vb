@@ -137,6 +137,7 @@ Public Class olcNoiseMaker(Of T)
       result = WaveOutPrepareHeader(m_waveOut, m_waveHeaders(i), Marshal.SizeOf(GetType(WaveHeader)))
     Next
 
+    ReDim m_buffer(m_blockSamples - 1)
     m_ready = True
 
     Dim thread = New Thread(AddressOf MainThread)
@@ -174,11 +175,7 @@ Public Class olcNoiseMaker(Of T)
   End Sub
 
   Public Function Clip(sample As Double, max As Double) As Double
-    If sample >= 0.0 Then
-      Return Math.Min(sample, max)
-    Else
-      Return Math.Max(sample, -max)
-    End If
+    Return If(sample >= 0.0, Math.Min(sample, max), Math.Max(sample, -max))
   End Function
 
   Public Function Destroy() As Boolean
@@ -223,8 +220,8 @@ Public Class olcNoiseMaker(Of T)
                                   param2 As IntPtr)
 
     If msg = WOM_DONE Then
-      m_blockFree += 1
       SyncLock m_playbackThread
+        m_blockFree += 1
         m_bufferIndex = (m_bufferIndex + 1) Mod m_blockCount
         Monitor.PulseAll(m_playbackThread)
       End SyncLock
@@ -243,6 +240,7 @@ Public Class olcNoiseMaker(Of T)
     m_globalTime = 0.0#
 
     Dim currentBufferIndex = m_bufferIndex
+    Dim sz = Marshal.SizeOf(GetType(WaveHeader))
 
     While m_ready
 
@@ -259,7 +257,7 @@ Public Class olcNoiseMaker(Of T)
       m_blockFree -= 1
 
       FillBuffer(currentBufferIndex)
-      apiResult = WaveOutWrite(m_waveOut, m_waveHeaders(currentBufferIndex), Marshal.SizeOf(GetType(WaveHeader)))
+      apiResult = WaveOutWrite(m_waveOut, m_waveHeaders(currentBufferIndex), sz)
       currentBufferIndex = (currentBufferIndex + 1) Mod m_blockCount
 
     End While
@@ -267,7 +265,7 @@ Public Class olcNoiseMaker(Of T)
     ' cleanup
     apiResult = WaveOutReset(m_waveOut)
     For i = 0 To m_waveHeaders.Length - 1
-      apiResult = WaveOutUnprepareHeader(m_waveOut, m_waveHeaders(i), Marshal.SizeOf(GetType(WaveHeader)))
+      apiResult = WaveOutUnprepareHeader(m_waveOut, m_waveHeaders(i), sz)
       Marshal.FreeHGlobal(m_waveHeaders(i).Data)
     Next
     apiResult = WaveOutClose(m_waveOut)
@@ -278,19 +276,22 @@ Public Class olcNoiseMaker(Of T)
   Private ReadOnly m_maxSample As Short = CShort(Math.Pow(2, (m_sizeOfT * 8) - 1) - 1)
   Private m_timeStep As Double = 1.0# / 44100 ' default to 44100 - will reset appropriately in Create.
 
+  Private m_buffer() As Short
+  Private m_fillBufferI As Integer
+
   Private Sub FillBuffer(bufferIndex As Integer)
 
     ' Copy the sine wave to the buffer
-    Dim buffer(m_blockSamples - 1) As Short
-    For i = 0 To buffer.Length - 1
+    'Dim buffer(m_blockSamples - 1) As Short
+    For m_fillBufferI = 0 To m_buffer.Length - 1
       If m_userFunction Is Nothing Then
-        buffer(i) = CShort(Clip(UserProcess(m_globalTime), 1.0) * m_maxSample)
+        m_buffer(m_fillBufferI) = CShort(Clip(UserProcess(m_globalTime), 1.0) * m_maxSample)
       Else
-        buffer(i) = CShort(Clip(m_userFunction(m_globalTime), 1.0) * m_maxSample)
+        m_buffer(m_fillBufferI) = CShort(Clip(m_userFunction(m_globalTime), 1.0) * m_maxSample)
       End If
       m_globalTime += m_timeStep
     Next
-    Marshal.Copy(buffer, 0, m_buffers(bufferIndex), buffer.Length)
+    Marshal.Copy(m_buffer, 0, m_buffers(bufferIndex), m_buffer.Length)
 
   End Sub
 

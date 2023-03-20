@@ -76,6 +76,7 @@ Public Class olcNoiseMaker(Of T)
   Public ReadOnly BufferLock As New Object()
 
   Private m_delegate As WaveOutCallback
+  Private m_delegateHandle As GCHandle
 
   Public Sub New(outputDevice As String,
                  Optional sampleRate As Integer = 44100,
@@ -110,7 +111,7 @@ Public Class olcNoiseMaker(Of T)
 
       ' Device is available
 
-      Dim deviceID = d
+      Dim deviceID = -1 'WAVE_MAPPER 'd
 
       Dim waveFormat As New WaveFormat With {
         .FormatTag = WAVE_FORMAT_PCM,
@@ -123,6 +124,9 @@ Public Class olcNoiseMaker(Of T)
 
       ' Open Device if valid
       m_delegate = New WaveOutCallback(AddressOf WaveOutCallbackFunc)
+      m_delegateHandle = GCHandle.Alloc(m_delegate)
+      'Dim callbackDelegate As New WaveOutCallback(AddressOf WaveOutCallbackFunc)
+      'Dim callbackPointer As IntPtr = Marshal.GetFunctionPointerForDelegate(m_delegate)
       If WaveOutOpen(m_waveOut, deviceID, waveFormat, m_delegate, IntPtr.Zero, CALLBACK_FUNCTION) <> S_OK Then
         Return Destroy()
       End If
@@ -140,6 +144,8 @@ Public Class olcNoiseMaker(Of T)
     Next
 
     m_ready = True
+
+    ReDim m_buffer(m_blockSamples - 1)
 
     Dim thread = New Thread(AddressOf MainThread)
     thread.Start()
@@ -221,18 +227,15 @@ Public Class olcNoiseMaker(Of T)
                                   instance As IntPtr,
                                   param1 As IntPtr,
                                   param2 As IntPtr)
-
     If msg = WOM_DONE Then
 
       'Debug.WriteLine($"WOM_DONE - {Now}")
 
-      m_lockObj.WaitOne()
-      m_blockFree += 1
       SyncLock m_playbackThread
+        m_blockFree += 1
         m_bufferIndex = (m_bufferIndex + 1) Mod m_blockCount
         Monitor.PulseAll(m_playbackThread)
       End SyncLock
-      m_lockObj.ReleaseMutex()
 
     End If
 
@@ -250,7 +253,13 @@ Public Class olcNoiseMaker(Of T)
 
     Dim currentBufferIndex = m_bufferIndex
 
+    Dim sz = Marshal.SizeOf(GetType(WaveHeader))
+
     While m_ready
+
+      If m_delegate Is Nothing Then
+        Stop
+      End If
 
       ' Wait for block to become available
       If m_blockFree = 0 Then
@@ -262,16 +271,12 @@ Public Class olcNoiseMaker(Of T)
       End If
 
       ' Block is here, so use it
-      m_lockObj.WaitOne()
       m_blockFree -= 1
-      m_lockObj.ReleaseMutex()
 
       FillBuffer(currentBufferIndex)
 
       ' Send block to sound device
-      m_lockObj.WaitOne()
-      apiResult = WaveOutWrite(m_waveOut, m_waveHeaders(currentBufferIndex), Marshal.SizeOf(GetType(WaveHeader)))
-      m_lockObj.ReleaseMutex()
+      apiResult = WaveOutWrite(m_waveOut, m_waveHeaders(currentBufferIndex), sz)
 
       If apiResult <> 0 Then
         Debug.WriteLine($"WaveOutWrite = {apiResult}: {Now}")
@@ -282,6 +287,7 @@ Public Class olcNoiseMaker(Of T)
     End While
 
     ' cleanup
+    m_delegateHandle.Free()
     apiResult = WaveOutReset(m_waveOut)
     If apiResult <> 0 Then Debug.WriteLine($"WaveOutReset = {apiResult}")
     For i = 0 To m_waveHeaders.Length - 1
@@ -298,23 +304,25 @@ Public Class olcNoiseMaker(Of T)
   Private ReadOnly m_maxSample As Short = CShort(Math.Pow(2, (m_sizeOfT * 8) - 1) - 1)
   Private m_timeStep As Double = 1.0# / 44100 ' default to 44100 - will reset appropriately in Create.
 
+  Private m_buffer() As Short
+  Private m_iBuffer As Integer
+  Private m_cBuffer As Integer
+
   Private Sub FillBuffer(bufferIndex As Integer)
 
     ' Copy the sine wave to the buffer
-    Dim buffer(m_blockSamples - 1) As Short
-    For i = 0 To buffer.Length - 1
-      For c = 0 To m_channels - 1
+    'Dim buffer(m_blockSamples - 1) As Short
+    For m_iBuffer = 0 To m_buffer.Length - 1
+      For m_cBuffer = 0 To m_channels - 1
         If m_userFunction Is Nothing Then
-          buffer(i) = CShort(Clip(UserProcess(c, m_globalTime), 1.0) * m_maxSample)
+          m_buffer(m_iBuffer) = CShort(Fix(Clip(UserProcess(m_cBuffer, m_globalTime), 1.0) * m_maxSample))
         Else
-          buffer(i) = CShort(Clip(m_userFunction(c, m_globalTime), 1.0) * m_maxSample)
+          m_buffer(m_iBuffer) = CShort(Fix(Clip(m_userFunction(m_cBuffer, m_globalTime), 1.0) * m_maxSample))
         End If
       Next
       m_globalTime += m_timeStep
     Next
-    m_lockObj.WaitOne()
-    Marshal.Copy(buffer, 0, m_buffers(bufferIndex), buffer.Length)
-    m_lockObj.ReleaseMutex()
+    Marshal.Copy(m_buffer, 0, m_buffers(bufferIndex), m_buffer.Length)
 
   End Sub
 

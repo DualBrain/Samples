@@ -24,11 +24,11 @@ Friend Module Synth
   ' A basic note
   Public Class Note
 
-    Public Id As Integer
-    Public [On] As Double
-    Public [Off] As Double
-    Public Active As Boolean
-    Public Channel As Integer
+    Public ReadOnly Property Id As Integer
+    Public Property [On] As Double
+    Public Property [Off] As Double
+    Public Property Active As Boolean
+    Public ReadOnly Property Channel As Integer
 
     Public Sub New(id As Integer, [on] As Double, [off] As Double, active As Boolean, channel As Integer)
       Me.Id = id
@@ -296,36 +296,40 @@ Module Program
 
 #End Region
 
-  Private ReadOnly m_vecNotes As New List(Of Synth.Note)
-  Private ReadOnly m_instBell As New Synth.InstrumentBell()
-  Private ReadOnly m_instHarm As New Synth.InstrumentHarmonica()
+  Private ReadOnly m_threadObject As New Object()
 
-  Private ReadOnly m_syncObject As New Object
+  Private ReadOnly m_vecNotes As New List(Of Note)
+  Private ReadOnly m_instBell As New InstrumentBell()
+  Private ReadOnly m_instHarm As New InstrumentHarmonica()
+
+  Private m_mixedOutput As Double
+  Private m_makeNoiseIndex As Integer
+  Private m_noteFinished As Boolean
+  Private m_sound As Double
 
   Private Function MakeNoise(channel As Integer, time As Double) As Double
 
-    Dim mixedOutput = 0.0#
+    m_mixedOutput = 0.0#
 
-    'mixedOutput = Math.Sin(W(440.0) * time + 0.05 * 440.0 * Math.Sin(W(1.0) * time))
-
-    SyncLock m_syncObject
-
-      For index = m_vecNotes.Count - 1 To 0 Step -1
-        Dim entry = m_vecNotes(index)
+    'SyncLock m_threadObject
+    For m_makeNoiseIndex = m_vecNotes.Count - 1 To 0 Step -1
+      Try
+        Dim entry = m_vecNotes(m_makeNoiseIndex)
+        If entry Is Nothing Then Continue For
         'For Each entry In m_vecNotes
-        Dim noteFinished = False
-        Dim sound = 0.0#
-        If entry?.Channel = 2 Then sound = m_instBell.Sound(time, entry, noteFinished)
-        If entry?.Channel = 1 Then sound = m_instHarm.Sound(time, entry, noteFinished) * 0.5
-        mixedOutput += sound
-        If noteFinished AndAlso entry?.Off > entry?.On Then entry.Active = False
-      Next
+        m_noteFinished = False
+        m_sound = 0.0#
+        If entry.Channel = 2 Then m_sound = m_instBell.Sound(time, entry, m_noteFinished)
+        If entry.Channel = 1 Then m_sound = m_instHarm.Sound(time, entry, m_noteFinished) * 0.5
+        m_mixedOutput += m_sound
+        If m_noteFinished AndAlso entry.Off > entry.On Then entry.Active = False
+      Catch
+        Continue For
+      End Try
+    Next
+    'End SyncLock
 
-      'Monitor.PulseAll(m_syncObject)
-
-    End SyncLock
-
-    Return mixedOutput * 0.2
+    Return m_mixedOutput * 0.2
 
   End Function
 
@@ -364,80 +368,83 @@ Module Program
 
     Console.CursorVisible = False
 
-    While True
+    Dim keys = "ZSXCFVGBNJMK" & ChrW(&HBC) & ChrW(&HBE) & ChrW(&HBF)
+    Dim abort = False
+    Dim keyState As Short
+    Dim timeNow As Double
+    Dim index As Integer
+    'Dim noteFound As Note = Nothing
+    Dim i As Integer
+    Dim foundIndex As Integer
 
-      Dim abort = (GetAsyncKeyState(27) And &H8000) <> 0
+    Do
+
+      abort = (GetAsyncKeyState(27) And &H8000) <> 0
       If abort Then
         sound.StopAudio()
-        Exit While
+        Exit Do
       End If
 
       For k = 0 To 14
 
-        Dim str = "ZSXCFVGBNJMK" & ChrW(&HBC) & ChrW(&HBE) & ChrW(&HBF)
-        Dim keyState = GetAsyncKeyState(AscW(str(k)))
-        Dim timeNow = sound.GetTime
+        keyState = GetAsyncKeyState(AscW(keys(k)))
+        timeNow = sound.GetTime
 
-        Dim i = k
+        i = k
 
-        Dim notefound As Note = Nothing '        = vecNotes.Find(Function(item) item.Id = i)
+        foundIndex = -1
+        'noteFound = Nothing '        = vecNotes.Find(Function(item) item.Id = i)
 
-        SyncLock m_syncObject
+        For index = m_vecNotes.Count - 1 To 0 Step -1
+          'If m_vecNotes(index).Id = i Then noteFound = m_vecNotes(index) : Exit For
+          If m_vecNotes(index).Id = i Then foundIndex = index : Exit For
+        Next
+        'For Each entry In m_vecNotes
+        '  If entry.Id = i Then notefound = entry : Exit For
+        'Next
 
-          For index = m_vecNotes.Count - 1 To 0 Step -1
-            If m_vecNotes(index)?.Id = i Then notefound = m_vecNotes(index) : Exit For
-          Next
-          'For Each entry In m_vecNotes
-          '  If entry.Id = i Then notefound = entry : Exit For
-          'Next
-
-          If notefound Is Nothing Then
-            ' Note not found in list
-            If (keyState And &H8000) <> 0 Then
-              ' Key has been pressed so create a new note
-              SyncLock sound.BufferLock
-                Dim n = New Synth.Note(i, timeNow, 0, True, 1)
-                m_vecNotes?.Add(n)
-              End SyncLock
-            Else
-              ' Note not in list, but key has been relesed...
-              ' ... nothing to do
+        If foundIndex = -1 Then
+          ' Note not found in list
+          If (keyState And &H8000) <> 0 Then
+            ' Key has been pressed so create a new note
+            m_vecNotes?.Add(New Note(i, timeNow, 0, True, 1))
+          Else
+            ' Note not in list, but key has been relesed...
+            ' ... nothing to do
+          End If
+        Else
+          ' Note exists in list
+          If (keyState And &H8000) <> 0 Then
+            ' Key is still held, so nothing to do
+            If m_vecNotes(foundIndex).Off > m_vecNotes(foundIndex).On Then
+              'Key has been pressed again during release phase
+              m_vecNotes(foundIndex).On = timeNow
+              m_vecNotes(foundIndex).Active = True
             End If
           Else
-            ' Note exists in list
-            If (keyState And &H8000) <> 0 Then
-              ' Key is still held, so nothing to do
-              If notefound?.Off > notefound?.On Then
-                'Key has been pressed again during release phase
-                If notefound IsNot Nothing Then notefound.On = timeNow
-                If notefound IsNot Nothing Then notefound.Active = True
-              End If
-            Else
-              ' Key has been released, so switch off
-              If notefound?.Off < notefound?.On Then
-                If notefound IsNot Nothing Then notefound.Off = timeNow
-              End If
+            ' Key has been released, so switch off
+            If m_vecNotes(foundIndex).Off < m_vecNotes(foundIndex).On Then
+              m_vecNotes(foundIndex).Off = timeNow
             End If
-
           End If
 
-          SyncLock sound.BufferLock
-            For index = m_vecNotes.Count - 1 To 0 Step -1
-              If Not m_vecNotes(index)?.Active Then
-                m_vecNotes.RemoveAt(index)
-                'Monitor.PulseAll(m_syncObject)
-                Exit For
-              End If
-            Next
-          End SyncLock
+        End If
 
-        End SyncLock
+        'SyncLock m_threadObject
+        For index = m_vecNotes.Count - 1 To 0 Step -1
+          If Not m_vecNotes(index).Active Then
+            m_vecNotes(index) = Nothing
+            m_vecNotes.RemoveAt(index)
+            Exit For
+          End If
+        Next
+        'End SyncLock
 
       Next
 
-      Dim row = Console.CursorTop : Console.WriteLine("Notes: " & m_vecNotes?.Count & "    ") : Console.CursorTop = row
+      'Dim row = Console.CursorTop : Console.WriteLine("Notes: " & m_vecNotes?.Count & "    ") : Console.CursorTop = row
 
-    End While
+    Loop
 
   End Sub
 

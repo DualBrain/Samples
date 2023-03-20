@@ -67,6 +67,9 @@ Module Program
   Private Const OSC_SAW_DIG = 4
   Private Const OSC_NOISE = 5
 
+  Private m_oscN As Double
+  Private m_oscOutput As Double
+
   Private Function Osc(hertz As Double, time As Double, Optional type As Integer = OSC_SINE) As Double
 
     Select Case type
@@ -81,11 +84,11 @@ Module Program
         Return Math.Asin(Math.Sin(W(hertz) * time)) * (2.0 / PI)
 
       Case OSC_SAW_ANA ' Saw wave (analogue / warm / slow)
-        Dim dOutput = 0.0#
-        For n = 1.0 To 39.0
-          dOutput += (Math.Sin(n * W(hertz) * time)) / n
+        m_oscOutput = 0.0#
+        For m_oscN = 1.0 To 39.0
+          m_oscOutput += (Math.Sin(m_oscN * W(hertz) * time)) / m_oscN
         Next
-        Return dOutput * (2.0 / PI)
+        Return m_oscOutput * (2.0 / PI)
 
       Case OSC_SAW_DIG ' Saw Wave (optimised / harsh / fast)
         Return (2.0 / PI) * (hertz * PI * (time Mod (1.0 / hertz)) - (PI / 2.0))
@@ -135,39 +138,41 @@ Module Program
       bNoteOn = False
     End Sub
 
+    Private m_amplitude As Double
+    Private m_lifeTime As Double
+
     ' Get the correct amplitude at the requested point in time
     Public Function GetAmplitude(time As Double) As Double
 
-      Dim amplitude = 0.0#
-      Dim lifeTime = time - TriggerOnTime
+      m_amplitude = 0.0#
+      m_lifeTime = time - TriggerOnTime
 
       If bNoteOn Then
 
-        If lifeTime <= AttackTime Then
+        If m_lifeTime <= AttackTime Then
           ' In attack Phase - approach max amplitude
-          amplitude = (lifeTime / AttackTime) * StartAmplitude
+          m_amplitude = (m_lifeTime / AttackTime) * StartAmplitude
         End If
 
-        If lifeTime > AttackTime And lifeTime <= (AttackTime + DecayTime) Then
+        If m_lifeTime > AttackTime AndAlso m_lifeTime <= (AttackTime + DecayTime) Then
           ' In decay phase - reduce to sustained amplitude
-          amplitude = ((lifeTime - AttackTime) / DecayTime) * (SustainAmplitude - StartAmplitude) + StartAmplitude
+          m_amplitude = ((m_lifeTime - AttackTime) / DecayTime) * (SustainAmplitude - StartAmplitude) + StartAmplitude
         End If
 
-        If lifeTime > (AttackTime + DecayTime) Then
+        If m_lifeTime > (AttackTime + DecayTime) Then
           ' In sustain phase - dont change until note released
-          amplitude = SustainAmplitude
+          m_amplitude = SustainAmplitude
         End If
+
       Else
         ' Note has been released, so in release phase
-        amplitude = ((time - TriggerOffTime) / ReleaseTime) * (0.0 - SustainAmplitude) + SustainAmplitude
+        m_amplitude = ((time - TriggerOffTime) / ReleaseTime) * (0.0 - SustainAmplitude) + SustainAmplitude
       End If
 
       ' Amplitude should not be negative
-      If amplitude <= 0.0001 Then
-        amplitude = 0.0
-      End If
+      If m_amplitude <= 0.0001 Then m_amplitude = 0.0
 
-      Return amplitude
+      Return m_amplitude
 
     End Function
 
@@ -181,6 +186,8 @@ Module Program
   Private m_frequencyOutput As Double = 0.0                                   ' dominant output frequency of instrument, i.e. the note
   Private ReadOnly m_octaveBaseFrequency As Double = 110.0                    ' A2 frequency Of octave represented by keyboard
   Private ReadOnly m_12thRootOf2 As Double = Math.Pow(2.0, 1.0 / 12.0)   ' assuming western 12 notes per ocatve
+
+  Private m_makeNoiseOutput As Double
 
   ' Function used by olcNoiseMaker to generate sound waves
   ' Returns amplitude (-1.0 to +1.0) as a function of time
@@ -215,8 +222,8 @@ Module Program
     'Return output * 0.4 ' Master Volume
 
     ' Mix together a little sine And square waves
-    Dim output = m_envelope.GetAmplitude(time) * (1.0 * Osc(m_frequencyOutput * 0.5, time, OSC_SINE) + 1.0 * Osc(m_frequencyOutput, time, OSC_SAW_ANA))
-    Return output * 0.4 ' Master Volume
+    m_makeNoiseOutput = m_envelope.GetAmplitude(time) * (1.0 * Osc(m_frequencyOutput * 0.5, time, OSC_SINE) + 1.0 * Osc(m_frequencyOutput, time, OSC_SAW_ANA))
+    Return m_makeNoiseOutput * 0.4 ' Master Volume
 
   End Function
 
@@ -258,24 +265,27 @@ Module Program
     ' Sit in loop, capturing keyboard state changes and modify synthesizer output accordingly
     Dim currentKey = -1
     Dim keyPressed = False
+    Dim abort = False
+    Dim keys = "ZSXCFVGBNJMK" & ChrW(&HBC) & ChrW(&HBE) & ChrW(&HBF)
+    Dim k = 0
+    Dim row = 0
 
     While True
 
       keyPressed = False
 
-      Dim abort = (GetAsyncKeyState(27) And &H8000) <> 0
+      abort = (GetAsyncKeyState(27) And &H8000) <> 0
       If abort Then
         sound.StopAudio()
         Exit While
       End If
 
       For k = 0 To 14
-        Dim str = "ZSXCFVGBNJMK" & ChrW(&HBC) & ChrW(&HBE) & ChrW(&HBF)
-        If (GetAsyncKeyState(AscW(str(k))) And &H8000) <> 0 Then
+        If (GetAsyncKeyState(AscW(keys(k))) And &H8000) <> 0 Then
           If currentKey <> k Then
             m_frequencyOutput = m_octaveBaseFrequency * Math.Pow(m_12thRootOf2, k)
             m_envelope.NoteOn(sound.GetTime) ' <--- introduced in Part 2
-            Dim row = Console.CursorTop : Console.WriteLine($"Note On : {sound.GetTime}s {m_frequencyOutput}Hz") : Console.CursorTop = row
+            'row = Console.CursorTop : Console.WriteLine($"Note On : {sound.GetTime}s {m_frequencyOutput}Hz") : Console.CursorTop = row
             currentKey = k
           End If
           keyPressed = True
@@ -283,17 +293,19 @@ Module Program
       Next
 
       If Not keyPressed Then
+
         If currentKey <> -1 Then
-          Dim row = Console.CursorTop : Console.WriteLine($"Note Off: {sound.GetTime}s                        ") : Console.CursorTop = row
+          'row = Console.CursorTop : Console.WriteLine($"Note Off: {sound.GetTime}s                        ") : Console.CursorTop = row
           m_envelope.NoteOff(sound.GetTime) ' <--- introduced in Part 2
           currentKey = -1
         End If
         m_frequencyOutput = 0.0
+
+        While Console.KeyAvailable : Console.ReadKey(True) : End While ' Flush 'Console' key buffer.
+
       End If
 
     End While
-
-    'Return 0
 
   End Sub
 

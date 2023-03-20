@@ -47,23 +47,33 @@ Module Program
 
 #End Region
 
+  Private Declare Function GetAsyncKeyState Lib "user32.dll" (virtualKeyCode As Integer) As Short
+
   Private Const BUFFER_COUNT As Integer = 8
-  Private Const BUFFER_SIZE As Integer = 256
+  Private Const BUFFER_SIZE As Integer = 2048 '256
 
   Private m_waveOut As IntPtr
   Private ReadOnly m_waveHeaders(BUFFER_COUNT - 1) As WaveHeader
   Private ReadOnly m_buffers(BUFFER_COUNT - 1) As IntPtr
-  Private ReadOnly m_sineWave(BUFFER_SIZE - 1) As Short
+  'Private ReadOnly m_sineWave(BUFFER_SIZE - 1) As Short
   Private ReadOnly m_playbackThread As New Object()
   Private m_bufferIndex As Integer
   Private m_stopPlayback As Boolean = False
 
+  Public Function W(hertz As Double) As Double
+    Return hertz * 2.0 * Math.PI
+  End Function
+
+  Private m_frequencyOutput As Double = 0.0                                   ' dominant output frequency of instrument, i.e. the note
+  Private ReadOnly m_octaveBaseFrequency As Double = 110.0                    ' frequency Of octave represented by keyboard
+  Private ReadOnly m_12thRootOf2 As Double = Math.Pow(2.0, 1.0 / 12.0)   ' assuming western 12 notes per ocatve
+
   Sub Main()
 
     ' Initialize the sine wave buffer
-    For i = 0 To m_sineWave.Length - 1
-      m_sineWave(i) = CShort(Short.MaxValue * Math.Sin(2 * Math.PI * i / m_sineWave.Length))
-    Next
+    'For i = 0 To m_sineWave.Length - 1
+    '  m_sineWave(i) = CShort(Short.MaxValue * Math.Sin(8 * Math.PI * i / m_sineWave.Length))
+    'Next
 
     ' Open the wave output device
     Dim format = New WaveFormat With {.FormatTag = &H1,
@@ -73,7 +83,8 @@ Module Program
                                       .BlockAlign = 2,
                                       .AvgBytesPerSec = 88200,
                                       .Size = 0}
-    Dim result = WaveOutOpen(m_waveOut, WAVE_MAPPER, format, New WaveOutCallback(AddressOf WaveOutCallbackFunc), IntPtr.Zero, CALLBACK_FUNCTION)
+    'Dim result = WaveOutOpen(m_waveOut, WAVE_MAPPER, format, New WaveOutCallback(AddressOf WaveOutCallbackFunc), IntPtr.Zero, CALLBACK_FUNCTION)
+    Dim result = WaveOutOpen(m_waveOut, 0, format, New WaveOutCallback(AddressOf WaveOutCallbackFunc), IntPtr.Zero, CALLBACK_FUNCTION)
     If result <> 0 Then
       Console.WriteLine($"Failed to open wave output device. result={result}")
       Return
@@ -91,9 +102,53 @@ Module Program
     Dim thread = New Thread(AddressOf PlaybackThreadProc)
     thread.Start()
 
+    Dim currentKey = -1
+    Dim keyPressed = False
+
+    Dim keys = "ZSXCFVGBNJMK" & ChrW(&HBC) & ChrW(&HBE) & ChrW(&HBF)
+    Dim abort = False
+    Dim row = 0
+    Dim k = 0
+
+    Console.WriteLine("Press ESC to stop playback.")
+    Do
+
+      keyPressed = False
+
+      abort = (GetAsyncKeyState(27) And &H8000) <> 0
+      If abort Then Exit Do
+
+      For k = 0 To 14
+        If (GetAsyncKeyState(AscW(keys(k))) And &H8000) <> 0 Then
+          If currentKey <> k Then
+            m_frequencyOutput = m_octaveBaseFrequency * Math.Pow(m_12thRootOf2, k)
+            'row = Console.CursorTop : Console.WriteLine($"Note On : {m_globalTime}s {m_frequencyOutput}Hz") : Console.CursorTop = row
+            currentKey = k
+          End If
+          keyPressed = True
+        End If
+      Next
+
+      If Not keyPressed Then
+
+        If currentKey <> -1 Then
+          'row = Console.CursorTop : Console.WriteLine($"Note Off: {m_globalTime}s                        ") : Console.CursorTop = row
+          currentKey = -1
+        End If
+        m_frequencyOutput = 0.0
+
+        ' Flush the keyboard buffer.
+        While Console.KeyAvailable
+          Console.ReadKey(True)
+        End While
+
+      End If
+
+    Loop
+
     ' Wait for a key press to stop playback
-    Console.WriteLine("Press any key to stop playback.")
-    Console.ReadKey(True)
+    'Console.WriteLine("Press any key to stop playback.")
+    'Console.ReadKey(True)
 
     Console.Write("Stopping playback...")
     m_stopPlayback = True
@@ -132,6 +187,8 @@ Module Program
 
     m_stopPlayback = False ' Not absolutely necessary to set to False here; but doing so for completeness.
 
+    Dim sz = Marshal.SizeOf(GetType(WaveHeader))
+
     ' Play the sine wave continuously
     While Not m_stopPlayback
 
@@ -143,10 +200,9 @@ Module Program
 
       If Not m_stopPlayback Then
         ' Refill the used buffer and play it
-        Dim bufferToRefill = m_waveHeaders(currentBufferIndex)
         FillBuffer(currentBufferIndex)
-        Marshal.Copy(m_sineWave, 0, bufferToRefill.Data, BUFFER_SIZE)
-        result = WaveOutWrite(m_waveOut, bufferToRefill, Marshal.SizeOf(GetType(WaveHeader)))
+        'Marshal.Copy(m_sineWave, 0, bufferToRefill.Data, BUFFER_SIZE) ' handled in FillBuffer.
+        result = WaveOutWrite(m_waveOut, m_waveHeaders(currentBufferIndex), sz)
         currentBufferIndex = (currentBufferIndex + 1) Mod BUFFER_COUNT
       End If
 
@@ -169,15 +225,43 @@ Module Program
 
   End Sub
 
+  'Private Sub FillBuffer(bufferIndex As Integer)
+  '  Dim bufferPtr = m_buffers(bufferIndex)
+  '  ' Copy the sine wave to the buffer
+  '  Dim buffer(BUFFER_SIZE - 1) As Short
+  '  For i = 0 To buffer.Length - 1
+  '    buffer(i) = m_sineWave(i)
+  '  Next
+  '  Marshal.Copy(buffer, 0, bufferPtr, buffer.Length)
+  'End Sub
+
+  Private ReadOnly m_timeStep As Double = 1.0# / 44100 ' default to 44100 - will reset appropriately in Create.
+  Private m_globalTime As Double = 0.0#
+  Private ReadOnly m_buffer(BUFFER_SIZE - 1) As Short
+
   Private Sub FillBuffer(bufferIndex As Integer)
-    Dim bufferPtr = m_buffers(bufferIndex)
+
     ' Copy the sine wave to the buffer
-    Dim buffer(BUFFER_SIZE - 1) As Short
-    For i = 0 To buffer.Length - 1
-      buffer(i) = m_sineWave(i)
+    'Dim buffer(BUFFER_SIZE - 1) As Short
+    For i = 0 To m_buffer.Length - 1
+      m_buffer(i) = CShort(Clip(UserProcess(m_globalTime), 1.0) * Short.MaxValue)
+      m_globalTime += m_timeStep
     Next
-    Marshal.Copy(buffer, 0, bufferPtr, buffer.Length)
+    Marshal.Copy(m_buffer, 0, m_buffers(bufferIndex), m_buffer.Length)
+
   End Sub
+
+  Private Function Clip(sample As Double, max As Double) As Double
+    Return If(sample >= 0.0, Math.Min(sample, max), Math.Max(sample, -max))
+  End Function
+
+  Private Function UserProcess(time As Double) As Double
+    'Return 0.0
+    'Return 0.5 + Math.Sin(W(440.0) * time + 0.05 * 440.0 * Math.Sin(W(1.0) * time))
+    'Return 0.5 + Math.Sin(W(m_frequencyOutput) * time + 0.05 * m_frequencyOutput * Math.Sin(W(1.0) * time))
+    Dim output = 0.1 * Math.Sin(m_frequencyOutput * 2 * 3.14159 * time)
+    Return If(output > 0, 0.2, -0.2)
+  End Function
 
   Private Sub WaveOutCallbackFunc(handle As IntPtr, msg As Integer, instance As IntPtr, param1 As IntPtr, param2 As IntPtr)
     If msg = WOM_DONE Then
