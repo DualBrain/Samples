@@ -1,5 +1,5 @@
-' Inspired by: "Code-It-Yourself! Sound Synthesizer #1" -- @javidx9
-' https://youtu.be/tgamhuQnOkM
+' Inspired by: "Code-It-Yourself! Sound Synthesizer #2 - Oscillators & Envelopes" -- @javidx9
+' https://youtu.be/OSCzKOqtgcA
 
 Option Explicit On
 Option Strict On
@@ -33,9 +33,153 @@ Module Program
 
 #End Region
 
+#Region "Helper methods that are copied out of ConsoleGameEngine"
+
+  Private ReadOnly m_random As New Random
+  Private Const PI As Single = Math.PI '3.14159
+  Private Const RAND_MAX As Integer = 2147483647
+
+  Private ReadOnly Property Rnd As Double
+    Get
+      Return m_random.NextDouble
+    End Get
+  End Property
+
+  ' Provide for something *similar* to C++.
+  Private ReadOnly Property Rand As Integer
+    Get
+      Return CInt(Fix(m_random.NextDouble * RAND_MAX))
+    End Get
+  End Property
+
+#End Region
+
+#Region "Introduced in Part 2"
+
+  Private Function W(hertz As Double) As Double
+    Return hertz * 2.0 * PI
+  End Function
+
+  Private Const OSC_SINE = 0
+  Private Const OSC_SQUARE = 1
+  Private Const OSC_TRIANGLE = 2
+  Private Const OSC_SAW_ANA = 3
+  Private Const OSC_SAW_DIG = 4
+  Private Const OSC_NOISE = 5
+
+  Private Function Osc(hertz As Double, time As Double, Optional type As Integer = OSC_SINE) As Double
+
+    Select Case type
+
+      Case OSC_SINE ' Sine wave bewteen -1 and +1
+        Return Math.Sin(W(hertz) * time)
+
+      Case OSC_SQUARE ' Square wave between -1 and +1
+        Return If(Math.Sin(W(hertz) * time) > 0, 1.0, -1.0)
+
+      Case OSC_TRIANGLE ' Triangle wave between -1 and +1
+        Return Math.Asin(Math.Sin(W(hertz) * time)) * (2.0 / PI)
+
+      Case OSC_SAW_ANA ' Saw wave (analogue / warm / slow)
+        Dim dOutput = 0.0#
+        For n = 1.0 To 39.0
+          dOutput += (Math.Sin(n * W(hertz) * time)) / n
+        Next
+        Return dOutput * (2.0 / PI)
+
+      Case OSC_SAW_DIG ' Saw Wave (optimised / harsh / fast)
+        Return (2.0 / PI) * (hertz * PI * (time Mod (1.0 / hertz)) - (PI / 2.0))
+
+      Case OSC_NOISE ' Pseudorandom noise
+        Return 2.0 * (Rand / RAND_MAX - 1.0)
+
+      Case Else
+        Return 0.0
+
+    End Select
+
+  End Function
+
+  ' Amplitude (Attack, Decay, Sustain, Release) Envelope
+  Private Class EnvelopeADSR
+
+    Public AttackTime As Double
+    Public DecayTime As Double
+    Public SustainAmplitude As Double
+    Public ReleaseTime As Double
+    Public StartAmplitude As Double
+    Public TriggerOffTime As Double
+    Public TriggerOnTime As Double
+    Public bNoteOn As Boolean
+
+    Public Sub New()
+      AttackTime = 0.1
+      DecayTime = 0.01
+      StartAmplitude = 1.0
+      SustainAmplitude = 0.8
+      ReleaseTime = 0.2
+      bNoteOn = False
+      TriggerOffTime = 0.0
+      TriggerOnTime = 0.0
+    End Sub
+
+    ' Call when key is pressed
+    Public Sub NoteOn(timeOn As Double)
+      TriggerOnTime = timeOn
+      bNoteOn = True
+    End Sub
+
+    ' Call when key is released
+    Public Sub NoteOff(timeOff As Double)
+      TriggerOffTime = timeOff
+      bNoteOn = False
+    End Sub
+
+    ' Get the correct amplitude at the requested point in time
+    Public Function GetAmplitude(time As Double) As Double
+
+      Dim amplitude = 0.0#
+      Dim lifeTime = time - TriggerOnTime
+
+      If bNoteOn Then
+
+        If lifeTime <= AttackTime Then
+          ' In attack Phase - approach max amplitude
+          amplitude = (lifeTime / AttackTime) * StartAmplitude
+        End If
+
+        If lifeTime > AttackTime And lifeTime <= (AttackTime + DecayTime) Then
+          ' In decay phase - reduce to sustained amplitude
+          amplitude = ((lifeTime - AttackTime) / DecayTime) * (SustainAmplitude - StartAmplitude) + StartAmplitude
+        End If
+
+        If lifeTime > (AttackTime + DecayTime) Then
+          ' In sustain phase - dont change until note released
+          amplitude = SustainAmplitude
+        End If
+      Else
+        ' Note has been released, so in release phase
+        amplitude = ((time - TriggerOffTime) / ReleaseTime) * (0.0 - SustainAmplitude) + SustainAmplitude
+      End If
+
+      ' Amplitude should not be negative
+      If amplitude <= 0.0001 Then
+        amplitude = 0.0
+      End If
+
+      Return amplitude
+
+    End Function
+
+  End Class
+
+  Private ReadOnly m_envelope As New EnvelopeADSR
+
+#End Region
+
   ' Global synthesizer variables
   Private m_frequencyOutput As Double = 0.0                                   ' dominant output frequency of instrument, i.e. the note
-  Private ReadOnly m_octaveBaseFrequency As Double = 110.0                    ' frequency Of octave represented by keyboard
+  Private ReadOnly m_octaveBaseFrequency As Double = 110.0                    ' A2 frequency Of octave represented by keyboard
   Private ReadOnly m_12thRootOf2 As Double = Math.Pow(2.0, 1.0 / 12.0)   ' assuming western 12 notes per ocatve
 
   ' Function used by olcNoiseMaker to generate sound waves
@@ -55,20 +199,32 @@ Module Program
     ' Besides, I kind of like the square wave sound a bit more. ;-)
 
     ' Turn sin into square wave.
-    Dim output = 0.1 * Math.Sin(m_frequencyOutput * 2 * 3.14159 * time)
-    Return If(output > 0, 0.2, -0.2)
+    'Dim output = 0.1 * Math.Sin(m_frequencyOutput * 2 * 3.14159 * time)
+    'Return If(output > 0, 0.2, -0.2)
 
     ' A cord?
     'Dim output = 1.0 * Math.Sin(m_frequencyOutput * 2 * 3.14159 * time) + Math.Sin((m_frequencyOutput + 20) * 2.0 * 3.14159 * time)
     'Return output * 0.4
+
+    ' -----------------------
+    ' Introduced in Part 2...
+    ' -----------------------
+
+    ' Now use Osc...
+    'Dim output = Osc(m_frequencyOutput, time, 1)
+    'Return output * 0.4 ' Master Volume
+
+    ' Mix together a little sine And square waves
+    Dim output = m_envelope.GetAmplitude(time) * (1.0 * Osc(m_frequencyOutput * 0.5, time, OSC_SINE) + 1.0 * Osc(m_frequencyOutput, time, OSC_SAW_ANA))
+    Return output * 0.4 ' Master Volume
 
   End Function
 
   Sub Main() 'args As String())
 
     ' Shameless self-promotion
-    Console.WriteLine("gotBASIC.com and OneLoneCoder.com - Synthesizer Part 1")
-    Console.WriteLine("Single Sine Wave Oscillator, No Polyphony")
+    Console.WriteLine("gotBASIC.com and OneLoneCoder.com - Synthesizer Part 2")
+    Console.WriteLine("Multiple Oscillators with Single Amplitude Envelope, No Polyphony")
     Console.WriteLine()
 
     ' Get all sound hardware
@@ -118,6 +274,7 @@ Module Program
         If (GetAsyncKeyState(AscW(str(k))) And &H8000) <> 0 Then
           If currentKey <> k Then
             m_frequencyOutput = m_octaveBaseFrequency * Math.Pow(m_12thRootOf2, k)
+            m_envelope.NoteOn(sound.GetTime) ' <--- introduced in Part 2
             Dim row = Console.CursorTop : Console.WriteLine($"Note On : {sound.GetTime}s {m_frequencyOutput}Hz") : Console.CursorTop = row
             currentKey = k
           End If
@@ -128,6 +285,7 @@ Module Program
       If Not keyPressed Then
         If currentKey <> -1 Then
           Dim row = Console.CursorTop : Console.WriteLine($"Note Off: {sound.GetTime}s                        ") : Console.CursorTop = row
+          m_envelope.NoteOff(sound.GetTime) ' <--- introduced in Part 2
           currentKey = -1
         End If
         m_frequencyOutput = 0.0
