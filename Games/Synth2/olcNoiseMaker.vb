@@ -73,7 +73,7 @@ End Module
 
 Public Class olcNoiseMaker(Of T)
 
-  'Private ReadOnly PI As Double = 2.0 * Math.Acos(0.0)
+  Private m_delegate As WaveOutCallback
 
   Public Sub New(outputDevice As String,
                  Optional sampleRate As Integer = 44100,
@@ -120,7 +120,8 @@ Public Class olcNoiseMaker(Of T)
         .Size = 0}
 
       ' Open Device if valid
-      If WaveOutOpen(m_waveOut, deviceID, waveFormat, New WaveOutCallback(AddressOf WaveOutCallbackFunc), IntPtr.Zero, CALLBACK_FUNCTION) <> S_OK Then
+      m_delegate = New WaveOutCallback(AddressOf WaveOutCallbackFunc)
+      If WaveOutOpen(m_waveOut, deviceID, waveFormat, m_delegate, IntPtr.Zero, CALLBACK_FUNCTION) <> S_OK Then
         Return Destroy()
       End If
 
@@ -144,7 +145,6 @@ Public Class olcNoiseMaker(Of T)
     Return True
 
   End Function
-
 
   Public Sub [Stop]()
     m_ready = False

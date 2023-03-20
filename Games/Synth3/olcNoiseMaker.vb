@@ -1,5 +1,5 @@
-﻿' Code-It-Yourself! Sound Synthesizer #1 - Basic Noises
-' https://youtu.be/tgamhuQnOkM
+﻿' Code-It-Yourself! Sound Synthesizer #3 - Instruments & Polyphony
+' https://youtu.be/kDuvruJTjOs
 
 Option Explicit On
 Option Strict On
@@ -73,6 +73,8 @@ End Module
 
 Public Class olcNoiseMaker(Of T)
 
+  Public ReadOnly BufferLock As New Object()
+
   Private m_delegate As WaveOutCallback
 
   Public Sub New(outputDevice As String,
@@ -121,7 +123,7 @@ Public Class olcNoiseMaker(Of T)
 
       ' Open Device if valid
       m_delegate = New WaveOutCallback(AddressOf WaveOutCallbackFunc)
-      If WaveOutOpen(m_waveOut, deviceID, waveFormat, New WaveOutCallback(AddressOf WaveOutCallbackFunc), IntPtr.Zero, CALLBACK_FUNCTION) <> S_OK Then
+      If WaveOutOpen(m_waveOut, deviceID, waveFormat, m_delegate, IntPtr.Zero, CALLBACK_FUNCTION) <> S_OK Then
         Return Destroy()
       End If
 
@@ -146,7 +148,6 @@ Public Class olcNoiseMaker(Of T)
 
   End Function
 
-
   Public Sub [Stop]()
     m_ready = False
     'm_playbackThread.Join()
@@ -170,16 +171,12 @@ Public Class olcNoiseMaker(Of T)
     Return devices
   End Function
 
-  Public Sub SetUserFunction(func As Func(Of Double, Double))
+  Public Sub SetUserFunction(func As Func(Of Integer, Double, Double))
     m_userFunction = func
   End Sub
 
   Public Function Clip(sample As Double, max As Double) As Double
-    If sample >= 0.0 Then
-      Return Math.Min(sample, max)
-    Else
-      Return Math.Max(sample, -max)
-    End If
+    Return If(sample >= 0.0, Math.Min(sample, max), Math.Max(sample, -max))
   End Function
 
   Public Function Destroy() As Boolean
@@ -192,11 +189,11 @@ Public Class olcNoiseMaker(Of T)
   End Sub
 
   ' Override to process current sample
-  Protected Overridable Function UserProcess(ByVal dTime As Double) As Double
+  Protected Overridable Function UserProcess(channel As Integer, time As Double) As Double
     Return 0.0
   End Function
 
-  Private m_userFunction As Func(Of Double, Double)
+  Private m_userFunction As Func(Of Integer, Double, Double)
 
   Private m_sampleRate As Integer
   Private m_channels As Integer
@@ -216,6 +213,8 @@ Public Class olcNoiseMaker(Of T)
 
   Private m_globalTime As Double
 
+  Private ReadOnly m_lockObj As New Mutex()
+
   ' Handler for soundcard request for more data
   Private Sub WaveOutCallbackFunc(waveOut As IntPtr,
                                   msg As Integer,
@@ -224,11 +223,17 @@ Public Class olcNoiseMaker(Of T)
                                   param2 As IntPtr)
 
     If msg = WOM_DONE Then
+
+      'Debug.WriteLine($"WOM_DONE - {Now}")
+
+      m_lockObj.WaitOne()
       m_blockFree += 1
       SyncLock m_playbackThread
         m_bufferIndex = (m_bufferIndex + 1) Mod m_blockCount
         Monitor.PulseAll(m_playbackThread)
       End SyncLock
+      m_lockObj.ReleaseMutex()
+
     End If
 
   End Sub
@@ -257,21 +262,35 @@ Public Class olcNoiseMaker(Of T)
       End If
 
       ' Block is here, so use it
+      m_lockObj.WaitOne()
       m_blockFree -= 1
+      m_lockObj.ReleaseMutex()
 
       FillBuffer(currentBufferIndex)
+
+      ' Send block to sound device
+      m_lockObj.WaitOne()
       apiResult = WaveOutWrite(m_waveOut, m_waveHeaders(currentBufferIndex), Marshal.SizeOf(GetType(WaveHeader)))
+      m_lockObj.ReleaseMutex()
+
+      If apiResult <> 0 Then
+        Debug.WriteLine($"WaveOutWrite = {apiResult}: {Now}")
+        Exit While
+      End If
       currentBufferIndex = (currentBufferIndex + 1) Mod m_blockCount
 
     End While
 
     ' cleanup
     apiResult = WaveOutReset(m_waveOut)
+    If apiResult <> 0 Then Debug.WriteLine($"WaveOutReset = {apiResult}")
     For i = 0 To m_waveHeaders.Length - 1
       apiResult = WaveOutUnprepareHeader(m_waveOut, m_waveHeaders(i), Marshal.SizeOf(GetType(WaveHeader)))
+      If apiResult <> 0 Then Debug.WriteLine($"WaveOutUnprepareHeader = {apiResult}")
       Marshal.FreeHGlobal(m_waveHeaders(i).Data)
     Next
     apiResult = WaveOutClose(m_waveOut)
+    If apiResult <> 0 Then Debug.WriteLine($"WaveOutClose = {apiResult}")
 
   End Sub
 
@@ -284,14 +303,18 @@ Public Class olcNoiseMaker(Of T)
     ' Copy the sine wave to the buffer
     Dim buffer(m_blockSamples - 1) As Short
     For i = 0 To buffer.Length - 1
-      If m_userFunction Is Nothing Then
-        buffer(i) = CShort(Clip(UserProcess(m_globalTime), 1.0) * m_maxSample)
-      Else
-        buffer(i) = CShort(Clip(m_userFunction(m_globalTime), 1.0) * m_maxSample)
-      End If
+      For c = 0 To m_channels - 1
+        If m_userFunction Is Nothing Then
+          buffer(i) = CShort(Clip(UserProcess(c, m_globalTime), 1.0) * m_maxSample)
+        Else
+          buffer(i) = CShort(Clip(m_userFunction(c, m_globalTime), 1.0) * m_maxSample)
+        End If
+      Next
       m_globalTime += m_timeStep
     Next
+    m_lockObj.WaitOne()
     Marshal.Copy(buffer, 0, m_buffers(bufferIndex), buffer.Length)
+    m_lockObj.ReleaseMutex()
 
   End Sub
 

@@ -5,6 +5,7 @@ Option Explicit On
 Option Strict On
 Option Infer On
 
+Imports System.Data
 Imports System.Runtime.InteropServices
 
 Module Program
@@ -43,7 +44,7 @@ Module Program
   Function MakeNoise(time As Double) As Double
 
     'Return 0.5 * Math.Sin(440.0 * 2 * 3.14159 * time)
-    'Return 0.5 * Math.Sin(880.0 * 2 * 3.14159 * time)
+    Return 0.5 * Math.Sin(880.0 * 2 * 3.14159 * time)
     'Return 0.5 * Math.Sin(220.0 * 2 * 3.14159 * time)
 
     ' Note, the following raw sin wave is create pops/clicks when start/stop and changing frequency.
@@ -55,12 +56,16 @@ Module Program
     ' Besides, I kind of like the square wave sound a bit more. ;-)
 
     ' Turn sin into square wave.
-    Dim output = 0.1 * Math.Sin(m_frequencyOutput * 2 * 3.14159 * time)
-    Return If(output > 0, 0.2, -0.2)
+    'Dim output = 0.1 * Math.Sin(m_frequencyOutput * 2 * 3.14159 * time)
+    'Return If(output > 0, 0.2, -0.2)
 
     ' A cord?
     'Dim output = 1.0 * Math.Sin(m_frequencyOutput * 2 * 3.14159 * time) + Math.Sin((m_frequencyOutput + 20) * 2.0 * 3.14159 * time)
     'Return output * 0.4
+
+    ' Siren
+    'Dim output = 0.5 * Math.Sin(880.0 * time + 0.05 * 880.0 * Math.Sin(1.0 * time))
+    'Return output
 
   End Function
 

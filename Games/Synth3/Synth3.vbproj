@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Synth2</RootNamespace>
+    <RootNamespace>Synth3</RootNamespace>
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
