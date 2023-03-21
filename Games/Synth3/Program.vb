@@ -1,15 +1,9 @@
 ' Inspired by: "Code-It-Yourself! Sound Synthesizer #3 - Oscillators & Envelopes" -- @javidx9
-' https://youtu.be/
+' https://youtu.be/kDuvruJTjOs
 
 Option Explicit On
 Option Strict On
 Option Infer On
-
-Imports System.Data
-Imports System.Runtime.InteropServices
-Imports System.Runtime.InteropServices.JavaScript
-Imports System.Threading
-Imports Synth3.Synth
 
 Friend Module Synth
 
@@ -296,8 +290,6 @@ Module Program
 
 #End Region
 
-  Private ReadOnly m_threadObject As New Object()
-
   Private ReadOnly m_vecNotes As New List(Of Note)
   Private ReadOnly m_instBell As New InstrumentBell()
   Private ReadOnly m_instHarm As New InstrumentHarmonica()
@@ -442,7 +434,7 @@ Module Program
 
       Next
 
-      'Dim row = Console.CursorTop : Console.WriteLine("Notes: " & m_vecNotes?.Count & "    ") : Console.CursorTop = row
+      Dim row = Console.CursorTop : Console.WriteLine("Notes: " & m_vecNotes?.Count & "    ") : Console.CursorTop = row
 
     Loop
 

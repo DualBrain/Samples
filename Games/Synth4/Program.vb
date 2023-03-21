@@ -620,6 +620,7 @@ Module Program
 
       abort = (GetAsyncKeyState(27) And &H8000) <> 0
       If abort Then
+        While Console.KeyAvailable : Console.ReadKey(True) : End While
         sound.StopAudio()
         Exit Do
       End If
@@ -663,6 +664,8 @@ Module Program
         End If
 
       Next
+
+      While Console.KeyAvailable : Console.ReadKey(True) : End While
 
       For index = m_vecNotes.Count - 1 To 0 Step -1
         If Not m_vecNotes(index).Active Then
@@ -708,13 +711,11 @@ Module Program
       draw(2, 13, "|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|")
 
       ' Draw Stats - puts a significant amount of pressure on the GC...
-      'Dim stats = $"Notes: {m_vecNotes.Count} Wall Time: {dWallTime:N4} CPU Time: {dTimeNow:N4} Latency: {(dWallTime - dTimeNow):N4}"
-      'draw(2, 15, stats)
+      Dim stats = $"Notes: {m_vecNotes.Count} Wall Time: {dWallTime:N4} CPU Time: {timeNow:N4} Latency: {(dWallTime - timeNow):N4}"
+      draw(2, 15, stats)
 
       ' Update Display - puts a lot of pressure on the GC...
-      'WriteConsoleOutputCharacter(hConsole, screen, 80 * 30, New Coord(0, 0), dwBytesWritten)
-
-      Console.Title = m_vecNotes.Count.ToString
+      WriteConsoleOutputCharacter(hConsole, screen, 80 * 30, New Coord(0, 0), dwBytesWritten)
 
     Loop
 

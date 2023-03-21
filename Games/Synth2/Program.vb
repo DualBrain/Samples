@@ -5,31 +5,11 @@ Option Explicit On
 Option Strict On
 Option Infer On
 
-Imports System.Runtime.InteropServices
-
 Module Program
 
 #Region "Win32"
 
-  <StructLayout(LayoutKind.Sequential)>
-  Public Structure Coord
-    Public X As Short
-    Public Y As Short
-    Public Sub New(x As Short, y As Short)
-      Me.X = x
-      Me.Y = y
-    End Sub
-  End Structure
-
-  Private Declare Function CreateConsoleScreenBuffer Lib "kernel32.dll" (dwDesiredAccess As Integer, dwShareMode As UInteger, lpSecurityAttributes As IntPtr, dwFlags As UInteger, lpScreenBufferData As IntPtr) As IntPtr
-  Private Declare Function SetConsoleActiveScreenBuffer Lib "kernel32.dll" (hConsoleOutput As IntPtr) As Boolean
-  Private Declare Function WriteConsoleOutputCharacter Lib "kernel32.dll" Alias "WriteConsoleOutputCharacterA" (hConsoleOutput As IntPtr, lpCharacter As String, nLength As Integer, dwWriteCoord As Coord, ByRef lpNumberOfCharsWritten As Integer) As Boolean
   Private Declare Function GetAsyncKeyState Lib "user32.dll" (virtualKeyCode As Integer) As Short
-  Private Declare Function CloseHandle Lib "kernel32.dll" (hObject As Long) As Long
-
-  Private Const GENERIC_READ As Integer = &H80000000
-  Private Const GENERIC_WRITE As Integer = &H40000000
-  Private Const CONSOLE_TEXTMODE_BUFFER As Integer = 1
 
 #End Region
 
@@ -285,7 +265,7 @@ Module Program
           If currentKey <> k Then
             m_frequencyOutput = m_octaveBaseFrequency * Math.Pow(m_12thRootOf2, k)
             m_envelope.NoteOn(sound.GetTime) ' <--- introduced in Part 2
-            'row = Console.CursorTop : Console.WriteLine($"Note On : {sound.GetTime}s {m_frequencyOutput}Hz") : Console.CursorTop = row
+            row = Console.CursorTop : Console.WriteLine($"Note On : {sound.GetTime}s {m_frequencyOutput}Hz") : Console.CursorTop = row
             currentKey = k
           End If
           keyPressed = True
@@ -295,7 +275,7 @@ Module Program
       If Not keyPressed Then
 
         If currentKey <> -1 Then
-          'row = Console.CursorTop : Console.WriteLine($"Note Off: {sound.GetTime}s                        ") : Console.CursorTop = row
+          row = Console.CursorTop : Console.WriteLine($"Note Off: {sound.GetTime}s                        ") : Console.CursorTop = row
           m_envelope.NoteOff(sound.GetTime) ' <--- introduced in Part 2
           currentKey = -1
         End If

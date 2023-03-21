@@ -62,7 +62,7 @@ Friend Module Win32
   'Friend Declare Sub WaveOutProc Lib "winmm.dll" Alias "waveOutProc" (waveOut As IntPtr, uMsg As Integer, dwInstance As Integer, dwParam1 As Integer, dwParam2 As Integer)
   Friend Declare Function WaveOutGetNumDevs Lib "winmm.dll" Alias "waveOutGetNumDevs" () As Integer
   Friend Declare Auto Function WaveOutGetDevCaps Lib "winmm.dll" Alias "waveOutGetDevCaps" (deviceId As Short, ByRef caps As WaveOutCaps, size As Integer) As Integer
-  Friend Declare Function WaveOutOpen Lib "winmm.dll" Alias "waveOutOpen" (ByRef waveOut As IntPtr, deviceId As Integer, format As WaveFormat, callback As WaveOutCallback, instance As IntPtr, flags As Integer) As Integer
+  Friend Declare Function WaveOutOpen Lib "winmm.dll" Alias "waveOutOpen" (ByRef waveOut As IntPtr, deviceId As Integer, format As WaveFormat, callback As IntPtr, instance As IntPtr, flags As Integer) As Integer
   Friend Declare Function WaveOutPrepareHeader Lib "winmm.dll" Alias "waveOutPrepareHeader" (waveOut As IntPtr, ByRef waveOutHdr As WaveHeader, size As Integer) As Integer
   Friend Declare Function WaveOutWrite Lib "winmm.dll" Alias "waveOutWrite" (waveOut As IntPtr, ByRef waveOutHdr As WaveHeader, size As Integer) As Integer
   Friend Declare Function WaveOutUnprepareHeader Lib "winmm.dll" Alias "waveOutUnprepareHeader" (waveOut As IntPtr, ByRef waveOutHdr As WaveHeader, size As Integer) As Integer
@@ -74,6 +74,7 @@ End Module
 Public Class olcNoiseMaker(Of T)
 
   Private m_delegate As WaveOutCallback
+  Private m_delegateHandle As GCHandle
 
   Public Sub New(outputDevice As String,
                  Optional sampleRate As Integer = 44100,
@@ -121,7 +122,9 @@ Public Class olcNoiseMaker(Of T)
 
       ' Open Device if valid
       m_delegate = New WaveOutCallback(AddressOf WaveOutCallbackFunc)
-      If WaveOutOpen(m_waveOut, deviceID, waveFormat, New WaveOutCallback(AddressOf WaveOutCallbackFunc), IntPtr.Zero, CALLBACK_FUNCTION) <> S_OK Then
+      m_delegateHandle = GCHandle.Alloc(m_delegate, GCHandleType.Normal)
+      Dim ptr = Marshal.GetFunctionPointerForDelegate(m_delegate)
+      If WaveOutOpen(m_waveOut, deviceID, waveFormat, ptr, IntPtr.Zero, CALLBACK_FUNCTION) <> S_OK Then
         Return Destroy()
       End If
 
@@ -266,6 +269,7 @@ Public Class olcNoiseMaker(Of T)
     End While
 
     ' cleanup
+    m_delegateHandle.Free()
     apiResult = WaveOutReset(m_waveOut)
     For i = 0 To m_waveHeaders.Length - 1
       apiResult = WaveOutUnprepareHeader(m_waveOut, m_waveHeaders(i), Marshal.SizeOf(GetType(WaveHeader)))

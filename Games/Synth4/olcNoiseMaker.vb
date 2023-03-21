@@ -62,10 +62,14 @@ Friend Module Win32
   'Friend Declare Sub WaveOutProc Lib "winmm.dll" Alias "waveOutProc" (waveOut As IntPtr, uMsg As Integer, dwInstance As Integer, dwParam1 As Integer, dwParam2 As Integer)
   Friend Declare Function WaveOutGetNumDevs Lib "winmm.dll" Alias "waveOutGetNumDevs" () As Integer
   Friend Declare Auto Function WaveOutGetDevCaps Lib "winmm.dll" Alias "waveOutGetDevCaps" (deviceId As Short, ByRef caps As WaveOutCaps, size As Integer) As Integer
-  Friend Declare Function WaveOutOpen Lib "winmm.dll" Alias "waveOutOpen" (ByRef waveOut As IntPtr, deviceId As Integer, format As WaveFormat, callback As WaveOutCallback, instance As IntPtr, flags As Integer) As Integer
-  Friend Declare Function WaveOutPrepareHeader Lib "winmm.dll" Alias "waveOutPrepareHeader" (waveOut As IntPtr, ByRef waveOutHdr As WaveHeader, size As Integer) As Integer
-  Friend Declare Function WaveOutWrite Lib "winmm.dll" Alias "waveOutWrite" (waveOut As IntPtr, ByRef waveOutHdr As WaveHeader, size As Integer) As Integer
-  Friend Declare Function WaveOutUnprepareHeader Lib "winmm.dll" Alias "waveOutUnprepareHeader" (waveOut As IntPtr, ByRef waveOutHdr As WaveHeader, size As Integer) As Integer
+  'Friend Declare Function WaveOutOpen Lib "winmm.dll" Alias "waveOutOpen" (ByRef waveOut As IntPtr, deviceId As Integer, format As WaveFormat, callback As WaveOutCallback, instance As IntPtr, flags As Integer) As Integer
+  'Friend Declare Function WaveOutPrepareHeader Lib "winmm.dll" Alias "waveOutPrepareHeader" (waveOut As IntPtr, ByRef waveOutHdr As WaveHeader, size As Integer) As Integer
+  'Friend Declare Function WaveOutWrite Lib "winmm.dll" Alias "waveOutWrite" (waveOut As IntPtr, ByRef waveOutHdr As WaveHeader, size As Integer) As Integer
+  'Friend Declare Function WaveOutUnprepareHeader Lib "winmm.dll" Alias "waveOutUnprepareHeader" (waveOut As IntPtr, ByRef waveOutHdr As WaveHeader, size As Integer) As Integer
+  Friend Declare Function WaveOutOpen Lib "winmm.dll" Alias "waveOutOpen" (ByRef waveOut As IntPtr, deviceId As Integer, format As WaveFormat, callback As IntPtr, instance As IntPtr, flags As Integer) As Integer
+  Friend Declare Function WaveOutPrepareHeader Lib "winmm.dll" Alias "waveOutPrepareHeader" (waveOut As IntPtr, waveOutHdr As IntPtr, size As Integer) As Integer
+  Friend Declare Function WaveOutWrite Lib "winmm.dll" Alias "waveOutWrite" (waveOut As IntPtr, waveOutHdr As IntPtr, size As Integer) As Integer
+  Friend Declare Function WaveOutUnprepareHeader Lib "winmm.dll" Alias "waveOutUnprepareHeader" (waveOut As IntPtr, waveOutHdr As IntPtr, size As Integer) As Integer
   Friend Declare Function WaveOutClose Lib "winmm.dll" Alias "waveOutClose" (waveOut As IntPtr) As Integer
   Friend Declare Function WaveOutReset Lib "winmm.dll" Alias "waveOutReset" (waveOut As IntPtr) As Integer
 
@@ -91,8 +95,6 @@ Public Class olcNoiseMaker(Of T)
                          Optional channels As Integer = 1,
                          Optional blocks As Integer = 8,
                          Optional blockSamples As Integer = 512) As Boolean
-
-    Dim result As Integer
 
     m_ready = False
     m_sampleRate = sampleRate
@@ -124,23 +126,29 @@ Public Class olcNoiseMaker(Of T)
 
       ' Open Device if valid
       m_delegate = New WaveOutCallback(AddressOf WaveOutCallbackFunc)
-      m_delegateHandle = GCHandle.Alloc(m_delegate)
-      'Dim callbackDelegate As New WaveOutCallback(AddressOf WaveOutCallbackFunc)
-      'Dim callbackPointer As IntPtr = Marshal.GetFunctionPointerForDelegate(m_delegate)
-      If WaveOutOpen(m_waveOut, deviceID, waveFormat, m_delegate, IntPtr.Zero, CALLBACK_FUNCTION) <> S_OK Then
+      m_delegateHandle = GCHandle.Alloc(m_delegate, GCHandleType.Normal)
+      Dim ptr = Marshal.GetFunctionPointerForDelegate(m_delegate)
+      Dim apiResult = WaveOutOpen(m_waveOut, deviceID, waveFormat, ptr, IntPtr.Zero, CALLBACK_FUNCTION)
+      'Dim apiResult = WaveOutOpen(m_waveOut, deviceID, waveFormat, m_delegate, IntPtr.Zero, CALLBACK_FUNCTION)
+      If apiResult <> S_OK Then
+        Debug.WriteLine($"WaveOutOpen = {apiResult}: {Now}")
         Return Destroy()
       End If
 
     End If
 
     ' Allocate Wave|Block Memory and Link headers to block memory
+    ReDim m_wavePinnedHeaders(m_blockCount - 1) 'As GCHandle
     m_waveHeaders = New WaveHeader(m_blockCount - 1) {}
     ReDim m_buffers(m_blockCount - 1)
     For i = 0 To m_waveHeaders.Length - 1
       m_waveHeaders(i) = New WaveHeader With {.BufferLength = m_blockSamples * 2, ' number of bytes
                                               .Data = Marshal.AllocHGlobal(m_blockSamples * 2)} ' number of bytes
+      m_wavePinnedHeaders(i) = GCHandle.Alloc(m_waveHeaders(i), GCHandleType.Pinned)
       m_buffers(i) = m_waveHeaders(i).Data
-      result = WaveOutPrepareHeader(m_waveOut, m_waveHeaders(i), Marshal.SizeOf(GetType(WaveHeader)))
+      'result = WaveOutPrepareHeader(m_waveOut, m_waveHeaders(i), Marshal.SizeOf(GetType(WaveHeader)))
+      Dim apiResult = WaveOutPrepareHeader(m_waveOut, m_wavePinnedHeaders(i).AddrOfPinnedObject, Marshal.SizeOf(GetType(WaveHeader)))
+      If apiResult <> 0 Then Debug.WriteLine($"WaveOutPrepareHeader = {apiResult}: {Now}")
     Next
 
     m_ready = True
@@ -156,7 +164,6 @@ Public Class olcNoiseMaker(Of T)
 
   Public Sub [Stop]()
     m_ready = False
-    'm_playbackThread.Join()
   End Sub
 
   Public Function GetTime() As Double
@@ -169,9 +176,11 @@ Public Class olcNoiseMaker(Of T)
     Dim caps = New WaveOutCaps : caps.Init()
     For n = 0S To CShort(deviceCount - 1S)
       Dim sz = Marshal.SizeOf(GetType(WaveOutCaps))
-      Dim result = WaveOutGetDevCaps(n, caps, sz)
-      If result = S_OK Then
+      Dim apiResult = WaveOutGetDevCaps(n, caps, sz)
+      If apiResult = S_OK Then
         devices.Add(caps.Name)
+      Else
+        Debug.WriteLine($"WaveOutGetDevCaps = {apiResult}: {Now}")
       End If
     Next
     Return devices
@@ -207,6 +216,7 @@ Public Class olcNoiseMaker(Of T)
   Private m_blockSamples As Integer
   Private m_bufferIndex As Integer
 
+  Private m_wavePinnedHeaders() As GCHandle
   Private m_waveHeaders() As WaveHeader
   Private m_buffers() As IntPtr
 
@@ -219,25 +229,19 @@ Public Class olcNoiseMaker(Of T)
 
   Private m_globalTime As Double
 
-  Private ReadOnly m_lockObj As New Mutex()
-
   ' Handler for soundcard request for more data
-  Private Sub WaveOutCallbackFunc(waveOut As IntPtr,
+  Public Sub WaveOutCallbackFunc(waveOut As IntPtr,
                                   msg As Integer,
                                   instance As IntPtr,
                                   param1 As IntPtr,
                                   param2 As IntPtr)
-    If msg = WOM_DONE Then
+    If msg <> WOM_DONE Then Return
 
-      'Debug.WriteLine($"WOM_DONE - {Now}")
-
-      SyncLock m_playbackThread
-        m_blockFree += 1
-        m_bufferIndex = (m_bufferIndex + 1) Mod m_blockCount
-        Monitor.PulseAll(m_playbackThread)
-      End SyncLock
-
-    End If
+    SyncLock m_playbackThread
+      m_blockFree += 1
+      m_bufferIndex = (m_bufferIndex + 1) Mod m_blockCount
+      Monitor.PulseAll(m_playbackThread)
+    End SyncLock
 
   End Sub
 
@@ -257,10 +261,6 @@ Public Class olcNoiseMaker(Of T)
 
     While m_ready
 
-      If m_delegate Is Nothing Then
-        Stop
-      End If
-
       ' Wait for block to become available
       If m_blockFree = 0 Then
         SyncLock m_playbackThread
@@ -273,15 +273,19 @@ Public Class olcNoiseMaker(Of T)
       ' Block is here, so use it
       m_blockFree -= 1
 
+      If (m_waveHeaders(currentBufferIndex).Flags And WHDR_PREPARED) <> 0 Then
+        apiResult = WaveOutUnprepareHeader(m_waveOut, m_wavePinnedHeaders(currentBufferIndex).AddrOfPinnedObject, sz)
+        If apiResult <> 0 Then Debug.WriteLine($"WaveOutUnprepareHeader = {apiResult}: {Now}") : Exit While
+      End If
+
       FillBuffer(currentBufferIndex)
 
       ' Send block to sound device
-      apiResult = WaveOutWrite(m_waveOut, m_waveHeaders(currentBufferIndex), sz)
-
-      If apiResult <> 0 Then
-        Debug.WriteLine($"WaveOutWrite = {apiResult}: {Now}")
-        Exit While
-      End If
+      apiResult = WaveOutPrepareHeader(m_waveOut, m_wavePinnedHeaders(currentBufferIndex).AddrOfPinnedObject, sz)
+      If apiResult <> 0 Then Debug.WriteLine($"WaveOutPrepareHeader = {apiResult}: {Now}") : Exit While
+      'apiResult = WaveOutWrite(m_waveOut, m_waveHeaders(currentBufferIndex), sz)
+      apiResult = WaveOutWrite(m_waveOut, m_wavePinnedHeaders(currentBufferIndex).AddrOfPinnedObject, sz)
+      If apiResult <> 0 Then Debug.WriteLine($"WaveOutWrite = {apiResult}") : Exit While
       currentBufferIndex = (currentBufferIndex + 1) Mod m_blockCount
 
     End While
@@ -289,11 +293,13 @@ Public Class olcNoiseMaker(Of T)
     ' cleanup
     m_delegateHandle.Free()
     apiResult = WaveOutReset(m_waveOut)
-    If apiResult <> 0 Then Debug.WriteLine($"WaveOutReset = {apiResult}")
+    If apiResult <> 0 Then Debug.WriteLine($"WaveOutReset = {apiResult}: {Now}")
     For i = 0 To m_waveHeaders.Length - 1
-      apiResult = WaveOutUnprepareHeader(m_waveOut, m_waveHeaders(i), Marshal.SizeOf(GetType(WaveHeader)))
-      If apiResult <> 0 Then Debug.WriteLine($"WaveOutUnprepareHeader = {apiResult}")
+      'apiResult = WaveOutUnprepareHeader(m_waveOut, m_waveHeaders(i), Marshal.SizeOf(GetType(WaveHeader)))
+      apiResult = WaveOutUnprepareHeader(m_waveOut, m_wavePinnedHeaders(i).AddrOfPinnedObject, sz)
+      If apiResult <> 0 Then Debug.WriteLine($"WaveOutUnprepareHeader = {apiResult}: {Now}")
       Marshal.FreeHGlobal(m_waveHeaders(i).Data)
+      m_wavePinnedHeaders(i).Free()
     Next
     apiResult = WaveOutClose(m_waveOut)
     If apiResult <> 0 Then Debug.WriteLine($"WaveOutClose = {apiResult}")
