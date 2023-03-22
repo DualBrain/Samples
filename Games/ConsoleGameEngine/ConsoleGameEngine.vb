@@ -1,4 +1,8 @@
-﻿Imports System.IO
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
+Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.Threading
 
@@ -192,7 +196,7 @@ Public Class Sprite
         Create(Width, Height)
 
         For i = 0 To (Width * Height) - 1
-          m_colours(i) = br.ReadInt16()
+          m_colours(i) = CType(br.ReadInt16(), Colour)
         Next
         For i As Integer = 0 To (Width * Height) - 1
           m_glyphs(i) = BitConverter.ToChar(BitConverter.GetBytes(br.ReadInt16), 0)
@@ -375,6 +379,7 @@ Public MustInherit Class ConsoleGameEngine
 
 #Region "VK"
 
+  Public Const VK_TAB As Integer = &H9
   Public Const VK_SHIFT As Integer = &H10
   Public Const VK_CONTROL As Integer = &H11
   Public Const VK_SPACE As Integer = &H20
@@ -440,11 +445,11 @@ Public MustInherit Class ConsoleGameEngine
   Private ReadOnly m_sAppName As String
   Private m_rectWindow As SMALL_RECT
   Public m_bufScreen As CharInfo()
-  Private m_bConsoleInFocus = True
+  Private m_bConsoleInFocus As Boolean = True
 
-  Shared m_bAtomActive = False
-  Shared ReadOnly m_cvGameFinished = New System.Threading.AutoResetEvent(False)
-  Shared ReadOnly m_muxGame = New System.Threading.Mutex()
+  Shared m_bAtomActive As Boolean = False
+  Shared ReadOnly m_cvGameFinished As AutoResetEvent = New AutoResetEvent(False)
+  Shared ReadOnly m_muxGame As Mutex = New Mutex()
 
   Public Sub New()
 
@@ -491,7 +496,7 @@ Public MustInherit Class ConsoleGameEngine
 
   Public Function ConstructConsole(width As Integer, height As Integer, fontw As Integer, fonth As Integer) As Integer
 
-    If m_hConsole = INVALID_HANDLE_VALUE Then
+    If m_hConsole = New IntPtr(INVALID_HANDLE_VALUE) Then
       Return GenError("Bad Handle")
     End If
 
@@ -522,8 +527,8 @@ Public MustInherit Class ConsoleGameEngine
 
     ' Set the size of the screen buffer
     Dim coord As COORD
-    coord.X = m_nScreenWidth
-    coord.Y = m_nScreenHeight
+    coord.X = CShort(m_nScreenWidth)
+    coord.Y = CShort(m_nScreenHeight)
     If Not SetConsoleScreenBufferSize(m_hConsole, coord) Then
       Return GenError("SetConsoleScreenBufferSize")
     End If
@@ -538,8 +543,8 @@ Public MustInherit Class ConsoleGameEngine
     'cfi.cbSize = Len(cfi)
     cfi.cbSize = Marshal.SizeOf(cfi)
     cfi.nFont = 0
-    cfi.dwFontSize.X = fontw
-    cfi.dwFontSize.Y = fonth
+    cfi.dwFontSize.X = CShort(fontw)
+    cfi.dwFontSize.Y = CShort(fonth)
     cfi.FontFamily = FF_DONTCARE
     cfi.FontWeight = FW_NORMAL
 
@@ -599,7 +604,7 @@ Public MustInherit Class ConsoleGameEngine
 
   End Function
 
-  Private Function CloseHandler(evt As UInteger) As Boolean
+  Private Function CloseHandler(evt As Integer) As Boolean
 
     ' Note that std::unique_lock has been replaced by Threading.Monitor.Enter, 
     ' which is a similar construct in .NET. Also, DWORD has been replaced by
@@ -640,7 +645,7 @@ Public MustInherit Class ConsoleGameEngine
   Public Overridable Sub Draw(x As Integer, y As Integer, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
     If x >= 0 AndAlso x < m_nScreenWidth AndAlso y >= 0 AndAlso y < m_nScreenHeight Then
       m_bufScreen(y * m_nScreenWidth + x).CharUnion.UnicodeChar = ChrW(c)
-      m_bufScreen(y * m_nScreenWidth + x).Attributes = col
+      m_bufScreen(y * m_nScreenWidth + x).Attributes = CShort(col)
     End If
   End Sub
 
@@ -929,7 +934,7 @@ next2:
     For i As Integer = 0 To verts - 1
       Dim coordX As Single = vecModelCoordinates(i).X
       Dim coordY As Single = vecModelCoordinates(i).Y
-      vecTransformedCoordinates.Add((coordX * Math.Cos(r) - coordY * Math.Sin(r), coordX * Math.Sin(r) + coordY * Math.Cos(r)))
+      vecTransformedCoordinates.Add((coordX * CSng(Math.Cos(r)) - coordY * CSng(Math.Sin(r)), coordX * CSng(Math.Sin(r)) + coordY * CSng(Math.Cos(r))))
     Next
 
     ' Scale
@@ -990,7 +995,7 @@ next2:
         tp2 = DateTime.Now
         Dim elapsedTime As TimeSpan = tp2 - tp1
         tp1 = tp2
-        Dim fElapsedTime As Single = elapsedTime.TotalSeconds
+        Dim fElapsedTime As Single = CSng(elapsedTime.TotalSeconds)
 
         ' Handle Keyboard Input
         For i As Integer = 0 To 255
@@ -1025,7 +1030,7 @@ next2:
         For i As Integer = 0 To events - 1
           Select Case inBuf(i).EventType
             Case FOCUS_EVENT
-              m_bConsoleInFocus = inBuf(i).FocusEvent.bSetFocus
+              m_bConsoleInFocus = inBuf(i).FocusEvent.bSetFocus <> 0
             Case MOUSE_EVENT
               Select Case inBuf(i).MouseEvent.dwEventFlags
                 Case MOUSE_MOVED
@@ -1068,7 +1073,7 @@ next2:
         ' Update Title & Present Screen Buffer
         Dim s As String = String.Format("gotBASIC.com and OneLoneCoder.com - ConsoleGameEngine - {0} - FPS: {1:0.00}", m_sAppName, 1.0F / fElapsedTime)
         SetConsoleTitle(s)
-        WriteConsoleOutput(m_hConsole, m_bufScreen, New COORD(m_nScreenWidth, m_nScreenHeight), New COORD(0, 0), m_rectWindow)
+        WriteConsoleOutput(m_hConsole, m_bufScreen, New COORD(CShort(m_nScreenWidth), CShort(m_nScreenHeight)), New COORD(0, 0), m_rectWindow)
 
         If m_bEnableSound Then
           ' Close and Clean up audio system
@@ -1147,18 +1152,18 @@ next2:
       End While
 
       ' Finally got to data, so read it all in and convert to float samples
-      nSamples = nChunksize / (wavHeader.nChannels * (wavHeader.wBitsPerSample >> 3))
+      nSamples = nChunksize \ (wavHeader.nChannels * (wavHeader.wBitsPerSample >> 3))
       nChannels = wavHeader.nChannels
 
       ' Create floating point buffer to hold audio sample
-      fSample = New Single(nSamples * nChannels - 1) {}
+      fSample = New Single(CInt(nSamples * nChannels - 1)) {}
 
       ' Read in audio data and normalise
-      For i As Long = 0 To nSamples - 1
-        For c As Integer = 0 To nChannels - 1
-          Dim s As Short = 0
+      For i = 0 To nSamples - 1
+        For c = 0 To nChannels - 1
+          Dim s = 0
           f.Read(BitConverter.GetBytes(s), 0, 2)
-          fSample(i * nChannels + c) = s / Short.MaxValue
+          fSample(CInt(i * nChannels + c)) = s \ Short.MaxValue
         Next
       Next
 
@@ -1216,10 +1221,10 @@ next2:
   Public Const WAVE_MAPPER As Integer = -1
 
   ' The audio system uses by default a specific wave format
-  Public Function CreateAudio(Optional ByVal nSampleRate As UInteger = 44100,
-                             Optional ByVal nChannels As UInteger = 1,
-                             Optional ByVal nBlocks As UInteger = 8,
-                             Optional ByVal nBlockSamples As UInteger = 512) As Boolean
+  Public Function CreateAudio(Optional nSampleRate As Integer = 44100,
+                              Optional nChannels As Integer = 1,
+                              Optional nBlocks As Integer = 8,
+                              Optional nBlockSamples As Integer = 512) As Boolean
 
     ' Initialise Sound Engine
     m_bAudioThreadActive = False
@@ -1237,7 +1242,7 @@ next2:
         .wFormatTag = WAVE_FORMAT_PCM,
         .nSamplesPerSec = m_nSampleRate,
         .wBitsPerSample = CShort(8 * Marshal.SizeOf(Of Short)),
-        .nChannels = m_nChannels,
+        .nChannels = CShort(m_nChannels),
         .nBlockAlign = CShort(waveFormat.wBitsPerSample / 8 * waveFormat.nChannels),
         .nAvgBytesPerSec = waveFormat.nSamplesPerSec * waveFormat.nBlockAlign,
         .cbSize = 0
@@ -1316,8 +1321,8 @@ next2:
     Dim fTimeStep As Single = 1.0F / CSng(m_nSampleRate)
 
     ' Goofy hack to get maximum integer for a type at run-time
-    Dim nMaxSample As Short = CShort(Math.Pow(2, (2 * 8) - 1)) - 1
-    Dim fMaxSample As Single = CSng(nMaxSample)
+    Dim nMaxSample = CShort(Math.Pow(2, (2 * 8) - 1)) - 1S
+    Dim fMaxSample = CSng(nMaxSample)
     Dim nPreviousSample As Short = 0
 
     While m_bAudioThreadActive
@@ -1335,8 +1340,8 @@ next2:
       m_nBlockFree -= 1
 
       ' Prepare block for processing
-      If m_pWaveHeaders(m_nBlockCurrent).dwFlags And WHDR_PREPARED Then
-        waveOutUnprepareHeader(m_hwDevice, m_pWaveHeaders(m_nBlockCurrent), CUInt(Marshal.SizeOf(m_pWaveHeaders(m_nBlockCurrent))))
+      If (m_pWaveHeaders(m_nBlockCurrent).dwFlags And WHDR_PREPARED) <> 0 Then
+        waveOutUnprepareHeader(m_hwDevice, m_pWaveHeaders(m_nBlockCurrent), CInt(Marshal.SizeOf(m_pWaveHeaders(m_nBlockCurrent))))
       End If
 
       Dim nNewSample As Short = 0
@@ -1350,9 +1355,9 @@ next2:
                    End If
                  End Function
 
-      For n As UInteger = 0 To m_nBlockSamples - 1 Step m_nChannels
+      For n = 0 To m_nBlockSamples - 1 Step m_nChannels
         ' User Process
-        For c As UInteger = 0 To m_nChannels - 1
+        For c = 0 To m_nChannels - 1
           nNewSample = CShort(clip(GetMixerOutput(c, m_fGlobalTime, fTimeStep), 1.0F) * fMaxSample)
           m_pBlockMemory(nCurrentBlock + n + c) = nNewSample
           nPreviousSample = nNewSample
@@ -1362,8 +1367,8 @@ next2:
       Next
 
       ' Send block to sound device
-      Dim junk = waveOutPrepareHeader(m_hwDevice, m_pWaveHeaders(m_nBlockCurrent), CUInt(Marshal.SizeOf(m_pWaveHeaders(m_nBlockCurrent))))
-      junk = waveOutWrite(m_hwDevice, m_pWaveHeaders(m_nBlockCurrent), CUInt(Marshal.SizeOf(m_pWaveHeaders(m_nBlockCurrent))))
+      Dim junk = waveOutPrepareHeader(m_hwDevice, m_pWaveHeaders(m_nBlockCurrent), CInt(Marshal.SizeOf(m_pWaveHeaders(m_nBlockCurrent))))
+      junk = waveOutWrite(m_hwDevice, m_pWaveHeaders(m_nBlockCurrent), CInt(Marshal.SizeOf(m_pWaveHeaders(m_nBlockCurrent))))
       m_nBlockCurrent += 1
       m_nBlockCurrent = m_nBlockCurrent Mod m_nBlockCount
     End While
@@ -1407,7 +1412,7 @@ next2:
 
       ' If sample position is valid add to the mix
       If s.nSamplePosition < vecAudioSamples(s.nAudioSampleID - 1).nSamples Then
-        fMixerSample += vecAudioSamples(s.nAudioSampleID - 1).fSample((s.nSamplePosition * vecAudioSamples(s.nAudioSampleID - 1).nChannels) + nChannel)
+        fMixerSample += vecAudioSamples(s.nAudioSampleID - 1).fSample(CInt(Fix((s.nSamplePosition * vecAudioSamples(s.nAudioSampleID - 1S).nChannels) + nChannel)))
       Else
         s.bFinished = True ' Else sound has completed
       End If
@@ -1423,11 +1428,11 @@ next2:
     Return OnUserSoundFilter(nChannel, fGlobalTime, fMixerSample)
   End Function
 
-  Dim m_nSampleRate As UInteger
-  Dim m_nChannels As UInteger
-  Dim m_nBlockCount As UInteger
-  Dim m_nBlockSamples As UInteger
-  Dim m_nBlockCurrent As UInteger
+  Dim m_nSampleRate As Integer
+  Dim m_nChannels As Integer
+  Dim m_nBlockCount As Integer
+  Dim m_nBlockSamples As Integer
+  Dim m_nBlockCurrent As Integer
 
   Dim m_pBlockMemory As Short() = Nothing
   Dim m_pWaveHeaders As WAVEHDR() = Nothing
