@@ -628,7 +628,7 @@ Public MustInherit Class ConsoleGameEngine
     Dim errorMessage As String = ex.Message
     Console.SetOut(New StreamWriter(Console.OpenStandardOutput()))
     Console.WriteLine($"ERROR: {msg}{Environment.NewLine}" & vbTab & $"{errorMessage}")
-    Return 0
+    Return 1
   End Function
 
   'Public Overridable Sub Draw(x As Integer, y As Integer, Optional c As Char = "█"c, Optional col As Short = &HF)
@@ -993,12 +993,13 @@ next2:
       While m_bAtomActive
         ' Handle Timing
         tp2 = DateTime.Now
-        Dim elapsedTime As TimeSpan = tp2 - tp1
+        Dim elapsedTime = tp2 - tp1
         tp1 = tp2
-        Dim fElapsedTime As Single = CSng(elapsedTime.TotalSeconds)
+        Dim fElapsedTime = CSng(elapsedTime.TotalSeconds)
 
         ' Handle Keyboard Input
-        For i As Integer = 0 To 255
+        For i = 0 To 255
+
           m_keyNewState(i) = GetAsyncKeyState(i)
 
           m_keys(i).Pressed = False
@@ -1015,19 +1016,19 @@ next2:
           End If
 
           m_keyOldState(i) = m_keyNewState(i)
+
         Next
 
         ' Handle Mouse Input - Check for window events
         Dim inBuf(31) As INPUT_RECORD
-        Dim events As Integer = 0
+        Dim events = 0
         GetNumberOfConsoleInputEvents(m_hConsoleIn, events)
         If events > 0 Then
           ReadConsoleInput(m_hConsoleIn, inBuf(0), events, events)
         End If
 
-        ' Handle events - we only care about mouse clicks and movement
-        ' for now
-        For i As Integer = 0 To events - 1
+        ' Handle events - we only care about mouse clicks and movement for now
+        For i = 0 To events - 1
           Select Case inBuf(i).EventType
             Case FOCUS_EVENT
               m_bConsoleInFocus = inBuf(i).FocusEvent.bSetFocus <> 0
@@ -1037,7 +1038,7 @@ next2:
                   m_mousePosX = inBuf(i).MouseEvent.dwMousePosition.X
                   m_mousePosY = inBuf(i).MouseEvent.dwMousePosition.Y
                 Case 0
-                  For m As Integer = 0 To 4
+                  For m = 0 To 4
                     m_mouseNewState(m) = (inBuf(i).MouseEvent.dwButtonState And (1 << m)) > 0
                   Next
                 Case Else
@@ -1048,7 +1049,8 @@ next2:
           End Select
         Next
 
-        For m As Integer = 0 To 4
+        For m = 0 To 4
+
           m_mouse(m).Pressed = False
           m_mouse(m).Released = False
 
@@ -1063,6 +1065,7 @@ next2:
           End If
 
           m_mouseOldState(m) = m_mouseNewState(m)
+
         Next
 
         ' Handle Frame Update
