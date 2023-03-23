@@ -2,6 +2,13 @@
 
 Welcome to the Cory Smith (DualBrain) Sample Repo... feel free to browse around and, hopefully, make some happy discoveries.
 
+## One Lone Coder
+
+[OneLoneCoder](https://github.com/OneLoneCoder) has some really awesome videos on [youtube](https://www.youtube.com/@javidx9/videos) and a pretty interesting game engine that, well, abuses the Windows Console and bends it to his will as a "game" output device. This intrigues me to no end and I so wanted to play with stuff, but alas it is all in C++. I could, of course, just use C++ and *get over it* but that just isn't the way I do things. As I see it, there was a need (at least for me) to have it in VB! It was taunting me and I simply had to cowboy up and gitterdun. This section of the Samples repo contains the ongoing results of this effort.
+
+- [olcConsoleGameEngine](OLC/CGE/)
+- [Other](OLC/Other/)
+
 ## BASIC Computer Games
 
 The classic book BASIC Computer Games by David H. Ahl (1970's) contains many games that worked on the Microsoft MBASIC BASIC dialect which is the foundation for the Microsoft BASIC's to follow... including, of course, VB.  This folder contains many of these games converted to VB.  What makes my contribution to this sort of project different than many others is that:
