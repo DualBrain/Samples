@@ -866,25 +866,40 @@ next2:
     End While
   End Sub
 
-  Sub FillCircle(ByVal xc As Integer, ByVal yc As Integer, ByVal r As Integer, Optional ByVal c As Short = &H2588, Optional ByVal col As Short = &HF)
-    Dim x As Integer = 0
-    Dim y As Integer = r
-    Dim p As Integer = 3 - 2 * r
+  Sub FillCircle(xc As Double, yc As Double, r As Double, c As Integer, col As Integer)
+    FillCircle(CInt(Fix(xc)), CInt(Fix(yc)), CInt(Fix(r)), c, col)
+  End Sub
+
+  Sub FillCircle(xc As Integer, yc As Integer, r As Integer, Optional c As Integer = &H2588, Optional col As Integer = &HF)
+
+    Dim x = 0
+    Dim y = r
+    Dim p = 3 - 2 * r
+
     If r = 0 Then Return
-    Dim drawline = Sub(ByVal sx As Integer, ByVal ex As Integer, ByVal ny As Integer)
-                     For i As Integer = sx To ex
+
+    Dim drawLine = Sub(sx As Integer, ex As Integer, ny As Integer)
+                     For i = sx To ex
                        Draw(i, ny, c, col)
                      Next
                    End Sub
 
     While y >= x
       ' Modified to draw scan-lines instead of edges
-      drawline(xc - x, xc + x, yc - y)
-      drawline(xc - y, xc + y, yc - x)
-      drawline(xc - x, xc + x, yc + y)
-      drawline(xc - y, xc + y, yc + x)
-      If p < 0 Then p += 4 * x + 6 : x += 1 Else p += 4 * (x - y) + 10 : x += 1 : y -= 1
+      drawLine(xc - x, xc + x, yc - y)
+      drawLine(xc - y, xc + y, yc - x)
+      drawLine(xc - x, xc + x, yc + y)
+      drawLine(xc - y, xc + y, yc + x)
+      If p < 0 Then
+        p += 4 * x + 6
+        x += 1
+      Else
+        p += 4 * (x - y) + 10
+        x += 1
+        y -= 1
+      End If
     End While
+
   End Sub
 
   Sub DrawSprite(x As Double, y As Double, sprite As Sprite)
