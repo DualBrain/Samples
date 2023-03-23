@@ -19,21 +19,21 @@ The classic book BASIC Computer Games by David H. Ahl (1970's) contains many gam
 
 I draw attention to the last bullet point as most, if not all, of the the examples I've seen that attempt to migrate these samples to something newer tend to be much larger as a result - or if the goal was to reduce, the results are not really readable.  With VB, it is possible to not only reduce but retain readability... win-win.
 
-Read [more...](BasicComputerGames/README.md)
+Read [more...](BasicComputerGames/)
 
 ## ClearScript
 
 As far as I can tell, ClearScript is a new project from Microsoft announced around January 2022 to provide an easy means to incorporate
 and provide a scripting engine in your application.
 
-Read [more...](ClearScript/README.md)
+Read [more...](ClearScript/)
 
 ## GUI
 
 This folder contains many examples related to the my exploration of various
 projects that provide for video output for the VB (or rather, .NET) developer.
 
-Read [more...](GUI/README.md)
+Read [more...](GUI/)
 
 ## QBasic
 
@@ -42,4 +42,4 @@ several of the included samples that shipped with MS-DOS 5.0 converted to
 VB with an effort to retain as much fidelity as possible to demonstrate 
 that VB, although different, is also very much familiar.
 
-Read [more...](QBasic/README.md)
+Read [more...](QBasic/)
