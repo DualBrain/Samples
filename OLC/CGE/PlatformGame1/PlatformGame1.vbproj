@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>PlatformGame1</RootNamespace>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="JarioSprites\leveljario.spr" />
+    <None Remove="JarioSprites\minijario.spr" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="JarioSprites\leveljario.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JarioSprites\minijario.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConsoleGameEngine\ConsoleGameEngine.vbproj" />
+  </ItemGroup>
+
+</Project>
