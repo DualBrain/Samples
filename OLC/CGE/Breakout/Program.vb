@@ -1,3 +1,6 @@
+' Inspired by "Code-It-Yourself Breakout in 30 minutes?" -- @javidx9
+' https://youtu.be/Il6kREcjdzE
+
 Option Explicit On
 Option Strict On
 Option Infer On
@@ -110,8 +113,6 @@ Class Breakout
         m_ballDy = CSng(Math.Sin(ang))
       End If
     End If
-
-    'If m_ballDx > 
 
     ' Draw Level
     For y = 0 To m_height - 1
