@@ -4,9 +4,9 @@ I stumbled across [OneLoneCoder](https://github.com/OneLoneCoder) and I couldn't
 
 Right now the main focus is on the olcConsoleGameEngine (CGE) which as since been retired and replaced with olcPixelGameEngine, which subsequently was replaced by olcPixelGameEngine 2.0. As I work through his videos (in reverse chronological order), I'll continue to update this repo as I progress.
 
-- [CGE/README.md]
-- [PGE1/README.md]
-- [Other/README.md]
+- [olcConsoleGameEngine](CGE/README.md)
+- [olcPixelGameEngine 1.0](PGE1/README.md)
+- [Other](Other/README.md)
 
 ## Further Research / Exploration
 
