@@ -920,16 +920,15 @@ next2:
   End Sub
 
   Public Sub DrawPartialSprite(x As Double, y As Double, sprite As Sprite, ox As Double, oy As Double, w As Double, h As Double)
-    DrawPartialSprite(CInt(x), CInt(y), sprite, CInt(ox), CInt(oy), CInt(w), CInt(h))
-
+    DrawPartialSprite(CInt(Fix(x)), CInt(Fix(y)), sprite, CInt(Fix(ox)), CInt(Fix(oy)), CInt(Fix(w)), CInt(Fix(h)))
   End Sub
 
   Public Sub DrawPartialSprite(x As Integer, y As Integer, sprite As Sprite, ox As Integer, oy As Integer, w As Integer, h As Integer)
     If sprite Is Nothing Then
       Return
     End If
-    For i As Integer = 0 To w - 1
-      For j As Integer = 0 To h - 1
+    For i = 0 To w - 1
+      For j = 0 To h - 1
         If sprite.GetGlyph(i + ox, j + oy) <> " "c Then
           Draw(x + i, y + j, AscW(sprite.GetGlyph(i + ox, j + oy)), sprite.GetColour(i + ox, j + oy))
         End If

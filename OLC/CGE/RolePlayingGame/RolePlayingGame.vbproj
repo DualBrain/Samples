@@ -1,0 +1,167 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>RolePlayingGame</RootNamespace>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="JarioSprites\leveljario.spr" />
+    <None Remove="JarioSprites\minijario.spr" />
+    <None Remove="rpgdata\gfx\balloon1.png.spr" />
+    <None Remove="rpgdata\gfx\cpp_guy.png.spr" />
+    <None Remove="rpgdata\gfx\item_health.spr" />
+    <None Remove="rpgdata\gfx\item_healthboost.spr" />
+    <None Remove="rpgdata\gfx\javidx9_nesfont8x8.spr" />
+    <None Remove="rpgdata\gfx\olc_sprite.exe" />
+    <None Remove="rpgdata\gfx\SeditSlimeTransparent.spr" />
+    <None Remove="rpgdata\gfx\sky1.png.spr" />
+    <None Remove="rpgdata\gfx\SpriteEditor.exe" />
+    <None Remove="rpgdata\gfx\sprites_items.png" />
+    <None Remove="rpgdata\gfx\sprites_items.png.spr" />
+    <None Remove="rpgdata\gfx\sprites_weapons.png" />
+    <None Remove="rpgdata\gfx\sprites_weapons.png.spr" />
+    <None Remove="rpgdata\gfx\Sword.spr" />
+    <None Remove="rpgdata\gfx\tiles002.png" />
+    <None Remove="rpgdata\gfx\tiles002.spr" />
+    <None Remove="rpgdata\gfx\tileset_modernish.png" />
+    <None Remove="rpgdata\gfx\tileset_modernish.png.spr" />
+    <None Remove="rpgdata\gfx\title3.png.spr" />
+    <None Remove="rpgdata\gfx\toml_castleinterior.spr" />
+    <None Remove="rpgdata\gfx\toml_char001.png.spr" />
+    <None Remove="rpgdata\gfx\toml_CharacterSprites.spr" />
+    <None Remove="rpgdata\gfx\toml_modernish.spr" />
+    <None Remove="rpgdata\gfx\toml_orange.spr" />
+    <None Remove="rpgdata\gfx\toml_orange_glasses.spr" />
+    <None Remove="rpgdata\gfx\toml_purple.spr" />
+    <None Remove="rpgdata\gfx\toml_spritesheetdark.spr" />
+    <None Remove="rpgdata\gfx\toml_treasurechest.spr" />
+    <None Remove="rpgdata\gfx\toml_village.spr" />
+    <None Remove="rpgdata\gfx\weapon_basic_sword.spr" />
+    <None Remove="rpgdata\gfx\worldmap1.png.spr" />
+    <None Remove="rpgdata\map\home.lvl" />
+    <None Remove="rpgdata\map\introduction.lvl" />
+    <None Remove="rpgdata\map\loz_dungeon.lvl" />
+    <None Remove="rpgdata\map\village1.lvl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="JarioSprites\leveljario.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JarioSprites\minijario.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\balloon1.png.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\cpp_guy.png.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\item_health.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\item_healthboost.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\javidx9_nesfont8x8.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\olc_sprite.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\SeditSlimeTransparent.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\sky1.png.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\SpriteEditor.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\sprites_items.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\sprites_items.png.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\sprites_weapons.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\sprites_weapons.png.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\Sword.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\tiles002.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\tiles002.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\tileset_modernish.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\tileset_modernish.png.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\title3.png.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\toml_castleinterior.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\toml_char001.png.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\toml_CharacterSprites.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\toml_modernish.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\toml_orange.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\toml_orange_glasses.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\toml_purple.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\toml_spritesheetdark.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\toml_treasurechest.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\toml_village.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\weapon_basic_sword.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\gfx\worldmap1.png.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\map\home.lvl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\map\introduction.lvl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\map\loz_dungeon.lvl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rpgdata\map\village1.lvl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConsoleGameEngine\ConsoleGameEngine.vbproj" />
+  </ItemGroup>
+
+</Project>
