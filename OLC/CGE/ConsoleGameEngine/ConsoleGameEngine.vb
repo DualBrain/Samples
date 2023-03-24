@@ -442,7 +442,7 @@ Public MustInherit Class ConsoleGameEngine
   Public m_mousePosX As Integer
   Public m_mousePosY As Integer
   Private m_bEnableSound As Boolean
-  Private ReadOnly m_sAppName As String
+  Public m_sAppName As String
   Private m_rectWindow As SMALL_RECT
   Public m_bufScreen As CharInfo()
   Private m_bConsoleInFocus As Boolean = True
@@ -468,6 +468,7 @@ Public MustInherit Class ConsoleGameEngine
     m_bEnableSound = False
 
     m_sAppName = "Default"
+
   End Sub
 
   Public Function GetKey(nKeyID As Integer) As sKeyState
@@ -1088,7 +1089,7 @@ next2:
         End If
 
         ' Update Title & Present Screen Buffer
-        Dim s As String = String.Format("gotBASIC.com and OneLoneCoder.com - ConsoleGameEngine - {0} - FPS: {1:0.00}", m_sAppName, 1.0F / fElapsedTime)
+        Dim s As String = String.Format("AddressOf.com, gotBASIC.com, OneLoneCoder.com - ConsoleGameEngine - {0} - FPS: {1:0.00}", m_sAppName, 1.0F / fElapsedTime)
         SetConsoleTitle(s)
         WriteConsoleOutput(m_hConsole, m_bufScreen, New COORD(CShort(m_nScreenWidth), CShort(m_nScreenHeight)), New COORD(0, 0), m_rectWindow)
 
