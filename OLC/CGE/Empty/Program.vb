@@ -4,6 +4,7 @@ Option Infer On
 
 Imports ConsoleGameEngine.PIXEL_TYPE
 Imports ConsoleGameEngine.Colour
+Imports ConsoleGameEngine
 
 Module Program
 
@@ -17,6 +18,10 @@ End Module
 
 Class Empty
   Inherits ConsoleGameEngine.ConsoleGameEngine
+
+  Public Sub New()
+    m_sAppName = "Empty"
+  End Sub
 
   Public Overrides Function OnUserCreate() As Boolean
 

@@ -100,11 +100,11 @@ Public Class Sprite
     Next
   End Sub
 
-  Public Sub SetGlyph(x As Integer, y As Integer, c As Char)
+  Public Sub SetGlyph(x As Integer, y As Integer, c As Integer)
     If x < 0 OrElse x >= Width OrElse y < 0 OrElse y >= Height Then
       Return
     Else
-      m_glyphs(y * Width + x) = c
+      m_glyphs(y * Width + x) = ChrW(c)
     End If
   End Sub
 
@@ -132,9 +132,10 @@ Public Class Sprite
     End If
   End Function
 
-  Public Function SampleGlyph(x As Double, y As Double) As Integer
+  Public Function SampleGlyph(x As Single, y As Single) As Integer
+    If Single.IsNaN(x) Then Return 32
     Dim sx = CInt(Fix(x * Width))
-    Dim sy = CInt(Fix(y * Height - 1))
+    Dim sy = CInt(Fix(y * Height - 1.0F))
     If sx < 0 OrElse sx >= Width OrElse sy < 0 OrElse sy >= Height Then
       Return AscW(" "c)
     Else
@@ -142,9 +143,10 @@ Public Class Sprite
     End If
   End Function
 
-  Public Function SampleColour(x As Double, y As Double) As Colour
+  Public Function SampleColour(x As Single, y As Single) As Colour
+    If Single.IsNaN(x) Then Return Colour.BG_BLACK
     Dim sx = CInt(Fix(x * Width))
-    Dim sy = CInt(Fix(y * Height - 1))
+    Dim sy = CInt(Fix(y * Height - 1.0F))
     If sx < 0 OrElse sx >= Width OrElse sy < 0 OrElse sy >= Height Then
       Return Colour.BG_BLACK
     Else
