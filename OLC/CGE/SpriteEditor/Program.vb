@@ -97,12 +97,12 @@ Class SpriteEditor
       If m_posY >= m_sprite.Height Then m_posY = m_sprite.Height - 1
 
       If m_keys(VK_SPACE).Released Then
-        m_sprite.SetGlyph(m_posX - 0, m_posY - 0, ChrW(m_currentGlyph))
+        m_sprite.SetGlyph(m_posX - 0, m_posY - 0, m_currentGlyph)
         m_sprite.SetColour(m_posX - 0, m_posY - 0, CType(m_currentColourFG Or (m_currentColourBG << 4), Colour))
       End If
 
       If m_keys(VK_DELETE).Released Then
-        m_sprite.SetGlyph(m_posX - 0, m_posY - 0, " "c)
+        m_sprite.SetGlyph(m_posX - 0, m_posY - 0, 32)
         m_sprite.SetColour(m_posX - 0, m_posY - 0, 0)
       End If
 

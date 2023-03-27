@@ -4,138 +4,97 @@ Option Infer On
 
 Imports ConsoleGameEngine
 
-Public MustInherit Class Dynamic
+Friend Class Dynamic
 
-  Public Property Px As Single
-  Public Property Py As Single
-  Public Property Vx As Single
-  Public Property Vy As Single
+  Friend Property Px As Single
+  Friend Property Py As Single
+  Friend Property Vx As Single
+  Friend Property Vy As Single
 
-  Public bSolidVsMap As Boolean
-  Public bSolidVsDyn As Boolean
-  Public bFriendly As Boolean
-  Public sName As String
+  Friend Property SolidVsMap As Boolean
+  Friend Property SolidVsDyn As Boolean
+  Friend Property Friendly As Boolean
+  Friend Property Redundant As Boolean
+  Friend Property IsProjectile As Boolean
+  Friend Property IsAttackable As Boolean = True
+  Friend Property Name As String
 
-  'Public bRedundant As Boolean
-  'Public bIsProjectile As Boolean
-  'Public bIsAttackable As Boolean = True
+  Friend Shared g_engine As RPG_Engine
 
-  'Public Shared g_engine As RPG_Engine = Nothing ' Protected?
-
-  Public Sub New(n As String)
-    sName = n
-    px = 0.0F
-    py = 0.0F
-    vx = 0.0F
-    vy = 0.0F
-    bSolidVsMap = True
-    bSolidVsDyn = True
-    bFriendly = True
-
-    'bRedundant = False
-    'bIsAttackable = False
-    'bIsProjectile = False
+  Friend Sub New(name As String)
+    Me.Name = name
+    Px = 0.0F
+    Py = 0.0F
+    Vx = 0.0F
+    Vy = 0.0F
+    SolidVsMap = True
+    SolidVsDyn = True
+    Friendly = True
+    Redundant = False
+    IsAttackable = False
+    IsProjectile = False
   End Sub
 
-  Public MustOverride Sub DrawSelf(gfx As ConsoleGameEngine.ConsoleGameEngine, ox As Single, oy As Single)
+  Friend Overridable Sub DrawSelf(gfx As ConsoleGameEngine.ConsoleGameEngine, ox As Single, oy As Single)
+    ' Do nothing?
+  End Sub
 
-  Public MustOverride Sub Update(fElapsedTime As Single, Optional player As Dynamic = Nothing)
+  Friend Overridable Sub Update(elapsedTime As Single, Optional player As Dynamic = Nothing)
+    ' Do nothing?
+  End Sub
 
-  Public Overridable Sub OnInteract(Optional player As Dynamic = Nothing)
+  Friend Overridable Sub OnInteract(Optional player As Dynamic = Nothing)
     ' Do nothing?
   End Sub
 
 End Class
 
-Public Class Dynamic_Creature
+Friend Class Dynamic_Creature
   Inherits Dynamic
 
-  Private m_pSprite As Sprite = Nothing
-  Private m_nGraphicCounter As Integer = 0
-  Private m_fTimer As Single = 0.0F
-
-  Public Enum FacingDirection
+  Friend Enum FacingDirection
     SOUTH = 0
     WEST = 1
     NORTH = 2
     EAST = 3
   End Enum
-  Private m_nFacingDirection As FacingDirection = FacingDirection.SOUTH
 
-  Public Enum GraphicState
+  Friend Enum GraphicState
     STANDING
     WALKING
     CELEBRATING
     DEAD
   End Enum
+
+  Friend Property Health As Integer = 10
+  Friend Property HealthMax As Integer = 10
+  Friend Property Controllable As Boolean = True
+
+  Protected m_stateTick As Single
+  Protected m_equipedWeapon As Weapon = Nothing
+
+  Private ReadOnly m_pSprite As Sprite = Nothing
+  Private m_nGraphicCounter As Integer = 0
+  Private m_fTimer As Single = 0.0F
+  Private m_nFacingDirection As FacingDirection = FacingDirection.SOUTH
   Private m_nGraphicState As GraphicState = GraphicState.STANDING
+  Private m_knockBackTimer As Single = 0.0F
+  Private m_knockBackDX As Single = 0.0F
+  Private m_knockBackDY As Single = 0.0F
 
-  Public nHealth As Integer = 10
-  Public nHealthMax As Integer = 10
-
-  '---
-
-  Public bControllable As Boolean = True
-  Protected m_fStateTick As Single
-  Protected m_fKnockBackTimer As Single = 0.0F
-  Protected m_fKnockBackDX As Single = 0.0F
-  Protected m_fKnockBackDY As Single = 0.0F
-
-  'Public pEquipedWeapon As Weapon = Nothing
-
-  Public Sub New(name As String, sprite As Sprite)
+  Friend Sub New(name As String, sprite As Sprite)
     MyBase.New(name)
     m_pSprite = sprite
-    nHealth = 10
-    nHealthMax = 10
+    Health = 10
+    HealthMax = 10
     m_nFacingDirection = FacingDirection.SOUTH
     m_nGraphicState = GraphicState.STANDING
-    m_fTimer = 0.0F
     m_nGraphicCounter = 0
-    'bIsAttackable = True
+    m_fTimer = 0.0F
+    IsAttackable = True
   End Sub
 
-  Public Overrides Sub Update(fElapsedTime As Single, Optional player As Dynamic = Nothing)
-
-    If m_fKnockBackTimer > 0.0F Then
-      vx = m_fKnockBackDX * 10.0F
-      vy = m_fKnockBackDY * 10.0F
-      'bIsAttackable = False
-      m_fKnockBackTimer -= fElapsedTime
-      If m_fKnockBackTimer <= 0.0F Then
-        m_fStateTick = 0.0F
-        bControllable = True
-        'bIsAttackable = True
-      End If
-    Else
-      bSolidVsDyn = True
-      m_fTimer += fElapsedTime
-      If m_fTimer >= 0.2F Then
-        m_fTimer -= 0.2F
-        m_nGraphicCounter += 1
-        m_nGraphicCounter = m_nGraphicCounter Mod 2
-      End If
-      If Math.Abs(vx) > 0 OrElse Math.Abs(vy) > 0 Then m_nGraphicState = GraphicState.WALKING Else m_nGraphicState = GraphicState.STANDING
-      If nHealth <= 0 Then m_nGraphicState = GraphicState.DEAD
-      If vx < 0.0F Then m_nFacingDirection = FacingDirection.WEST
-      If vx > 0.0F Then m_nFacingDirection = FacingDirection.EAST
-      If vy < -0.0F Then m_nFacingDirection = FacingDirection.NORTH
-      If vy > 0.0F Then m_nFacingDirection = FacingDirection.SOUTH
-      Behaviour(fElapsedTime, player)
-    End If
-
-  End Sub
-
-  Public Sub KnockBack(dx As Single, dy As Single, dist As Single)
-    m_fKnockBackDX = dx
-    m_fKnockBackDY = dy
-    m_fKnockBackTimer = dist
-    bSolidVsDyn = False
-    bControllable = False
-    'bIsAttackable = False
-  End Sub
-
-  Public Overrides Sub DrawSelf(gfx As ConsoleGameEngine.ConsoleGameEngine, ox As Single, oy As Single)
+  Friend Overrides Sub DrawSelf(gfx As ConsoleGameEngine.ConsoleGameEngine, ox As Single, oy As Single)
 
     Dim sheetOffsetX = 0
     Dim sheetOffsetY = 0
@@ -147,147 +106,239 @@ Public Class Dynamic_Creature
       Case GraphicState.DEAD : sheetOffsetX = 4 * 16 : sheetOffsetY = 1 * 16
     End Select
 
-    gfx.DrawPartialSprite((px - ox) * 16.0F, (py - oy) * 16.0F, m_pSprite, sheetOffsetX, sheetOffsetY, 16, 16)
+    gfx.DrawPartialSprite((Px - ox) * 16.0F, (Py - oy) * 16.0F, m_pSprite, sheetOffsetX, sheetOffsetY, 16, 16)
 
   End Sub
 
-  Public Overridable Sub Behaviour(fElapsedTime As Single, Optional player As Dynamic = Nothing)
+  Friend Overrides Sub Update(elapsedTime As Single, Optional player As Dynamic = Nothing)
+
+    If m_knockBackTimer > 0.0F Then
+      Vx = m_knockBackDX * 10.0F
+      Vy = m_knockBackDY * 10.0F
+      IsAttackable = False
+      m_knockBackTimer -= elapsedTime
+      If m_knockBackTimer <= 0.0F Then
+        m_stateTick = 0.0F
+        Controllable = True
+        IsAttackable = True
+      End If
+    Else
+      SolidVsDyn = True
+      m_fTimer += elapsedTime
+      If m_fTimer >= 0.2F Then
+        m_fTimer -= 0.2F
+        m_nGraphicCounter += 1
+        m_nGraphicCounter = m_nGraphicCounter Mod 2
+      End If
+      If Math.Abs(Vx) > 0 OrElse Math.Abs(Vy) > 0 Then m_nGraphicState = GraphicState.WALKING Else m_nGraphicState = GraphicState.STANDING
+      If Health <= 0 Then m_nGraphicState = GraphicState.DEAD
+      If Vx < 0.0F Then m_nFacingDirection = FacingDirection.WEST
+      If Vx > 0.0F Then m_nFacingDirection = FacingDirection.EAST
+      If Vy < -0.0F Then m_nFacingDirection = FacingDirection.NORTH
+      If Vy > 0.0F Then m_nFacingDirection = FacingDirection.SOUTH
+      Behaviour(elapsedTime, player)
+    End If
+
+  End Sub
+
+  Friend Overridable Sub Behaviour(elapsedTime As Single, Optional player As Dynamic = Nothing)
     ' No default behaviour
   End Sub
 
-  Public Function GetFacingDirection() As Integer
+  Friend Function GetFacingDirection() As Integer
     Return m_nFacingDirection
   End Function
 
-  Public Overridable Sub PerformAttack()
+  Friend Overridable Sub PerformAttack()
+  End Sub
+
+  Friend Sub KnockBack(dx As Single, dy As Single, dist As Single)
+    m_knockBackDX = dx
+    m_knockBackDY = dy
+    m_knockBackTimer = dist
+    SolidVsDyn = False
+    Controllable = False
+    IsAttackable = False
   End Sub
 
 End Class
 
-'Public Class Dynamic_Creature_Skelly
-'  Inherits Dynamic_Creature
+Friend Class Dynamic_Creature_Skelly
+  Inherits Dynamic_Creature
 
-'  Public Sub New()
-'    MyBase.New("Skelly", RPG_Assets.Get.GetSprite("skelly"))
-'    bFriendly = False
-'    nHealth = 10
-'    nHealthMax = 10
-'    m_fStateTick = 2.0F
-'    'pEquipedWeapon = DirectCast(RPG_Assets.Get().GetItem("Basic Sword"), Weapon)
-'  End Sub
+  Friend Sub New()
+    MyBase.New("Skelly", RPG_Assets.Get.GetSprite("skelly"))
+    Friendly = False
+    Health = 10
+    HealthMax = 10
+    m_stateTick = 2.0F
+    m_equipedWeapon = DirectCast(RPG_Assets.Get().GetItem("Basic Sword"), Weapon)
+  End Sub
 
-'  Public Overrides Sub Behaviour(fElapsedTime As Single, Optional player As Dynamic = Nothing)
-'  End Sub
+  Friend Overrides Sub Behaviour(elapsedTime As Single, Optional player As Dynamic = Nothing)
 
-'  Public Overrides Sub PerformAttack()
-'  End Sub
+    If Health <= 0 Then
+      Vx = 0
+      Vy = 0
+      SolidVsDyn = False
+      IsAttackable = False
+      Return
+    End If
 
-'End Class
+    ' Check if player is nearby
+    Dim targetX = player.Px - Px
+    Dim targetY = player.Py - Py
+    Dim distance = CSng(Math.Sqrt(targetX * targetX + targetY * targetY))
 
-'Public Class Dynamic_Creature_Witty
-'  Inherits Dynamic_Creature
+    m_stateTick -= elapsedTime
 
-'  Public Sub New()
-'    MyBase.New("witty", RPG_Assets.Get().GetSprite("player"))
-'    bFriendly = True
-'    nHealth = 9
-'    nHealthMax = 10
-'    m_fStateTick = 2.0F
-'    'pEquipedWeapon = DirectCast(RPG_Assets.Get().GetItem("Basic Sword"), Weapon)
-'  End Sub
+    If m_stateTick <= 0.0F Then
 
-'  Public Overrides Sub Behaviour(fElapsedTime As Single, Optional player As Dynamic = Nothing)
+      If distance < 6.0F Then
+        Vx = (targetX / distance) * 2.0F
+        Vy = (targetY / distance) * 2.0F
 
-'    If nHealth <= 0 Then
-'      vx = 0
-'      vy = 0
-'      bSolidVsDyn = False
-'      bIsAttackable = False
-'      Return
-'    End If
+        If distance < 1.5F Then
+          PerformAttack()
+        End If
+      Else
+        Vx = 0
+        Vy = 0
+      End If
 
-'    ' Check if player is nearby
-'    Dim fTargetX = player.px - px
-'    Dim fTargetY = player.py - py
-'    Dim fDistance = CSng(Math.Sqrt(fTargetX * fTargetX + fTargetY * fTargetY))
+      m_stateTick += 1.0F
 
-'    m_fStateTick -= fElapsedTime
+    End If
 
-'    If m_fStateTick <= 0.0F Then
+  End Sub
 
-'      If fDistance < 6.0F Then
-'        vx = (fTargetX / fDistance) * 2.0F
-'        vy = (fTargetY / fDistance) * 2.0F
+  Friend Overrides Sub PerformAttack()
+    If m_equipedWeapon Is Nothing Then Return
+    m_equipedWeapon.OnUse(Me)
+  End Sub
 
-'        If fDistance < 1.5F Then
-'          PerformAttack()
-'        End If
-'      Else
-'        vx = 0
-'        vy = 0
-'      End If
+End Class
 
-'      m_fStateTick += 1.0F
+Friend Class Dynamic_Creature_Witty
+  Inherits Dynamic_Creature
 
-'    End If
+  Friend Sub New()
+    MyBase.New("witty", RPG_Assets.Get().GetSprite("player"))
+    Friendly = True
+    Health = 9
+    HealthMax = 10
+    m_stateTick = 2.0F
+    m_equipedWeapon = DirectCast(RPG_Assets.Get().GetItem("Basic Sword"), Weapon)
+  End Sub
 
-'  End Sub
+  Friend Overrides Sub PerformAttack()
+    If m_equipedWeapon Is Nothing Then Return
+    m_equipedWeapon.OnUse(Me)
+  End Sub
 
-'  Public Overrides Sub PerformAttack()
-'    If pEquipedWeapon Is Nothing Then Return
-'    pEquipedWeapon.OnUse(Me)
-'  End Sub
+End Class
 
-'End Class
+Friend Class Dynamic_Teleport
+  Inherits Dynamic
 
-'Public Class Dynamic_Teleport
-'  Inherits Dynamic
+  Friend Property MapPosX As Single
+  Friend Property MapPosY As Single
+  Friend Property MapName As String
 
-'  Public Sub New(x As Single, y As Single, sMapName As String, tx As Single, ty As Single)
-'    MyBase.New(x, y)
-'    Me.sMapName = sMapName
-'    Me.fMapPosX = tx
-'    Me.fMapPosY = ty
-'  End Sub
+  Friend Sub New(x As Single, y As Single, mapName As String, tx As Single, ty As Single)
+    MyBase.New("Teleport")
+    Px = x
+    Py = y
+    MapPosX = tx
+    MapPosY = ty
+    Me.MapName = mapName
+    SolidVsDyn = False
+    SolidVsMap = False
+  End Sub
 
-'  Public Overrides Sub DrawSelf(gfx As ConsoleGameEngine.ConsoleGameEngine, ox As Single, oy As Single)
-'    'TODO: Implement the drawing code here
-'  End Sub
+  Friend Overrides Sub DrawSelf(gfx As ConsoleGameEngine.ConsoleGameEngine, ox As Single, oy As Single)
+    ' Does Nothing
+    gfx.DrawCircle((Px + 0.5F - ox) * 16.0F, (Py + 0.5F - oy) * 16.0F, 0.5F * 16.0F) ' For debugging
+  End Sub
 
-'  Public Overrides Sub Update(fElapsedTime As Single, Optional player As Dynamic = Nothing)
-'    'TODO: Implement the update logic here
-'  End Sub
+  Friend Overrides Sub Update(elapsedTime As Single, Optional player As Dynamic = Nothing)
+    ' Do Nothing
+  End Sub
 
-'  Public sMapName As String
-'  Public fMapPosX As Single
-'  Public fMapPosY As Single
+End Class
 
-'End Class
+Friend Class Dynamic_Item
+  Inherits Dynamic
 
-'Public Class Dynamic_Projectile
-'  Inherits Dynamic
+  Private ReadOnly m_item As Item
+  Private m_collected As Boolean = False
 
-'  Public pSprite As Sprite = Nothing
-'  Public fSpriteX As Single
-'  Public fSpriteY As Single
-'  Public fDuration As Single
-'  Public bOneHit As Boolean = True
-'  Public nDamage As Integer = 0
+  Friend Sub New(x As Single, y As Single, item As Item)
+    MyBase.New("pickup")
+    Px = x
+    Py = y
+    SolidVsDyn = False
+    SolidVsMap = False
+    Friendly = True
+    m_collected = False
+    Me.m_item = item
+  End Sub
 
-'  Public Sub New(ox As Single, oy As Single, bFriend As Boolean, velx As Single, vely As Single, duration As Single, sprite As Sprite, tx As Single, ty As Single)
-'    MyBase.New(ox, oy, bFriend, velx, vely)
-'    fDuration = duration
-'    pSprite = sprite
-'    fSpriteX = tx
-'    fSpriteY = ty
-'  End Sub
+  Friend Overrides Sub DrawSelf(gfx As ConsoleGameEngine.ConsoleGameEngine, ox As Single, oy As Single)
+    If m_collected Then Return
+    gfx.DrawPartialSprite((Px - ox) * 16.0F, (Py - oy) * 16.0F, m_item.Sprite, 0, 0, 16, 16)
+  End Sub
 
-'  Public Overrides Sub DrawSelf(gfx As ConsoleGameEngine.ConsoleGameEngine, ox As Single, oy As Single)
-'    ' TODO: Implement drawing logic
-'  End Sub
+  Friend Overrides Sub OnInteract(Optional player As Dynamic = Nothing)
 
-'  Public Overrides Sub Update(fElapsedTime As Single, Optional player As Dynamic = Nothing)
-'    ' TODO: Implement update logic
-'  End Sub
+    If m_collected Then Return
 
-'End Class
+    If m_item.OnInteract(player) Then
+      ' Add item to inventory
+      g_engine.GiveItem(m_item)
+    End If
+
+    m_collected = True
+
+  End Sub
+
+End Class
+
+Friend Class Dynamic_Projectile
+  Inherits Dynamic
+
+  Private ReadOnly m_sprite As Sprite = Nothing
+  Private ReadOnly m_spriteX As Single
+  Private ReadOnly m_spriteY As Single
+  Private m_duration As Single
+
+  Friend Property OneHit As Boolean = True
+  Friend Property Damage As Integer = 0
+
+  Friend Sub New(ox As Single, oy As Single, [friend] As Boolean, velX As Single, velY As Single, duration As Single, sprite As Sprite, tx As Single, ty As Single)
+    MyBase.New("projectile")
+    m_sprite = sprite
+    m_spriteX = tx
+    m_spriteY = ty
+    m_duration = duration
+    Px = ox
+    Py = oy
+    Vx = velX
+    Vy = velY
+    SolidVsDyn = False
+    SolidVsMap = True
+    IsProjectile = True
+    IsAttackable = False
+    Friendly = [friend]
+  End Sub
+
+  Friend Overrides Sub DrawSelf(gfx As ConsoleGameEngine.ConsoleGameEngine, ox As Single, oy As Single)
+    gfx.DrawPartialSprite((Px - ox) * 16, (Py - oy) * 16, m_sprite, m_spriteX * 16, m_spriteY * 16, 16, 16)
+  End Sub
+
+  Friend Overrides Sub Update(elapsedTime As Single, Optional player As Dynamic = Nothing)
+    m_duration -= elapsedTime
+    If (m_duration <= 0.0F) Then Redundant = True
+  End Sub
+
+End Class

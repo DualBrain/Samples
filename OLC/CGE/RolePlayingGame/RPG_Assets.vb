@@ -5,34 +5,33 @@ Option Infer On
 Imports ConsoleGameEngine
 
 ' A Singleton...
-Public Class RPG_Assets
+Friend Class RPG_Assets
 
   Private Shared ReadOnly m_instance As New RPG_Assets()
+  Private ReadOnly m_mapSprites As New Dictionary(Of String, Sprite)()
+  Private ReadOnly m_mapMaps As New Dictionary(Of String, Map)()
+  Private ReadOnly m_mapItems As New Dictionary(Of String, Item)()
 
-  Public Shared Function [Get]() As RPG_Assets
+  Friend Shared Function [Get]() As RPG_Assets
     Return m_instance
   End Function
 
   Private Sub New()
   End Sub
 
-  Private ReadOnly m_mapSprites As New Dictionary(Of String, Sprite)()
-  Private ReadOnly m_mapMaps As New Dictionary(Of String, Map)()
-  'Private ReadOnly m_mapItems As New Dictionary(Of String, Item)()
-
-  Public Function GetSprite(name As String) As Sprite
+  Friend Function GetSprite(name As String) As Sprite
     Return m_mapSprites(name)
   End Function
 
-  Public Function GetMap(name As String) As Map
+  Friend Function GetMap(name As String) As Map
     Return m_mapMaps(name)
   End Function
 
-  'Public Function GetItem(name As String) As Item
-  '  Return m_mapItems(name)
-  'End Function
+  Friend Function GetItem(name As String) As Item
+    Return m_mapItems(name)
+  End Function
 
-  Public Sub LoadSprites()
+  Friend Sub LoadSprites()
 
     Dim load As Action(Of String, String) = Sub(name As String, fileName As String)
                                               Dim s As New Sprite(fileName)
@@ -60,10 +59,10 @@ Public Class RPG_Assets
 
   End Sub
 
-  Public Sub LoadMaps()
+  Friend Sub LoadMaps()
 
     Dim load = Sub(m As Map)
-                 m_mapMaps(m.sName) = m
+                 m_mapMaps(m.Name) = m
                End Sub
 
     load(New Map_Village1())
@@ -71,17 +70,17 @@ Public Class RPG_Assets
 
   End Sub
 
-  'Public Sub LoadItems()
+  Friend Sub LoadItems()
 
-  '  Dim load = Sub(i As Item)
-  '               m_mapItems(i.sName) = i
-  '             End Sub
+    Dim load = Sub(i As Item)
+                 m_mapItems(i.Name) = i
+               End Sub
 
-  '  load(New Item_Health())
-  '  load(New Item_HealthBoost())
+    load(New Item_Health())
+    load(New Item_HealthBoost())
 
-  '  load(New Weapon_Sword())
+    load(New Weapon_Sword())
 
-  'End Sub
+  End Sub
 
 End Class

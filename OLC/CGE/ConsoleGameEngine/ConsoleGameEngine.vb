@@ -851,10 +851,14 @@ next2:
     Next
   End Sub
 
-  Sub DrawCircle(ByVal xc As Integer, ByVal yc As Integer, ByVal r As Integer, Optional ByVal c As Short = &H2588, Optional ByVal col As Short = &HF)
-    Dim x As Integer = 0
-    Dim y As Integer = r
-    Dim p As Integer = 3 - 2 * r
+  Public Sub DrawCircle(xc As Single, yc As Single, r As Single, Optional c As Integer = &H2588, Optional col As Integer = &HF)
+    DrawCircle(CInt(Fix(xc)), CInt(Fix(yc)), CInt(Fix(r)), c, col)
+  End Sub
+
+  Public Sub DrawCircle(xc As Integer, yc As Integer, r As Integer, Optional c As Integer = &H2588, Optional col As Integer = &HF)
+    Dim x = 0
+    Dim y = r
+    Dim p = 3 - 2 * r
     If r = 0 Then Return
     While y >= x ' only formulate 1/8 of circle
       Draw(xc - x, yc - y, c, col) 'upper left left

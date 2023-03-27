@@ -29,12 +29,12 @@ Class CommandLineFps
   Private ReadOnly m_mapWidth As Integer = 32 'World Dimensions
   Private ReadOnly m_mapHeight As Integer = 32
 
-  Private m_playerX As Double = 14.7 'Player Start Position
-  Private m_playerY As Double = 8 '5.09F
-  Private m_playerA As Double = -3.14159 / 2.0 'Player Start Rotation
-  Private ReadOnly m_fov As Double = 3.14159 / 4.0 'Field of View
-  Private ReadOnly m_depth As Double = 16.0 'Maximum rendering distance
-  Private ReadOnly m_speed As Double = 5.0 'Walking Speed
+  Private m_playerX As Single = 14.7 'Player Start Position
+  Private m_playerY As Single = 8 '5.09F
+  Private m_playerA As Single = -3.14159 / 2.0 'Player Start Rotation
+  Private ReadOnly m_fov As Single = 3.14159 / 4.0 'Field of View
+  Private ReadOnly m_depth As Single = 16.0 'Maximum rendering distance
+  Private ReadOnly m_speed As Single = 5.0 'Walking Speed
 
   Private m_map As String
 
@@ -42,7 +42,7 @@ Class CommandLineFps
   Private m_spriteLamp As Sprite
   Private m_spriteFireBall As Sprite
 
-  Private m_depthBuffer() As Double = Nothing
+  Private m_depthBuffer() As Single = Nothing
 
   Private Class ScreenObject
     Public X As Single
@@ -119,41 +119,41 @@ Class CommandLineFps
 
     ' Handle Forwards movement & collision
     If m_keys(AscW("W"c)).Held Then
-      m_playerX += Math.Sin(m_playerA) * m_speed * elapsedTime
-      m_playerY += Math.Cos(m_playerA) * m_speed * elapsedTime
+      m_playerX += CSng(Math.Sin(m_playerA)) * m_speed * elapsedTime
+      m_playerY += CSng(Math.Cos(m_playerA)) * m_speed * elapsedTime
       If m_map.Chars(CInt(Fix(m_playerX)) * m_mapWidth + CInt(Fix(m_playerY))) = "#"c Then
-        m_playerX -= Math.Sin(m_playerA) * m_speed * elapsedTime
-        m_playerY -= Math.Cos(m_playerA) * m_speed * elapsedTime
+        m_playerX -= CSng(Math.Sin(m_playerA)) * m_speed * elapsedTime
+        m_playerY -= CSng(Math.Cos(m_playerA)) * m_speed * elapsedTime
       End If
     End If
 
     ' Handle backwards movement & collision
     If m_keys(AscW("S"c)).Held Then
-      m_playerX -= Math.Sin(m_playerA) * m_speed * elapsedTime
-      m_playerY -= Math.Cos(m_playerA) * m_speed * elapsedTime
+      m_playerX -= CSng(Math.Sin(m_playerA)) * m_speed * elapsedTime
+      m_playerY -= CSng(Math.Cos(m_playerA)) * m_speed * elapsedTime
       If m_map.Chars(CInt(Fix(m_playerX)) * m_mapWidth + CInt(Fix(m_playerY))) = "#"c Then
-        m_playerX += Math.Sin(m_playerA) * m_speed * elapsedTime
-        m_playerY += Math.Cos(m_playerA) * m_speed * elapsedTime
+        m_playerX += CSng(Math.Sin(m_playerA)) * m_speed * elapsedTime
+        m_playerY += CSng(Math.Cos(m_playerA)) * m_speed * elapsedTime
       End If
     End If
 
     ' Handle Strafe Right movement & collision
     If m_keys(AscW("E"c)).Held Then
-      m_playerX += Math.Cos(m_playerA) * m_speed * elapsedTime
-      m_playerY -= Math.Sin(m_playerA) * m_speed * elapsedTime
+      m_playerX += CSng(Math.Cos(m_playerA)) * m_speed * elapsedTime
+      m_playerY -= CSng(Math.Sin(m_playerA)) * m_speed * elapsedTime
       If m_map.Chars(CInt(Fix(m_playerX)) * m_mapWidth + CInt(Fix(m_playerY))) = "#" Then
-        m_playerX -= Math.Cos(m_playerA) * m_speed * elapsedTime
-        m_playerY += Math.Sin(m_playerA) * m_speed * elapsedTime
+        m_playerX -= CSng(Math.Cos(m_playerA)) * m_speed * elapsedTime
+        m_playerY += CSng(Math.Sin(m_playerA)) * m_speed * elapsedTime
       End If
     End If
 
     ' Handle Strafe Left movement & collision
     If m_keys(AscW("Q"c)).Held Then
-      m_playerX -= Math.Cos(m_playerA) * m_speed * elapsedTime
-      m_playerY += Math.Sin(m_playerA) * m_speed * elapsedTime
+      m_playerX -= CSng(Math.Cos(m_playerA)) * m_speed * elapsedTime
+      m_playerY += CSng(Math.Sin(m_playerA)) * m_speed * elapsedTime
       If m_map.Chars(CInt(Fix(m_playerX)) * m_mapWidth + CInt(Fix(m_playerY))) = "#" Then
-        m_playerX += Math.Cos(m_playerA) * m_speed * elapsedTime
-        m_playerY -= Math.Sin(m_playerA) * m_speed * elapsedTime
+        m_playerX += CSng(Math.Cos(m_playerA)) * m_speed * elapsedTime
+        m_playerY -= CSng(Math.Sin(m_playerA)) * m_speed * elapsedTime
       End If
     End If
 
@@ -173,19 +173,19 @@ Class CommandLineFps
     For x = 0 To ScreenWidth() - 1
 
       ' For each column, calculate the projected ray angle into world space
-      Dim rayAngle = (m_playerA - m_fov / 2.0F) + (x / ScreenWidth()) * m_fov
+      Dim rayAngle = CSng((m_playerA - m_fov / 2.0F) + (x / ScreenWidth()) * m_fov)
 
       ' Find distance to wall
-      Dim stepSize = 0.01 ' Increment size for ray casting, decrease to increase resolution
-      Dim distanceToWall = 0.0 ' distance to wall
+      Dim stepSize = 0.01F ' Increment size for ray casting, decrease to increase resolution
+      Dim distanceToWall = 0.0F ' distance to wall
 
-      Dim hitWall As Boolean = False ' Set when ray hits wall block
-      Dim boundary As Boolean = False ' Set when ray hits boundary between two wall blocks
+      Dim hitWall = False ' Set when ray hits wall block
+      Dim boundary = False ' Set when ray hits boundary between two wall blocks
 
-      Dim eyeX = Math.Sin(rayAngle) ' Unit vector for ray in player space
-      Dim eyeY = Math.Cos(rayAngle)
+      Dim eyeX = CSng(Math.Sin(rayAngle)) ' Unit vector for ray in player space
+      Dim eyeY = CSng(Math.Cos(rayAngle))
 
-      Dim sampleX = 0.0
+      Dim sampleX = 0.0F
 
       Dim lit As Boolean = False
 
@@ -207,8 +207,8 @@ Class CommandLineFps
 
             ' Determine where ray has hit wall. Break Block boundary
             ' into 4 line segments
-            Dim blockMidX = testX + 0.5
-            Dim blockMidY = testY + 0.5
+            Dim blockMidX = testX + 0.5F
+            Dim blockMidY = testY + 0.5F
 
             Dim testPointX = m_playerX + eyeX * distanceToWall
             Dim testPointY = m_playerY + eyeY * distanceToWall
@@ -238,7 +238,7 @@ Class CommandLineFps
         ElseIf y > ceiling AndAlso y <= floor Then
           ' Draw Wall
           If distanceToWall < m_depth Then
-            Dim sampleY = (y - ceiling) / (floor - ceiling)
+            Dim sampleY = CSng((y - ceiling) / (floor - ceiling))
             Draw(x, y, m_spriteWall.SampleGlyph(sampleX, sampleY), m_spriteWall.SampleColour(sampleX, sampleY))
           Else
             Draw(x, y, PIXEL_SOLID, 0)
@@ -265,10 +265,10 @@ Class CommandLineFps
       ' Can object be seen?
       Dim vecX = obj.X - m_playerX
       Dim vecY = obj.Y - m_playerY
-      Dim distanceFromPlayer = Math.Sqrt(vecX * vecX + vecY * vecY)
+      Dim distanceFromPlayer = CSng(Math.Sqrt(vecX * vecX + vecY * vecY))
 
-      Dim eyeX = Math.Sin(m_playerA)
-      Dim eyeY = Math.Cos(m_playerA)
+      Dim eyeX = CSng(Math.Sin(m_playerA))
+      Dim eyeY = CSng(Math.Cos(m_playerA))
 
       ' Calculate angle between object and players feet, and players looking direction
       ' to determine if the object is in the players field of view
@@ -293,8 +293,8 @@ Class CommandLineFps
         ' Draw Lamp
         For lx = 0 To objectWidth - 1
           For ly = 0 To objectHeight - 1
-            Dim sampleX = lx / objectWidth
-            Dim sampleY = ly / objectHeight
+            Dim sampleX = CSng(lx / objectWidth)
+            Dim sampleY = CSng(ly / objectHeight)
             Dim c = obj.Sprite.SampleGlyph(sampleX, sampleY)
             Dim objectColumn = CInt(Fix(middleOfObject + lx - (objectWidth / 2.0)))
             If objectColumn >= 0 AndAlso objectColumn < ScreenWidth() Then

@@ -2,38 +2,37 @@
 Option Strict On
 Option Infer On
 
-Public MustInherit Class Command
+Friend MustInherit Class Command
 
   Public Sub New()
   End Sub
 
-  Public Property Started As Boolean = False
-  Public Property Completed As Boolean = False
+  Friend Property Started As Boolean = False
+  Friend Property Completed As Boolean = False
 
-  Public MustOverride Sub Start()
+  Friend MustOverride Sub Start()
 
-  Public Overridable Sub Update(elapsedTime As Single)
+  Friend Overridable Sub Update(elapsedTime As Single)
   End Sub
 
-  'Public Shared g_engine As RPG_Engine
-  Friend Shared g_engine As RPG_Main
+  Friend Shared g_engine As RPG_Engine
 
 End Class
 
-Public Class ScriptProcessor
+Friend Class ScriptProcessor
 
-  Public Sub New()
+  Friend Sub New()
   End Sub
 
-  Public Property UserControlEnabled As Boolean = False
+  Friend Property UserControlEnabled As Boolean = False
 
   Private ReadOnly m_listCommands As New List(Of Command)
 
-  Public Sub AddCommand(cmd As Command)
+  Friend Sub AddCommand(cmd As Command)
     m_listCommands.Add(cmd)
   End Sub
 
-  Public Sub ProcessCommands(fElapsedTime As Single)
+  Friend Sub ProcessCommands(fElapsedTime As Single)
 
     ' If command are available, halt user control
     UserControlEnabled = Not m_listCommands.Any
@@ -58,7 +57,7 @@ Public Class ScriptProcessor
   End Sub
 
   ' Marks currently active command as complete, from external source
-  Public Sub CompleteCommand()
+  Friend Sub CompleteCommand()
 
     If m_listCommands.Any Then
       m_listCommands(0).Completed = True
@@ -68,7 +67,7 @@ Public Class ScriptProcessor
 
 End Class
 
-Public Class Command_MoveTo
+Friend Class Command_MoveTo
   Inherits Command
 
   Private ReadOnly m_obj As Dynamic
@@ -79,7 +78,7 @@ Public Class Command_MoveTo
   Private ReadOnly m_duration As Single
   Private m_timeSoFar As Single
 
-  Public Sub New(obj As Dynamic, x As Single, y As Single, Optional duration As Single = 0.0F)
+  Friend Sub New(obj As Dynamic, x As Single, y As Single, Optional duration As Single = 0.0F)
 
     m_targetPosX = x
     m_targetPosY = y
@@ -89,12 +88,12 @@ Public Class Command_MoveTo
 
   End Sub
 
-  Public Overrides Sub Start()
+  Friend Overrides Sub Start()
     m_startPosX = m_obj.Px
     m_startPosY = m_obj.Py
   End Sub
 
-  Public Overrides Sub Update(elapsedTime As Single)
+  Friend Overrides Sub Update(elapsedTime As Single)
 
     m_timeSoFar += elapsedTime
     Dim t = m_timeSoFar / m_duration
@@ -119,53 +118,53 @@ Public Class Command_MoveTo
 
 End Class
 
-Public Class Command_ShowDialog
+Friend Class Command_ShowDialog
   Inherits Command
 
   Private ReadOnly m_lines As List(Of String)
 
-  Public Sub New(line As List(Of String))
+  Friend Sub New(line As List(Of String))
     m_lines = line
   End Sub
 
-  Public Overrides Sub Start()
+  Friend Overrides Sub Start()
     g_engine.ShowDialog(m_lines)
   End Sub
 
 End Class
 
-'Public Class Command_ChangeMap
-'  Inherits Command
+Friend Class Command_ChangeMap
+  Inherits Command
 
-'  Private ReadOnly m_mapName As String
-'  Private ReadOnly m_mapPosX As Single
-'  Private ReadOnly m_mapPosY As Single
+  Private ReadOnly m_mapName As String
+  Private ReadOnly m_mapPosX As Single
+  Private ReadOnly m_mapPosY As Single
 
-'  Public Sub New(mapName As String, mapPosX As Single, mapPosY As Single)
-'    m_mapName = mapName
-'    m_mapPosX = mapPosX
-'    m_mapPosY = mapPosY
-'  End Sub
+  Friend Sub New(mapName As String, mapPosX As Single, mapPosY As Single)
+    m_mapName = mapName
+    m_mapPosX = mapPosX
+    m_mapPosY = mapPosY
+  End Sub
 
-'  Public Overrides Sub Start()
-'    g_engine.ChangeMap(m_mapName, m_mapPosX, m_mapPosY)
-'    Completed = True
-'  End Sub
+  Friend Overrides Sub Start()
+    g_engine.ChangeMap(m_mapName, m_mapPosX, m_mapPosY)
+    Completed = True
+  End Sub
 
-'End Class
+End Class
 
-'Public Class Command_AddQuest
-'  Inherits Command
+Friend Class Command_AddQuest
+  Inherits Command
 
-'  Private ReadOnly m_quest As Quest
+  Private ReadOnly m_quest As Quest
 
-'  Public Sub New(quest As Quest)
-'    m_quest = quest
-'  End Sub
+  Friend Sub New(quest As Quest)
+    m_quest = quest
+  End Sub
 
-'  Public Overrides Sub Start()
-'    g_engine.AddQuest(m_quest)
-'    Completed = True
-'  End Sub
+  Friend Overrides Sub Start()
+    g_engine.AddQuest(m_quest)
+    Completed = True
+  End Sub
 
-'End Class
+End Class
