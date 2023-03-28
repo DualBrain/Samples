@@ -22,20 +22,20 @@ End Module
 Friend Class RacingLines
   Inherits ConsoleGameEngine.ConsoleGameEngine
 
-  Private ReadOnly path As New Spline
-  Private ReadOnly trackLeft As New Spline
-  Private ReadOnly trackRight As New Spline
-  Private ReadOnly racingLine As New Spline
+  Private ReadOnly m_path As New Spline
+  Private ReadOnly m_trackLeft As New Spline
+  Private ReadOnly m_trackRight As New Spline
+  Private ReadOnly m_racingLine As New Spline
 
-  Private ReadOnly nNodes As Integer = 20 ' Number of nodes in spline
+  Private ReadOnly m_nodes As Integer = 20 ' Number of nodes in spline
 
-  Private ReadOnly fDisplacement(19) As Single ' Displacement along spline node normal
+  Private ReadOnly m_displacement(19) As Single ' Displacement along spline node normal
 
-  Private nIterations As Integer = 1
-  Private fMarker As Single = 1.0F
-  Private nSelectedNode As Integer = -1
+  Private m_iterations As Integer = 1
+  Private m_marker As Single = 1.0F
+  Private m_selectedNode As Integer = -1
 
-  Private vecModelCar As New List(Of (Single, Single))
+  Private m_modelCar As New List(Of (Single, Single))
 
   Public Sub New()
     m_sAppName = "Racing Line"
@@ -43,24 +43,24 @@ Friend Class RacingLines
 
   Public Overrides Function OnUserCreate() As Boolean
 
-    For i = 0 To nNodes - 1
+    For i = 0 To m_nodes - 1
       ' Could use allocation functions for these now, but just size via append
-      trackLeft.Points.Add(New Point2D(0.0F, 0.0F))
-      trackRight.Points.Add(New Point2D(0.0F, 0.0F))
-      racingLine.Points.Add(New Point2D(0.0F, 0.0F))
+      m_trackLeft.Points.Add(New Point2D(0.0F, 0.0F))
+      m_trackRight.Points.Add(New Point2D(0.0F, 0.0F))
+      m_racingLine.Points.Add(New Point2D(0.0F, 0.0F))
     Next
 
     ' A hand crafted track
-    path.Points = New List(Of Point2D) From {New Point2D(81.8F, 196.0F), New Point2D(108.0F, 210.0F), New Point2D(152.0F, 216.0F),
-                                             New Point2D(182.0F, 185.6F), New Point2D(190.0F, 159.0F), New Point2D(198.0F, 122.0F), New Point2D(226.0F, 93.0F),
-                                             New Point2D(224.0F, 41.0F), New Point2D(204.0F, 15.0F), New Point2D(158.0F, 24.0F), New Point2D(146.0F, 52.0F),
-                                             New Point2D(157.0F, 93.0F), New Point2D(124.0F, 129.0F), New Point2D(83.0F, 104.0F), New Point2D(77.0F, 62.0F),
-                                             New Point2D(40.0F, 57.0F), New Point2D(21.0F, 83.0F), New Point2D(33.0F, 145.0F), New Point2D(30.0F, 198.0F),
-                                             New Point2D(48.0F, 210.0F)}
+    m_path.Points = New List(Of Point2D) From {New Point2D(81.8F, 196.0F), New Point2D(108.0F, 210.0F), New Point2D(152.0F, 216.0F),
+                                               New Point2D(182.0F, 185.6F), New Point2D(190.0F, 159.0F), New Point2D(198.0F, 122.0F), New Point2D(226.0F, 93.0F),
+                                               New Point2D(224.0F, 41.0F), New Point2D(204.0F, 15.0F), New Point2D(158.0F, 24.0F), New Point2D(146.0F, 52.0F),
+                                               New Point2D(157.0F, 93.0F), New Point2D(124.0F, 129.0F), New Point2D(83.0F, 104.0F), New Point2D(77.0F, 62.0F),
+                                               New Point2D(40.0F, 57.0F), New Point2D(21.0F, 83.0F), New Point2D(33.0F, 145.0F), New Point2D(30.0F, 198.0F),
+                                               New Point2D(48.0F, 210.0F)}
 
-    vecModelCar = New List(Of (Single, Single)) From {(2, 0), (0, -1), (0, 1)}
+    m_modelCar = New List(Of (Single, Single)) From {(2, 0), (0, -1), (0, 1)}
 
-    path.UpdateSplineProperties()
+    m_path.UpdateSplineProperties()
 
     Return True
 
@@ -73,82 +73,82 @@ Friend Class RacingLines
 
     ' Handle iteration count
     If (m_keys(AscW("A"c)).Held) Then
-      nIterations += 1
+      m_iterations += 1
     End If
     If (m_keys(AscW("S"c)).Held) Then
-      nIterations -= 1
+      m_iterations -= 1
     End If
-    If (nIterations < 0) Then
-      nIterations = 0
+    If (m_iterations < 0) Then
+      m_iterations = 0
     End If
 
     ' Check if node is selected with mouse
     If (GetMouse(0).Pressed) Then
-      For i = 0 To path.Points.Count() - 1
-        Dim d = CSng(Math.Sqrt(Math.Pow(path.Points(i).X - GetMouseX(), 2) + Math.Pow(path.Points(i).Y - GetMouseY(), 2)))
+      For i = 0 To m_path.Points.Count() - 1
+        Dim d = CSng(Math.Sqrt(Math.Pow(m_path.Points(i).X - GetMouseX(), 2) + Math.Pow(m_path.Points(i).Y - GetMouseY(), 2)))
         If (d < 5.0F) Then
-          nSelectedNode = i
+          m_selectedNode = i
           Exit For
         End If
       Next
     End If
 
     If (GetMouse(0).Released) Then
-      nSelectedNode = -1
+      m_selectedNode = -1
     End If
 
     ' Move selected node
-    If (GetMouse(0).Held AndAlso nSelectedNode >= 0) Then
-      path.Points(nSelectedNode).X = GetMouseX()
-      path.Points(nSelectedNode).Y = GetMouseY()
-      path.UpdateSplineProperties()
+    If (GetMouse(0).Held AndAlso m_selectedNode >= 0) Then
+      m_path.Points(m_selectedNode).X = GetMouseX()
+      m_path.Points(m_selectedNode).Y = GetMouseY()
+      m_path.UpdateSplineProperties()
     End If
 
     ' Move car around racing line
-    fMarker += 2.0F * elapsedTime
-    If fMarker >= racingLine.TotalSplineLength Then
-      fMarker -= racingLine.TotalSplineLength
+    m_marker += 2.0F * elapsedTime
+    If m_marker >= m_racingLine.TotalSplineLength Then
+      m_marker -= m_racingLine.TotalSplineLength
     End If
 
     ' Calculate track boundary points
-    Dim fTrackWidth = 10.0F
-    For i = 0 To path.Points.Count - 1
-      Dim p1 = path.GetSplinePoint(i)
-      Dim g1 = path.GetSplineGradient(i)
+    Dim trackWidth = 10.0F
+    For i = 0 To m_path.Points.Count - 1
+      Dim p1 = m_path.GetSplinePoint(i)
+      Dim g1 = m_path.GetSplineGradient(i)
       Dim glen = CSng(Math.Sqrt(g1.X * g1.X + g1.Y * g1.Y))
-      trackLeft.Points(i).X = p1.X + fTrackWidth * (-g1.Y / glen)
-      trackLeft.Points(i).Y = p1.Y + fTrackWidth * (g1.X / glen)
-      trackRight.Points(i).X = p1.X - fTrackWidth * (-g1.Y / glen)
-      trackRight.Points(i).Y = p1.Y - fTrackWidth * (g1.X / glen)
+      m_trackLeft.Points(i).X = p1.X + trackWidth * (-g1.Y / glen)
+      m_trackLeft.Points(i).Y = p1.Y + trackWidth * (g1.X / glen)
+      m_trackRight.Points(i).X = p1.X - trackWidth * (-g1.Y / glen)
+      m_trackRight.Points(i).Y = p1.Y - trackWidth * (g1.X / glen)
     Next
 
     ' Draw Track
-    Dim fRes = 0.2F
-    For t = 0.0F To path.Points.Count Step fRes
-      Dim pl1 = trackLeft.GetSplinePoint(t)
-      Dim pr1 = trackRight.GetSplinePoint(t)
-      Dim pl2 = trackLeft.GetSplinePoint(t + fRes)
-      Dim pr2 = trackRight.GetSplinePoint(t + fRes)
+    Dim res = 0.2F
+    For t = 0.0F To m_path.Points.Count Step res
+      Dim pl1 = m_trackLeft.GetSplinePoint(t)
+      Dim pr1 = m_trackRight.GetSplinePoint(t)
+      Dim pl2 = m_trackLeft.GetSplinePoint(t + res)
+      Dim pr2 = m_trackRight.GetSplinePoint(t + res)
       FillTriangle(pl1.X, pl1.Y, pr1.X, pr1.Y, pr2.X, pr2.Y, PIXEL_SOLID, FG_GREY)
       FillTriangle(pl1.X, pl1.Y, pl2.X, pl2.Y, pr2.X, pr2.Y, PIXEL_SOLID, FG_GREY)
     Next
 
     ' Reset racing line
-    For i = 0 To racingLine.Points.Count - 1
-      racingLine.Points(i).X = path.Points(i).X
-      racingLine.Points(i).Y = path.Points(i).Y
-      racingLine.Points(i).Length = path.Points(i).Length
-      fDisplacement(i) = 0
+    For i = 0 To m_racingLine.Points.Count - 1
+      m_racingLine.Points(i).X = m_path.Points(i).X
+      m_racingLine.Points(i).Y = m_path.Points(i).Y
+      m_racingLine.Points(i).Length = m_path.Points(i).Length
+      m_displacement(i) = 0
     Next
-    racingLine.UpdateSplineProperties()
+    m_racingLine.UpdateSplineProperties()
 
-    For n = 0 To nIterations - 1
-      For i = 0 To racingLine.Points.Count - 1
+    For n = 0 To m_iterations - 1
+      For i = 0 To m_racingLine.Points.Count - 1
 
         ' Get locations of neighbour nodes
-        Dim pointRight = racingLine.Points((i + 1) Mod racingLine.Points.Count)
-        Dim pointLeft = racingLine.Points((i + racingLine.Points.Count - 1) Mod racingLine.Points.Count)
-        Dim pointMiddle = racingLine.Points(i)
+        Dim pointRight = m_racingLine.Points((i + 1) Mod m_racingLine.Points.Count)
+        Dim pointLeft = m_racingLine.Points((i + m_racingLine.Points.Count - 1) Mod m_racingLine.Points.Count)
+        Dim pointMiddle = m_racingLine.Points(i)
 
         ' Create vectors to neighbours
         Dim vectorLeft As New Point2D(pointLeft.X - pointMiddle.X, pointLeft.Y - pointMiddle.Y)
@@ -166,7 +166,7 @@ Friend Class RacingLines
         vectorSum.X /= len : vectorSum.Y /= len
 
         ' Get point gradient and normalise
-        Dim g = path.GetSplineGradient(i)
+        Dim g = m_path.GetSplineGradient(i)
         Dim glen = CSng(Math.Sqrt(g.X * g.X + g.Y * g.Y))
         g.X /= glen : g.Y /= glen
 
@@ -174,45 +174,45 @@ Friend Class RacingLines
         Dim dp = -g.Y * vectorSum.X + g.X * vectorSum.Y
 
         ' Shortest path
-        fDisplacement(i) += dp * 0.3F
+        m_displacement(i) += dp * 0.3F
 
         ' Curvature
-        'fDisplacement((i + 1) Mod racingLine.points.Count) += dp * -0.2F
-        'fDisplacement((i - 1 + racingLine.points.Count) Mod racingLine.points.Count) += dp * -0.2F
+        'm_displacement((i + 1) Mod m_racingLine.Points.Count) += dp * -0.2F
+        'm_displacement((i - 1 + m_racingLine.Points.Count) Mod m_racingLine.Points.Count) += dp * -0.2F
 
       Next
 
       'Clamp displaced points to track width
-      For i = 0 To racingLine.Points.Count - 1
+      For i = 0 To m_racingLine.Points.Count - 1
 
-        If fDisplacement(i) >= fTrackWidth Then fDisplacement(i) = fTrackWidth
-        If fDisplacement(i) <= -fTrackWidth Then fDisplacement(i) = -fTrackWidth
+        If m_displacement(i) >= trackWidth Then m_displacement(i) = trackWidth
+        If m_displacement(i) <= -trackWidth Then m_displacement(i) = -trackWidth
 
-        Dim g = path.GetSplineGradient(i)
+        Dim g = m_path.GetSplineGradient(i)
         Dim glen = CSng(Math.Sqrt(g.X * g.X + g.Y * g.Y))
         g.X /= glen : g.Y /= glen
 
-        racingLine.Points(i).X = path.Points(i).X + -g.Y * fDisplacement(i)
-        racingLine.Points(i).Y = path.Points(i).Y + g.X * fDisplacement(i)
+        m_racingLine.Points(i).X = m_path.Points(i).X + -g.Y * m_displacement(i)
+        m_racingLine.Points(i).Y = m_path.Points(i).Y + g.X * m_displacement(i)
 
       Next
 
     Next
 
-    path.DrawSelf(Me, 0, 0)
-    'trackLeft.DrawSelf(Me, 0, 0)
-    'trackRight.DrawSelf(Me, 0, 0)
+    m_path.DrawSelf(Me, 0, 0)
+    'm_trackLeft.DrawSelf(Me, 0, 0)
+    'm_trackRight.DrawSelf(Me, 0, 0)
 
-    racingLine.UpdateSplineProperties()
-    racingLine.DrawSelf(Me, 0, 0, PIXEL_SOLID, FG_BLUE)
+    m_racingLine.UpdateSplineProperties()
+    m_racingLine.DrawSelf(Me, 0, 0, PIXEL_SOLID, FG_BLUE)
 
-    For Each i In path.Points
+    For Each i In m_path.Points
       Fill(i.X - 1, i.Y - 1, i.X + 2, i.Y + 2, PIXEL_SOLID, FG_RED)
     Next
 
-    Dim car_p = racingLine.GetSplinePoint(fMarker)
-    Dim car_g = racingLine.GetSplineGradient(fMarker)
-    DrawWireFrameModel(vecModelCar, car_p.X, car_p.Y, CSng(Math.Atan2(car_g.Y, car_g.X)), 4.0F, FG_BLACK)
+    Dim car_p = m_racingLine.GetSplinePoint(m_marker)
+    Dim car_g = m_racingLine.GetSplineGradient(m_marker)
+    DrawWireFrameModel(m_modelCar, car_p.X, car_p.Y, CSng(Math.Atan2(car_g.Y, car_g.X)), 4.0F, FG_BLACK)
 
     Return True
 
