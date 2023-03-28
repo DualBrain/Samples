@@ -86,7 +86,7 @@ Public Class Sprite
   Public Property Width As Integer
   Public Property Height As Integer
 
-  Private m_glyphs() As Char
+  Private m_glyphs() As Integer
   Private m_colours() As Colour
 
   Private Sub Create(w As Integer, h As Integer)
@@ -95,7 +95,7 @@ Public Class Sprite
     ReDim m_glyphs(w * h)
     ReDim m_colours(w * h)
     For i = 0 To (w * h) - 1
-      m_glyphs(i) = " "c
+      m_glyphs(i) = 32 '" "c
       m_colours(i) = Colour.BG_BLACK
     Next
   End Sub
@@ -104,7 +104,7 @@ Public Class Sprite
     If x < 0 OrElse x >= Width OrElse y < 0 OrElse y >= Height Then
       Return
     Else
-      m_glyphs(y * Width + x) = ChrW(c)
+      m_glyphs(y * Width + x) = c ' ChrW(c)
     End If
   End Sub
 
@@ -116,9 +116,9 @@ Public Class Sprite
     End If
   End Sub
 
-  Public Function GetGlyph(x As Integer, y As Integer) As Char
+  Public Function GetGlyph(x As Integer, y As Integer) As Integer
     If x < 0 OrElse x >= Width OrElse y < 0 OrElse y >= Height Then
-      Return " "c
+      Return 32 '" "c
     Else
       Return m_glyphs(y * Width + x)
     End If
@@ -139,7 +139,7 @@ Public Class Sprite
     If sx < 0 OrElse sx >= Width OrElse sy < 0 OrElse sy >= Height Then
       Return AscW(" "c)
     Else
-      Return AscW(m_glyphs(sy * Width + sx))
+      Return m_glyphs(sy * Width + sx) 'AscW(m_glyphs(sy * Width + sx))
     End If
   End Function
 
@@ -167,7 +167,8 @@ Public Class Sprite
           bw.Write(m_colours(i))
         Next
         For i As Integer = 0 To (Width * Height) - 1
-          bw.Write(CShort(AscW(m_glyphs(i))))
+          'bw.Write(CShort(AscW(m_glyphs(i))))
+          bw.Write(m_glyphs(i))
         Next
       End Using
 
@@ -201,7 +202,7 @@ Public Class Sprite
           m_colours(i) = CType(br.ReadInt16(), Colour)
         Next
         For i As Integer = 0 To (Width * Height) - 1
-          m_glyphs(i) = BitConverter.ToChar(BitConverter.GetBytes(br.ReadInt16), 0)
+          m_glyphs(i) = AscW(BitConverter.ToChar(BitConverter.GetBytes(br.ReadInt16), 0))
         Next
 
       End Using
@@ -219,6 +220,8 @@ End Class
 Public MustInherit Class ConsoleGameEngine
 
 #Region "Win32"
+
+  Public Const MAX_PATH As Integer = 260
 
   ' Structure for a KEY_EVENT_RECORD
   <StructLayout(LayoutKind.Sequential)>
@@ -381,9 +384,11 @@ Public MustInherit Class ConsoleGameEngine
 
 #Region "VK"
 
+  Public Const VK_BACK As Integer = &H8
   Public Const VK_TAB As Integer = &H9
   Public Const VK_SHIFT As Integer = &H10
   Public Const VK_CONTROL As Integer = &H11
+  Public Const VK_ESCAPE As Integer = &H1B
   Public Const VK_SPACE As Integer = &H20
   Public Const VK_LEFT As Integer = &H25
   Public Const VK_RIGHT As Integer = &H27
@@ -392,6 +397,16 @@ Public MustInherit Class ConsoleGameEngine
   Public Const VK_PRIOR As Integer = &H21
   Public Const VK_NEXT As Integer = &H22
   Public Const VK_DELETE As Integer = &H2E
+  Public Const VK_NUMPAD0 As Integer = &H60
+  Public Const VK_NUMPAD1 As Integer = &H61
+  Public Const VK_NUMPAD2 As Integer = &H62
+  Public Const VK_NUMPAD3 As Integer = &H63
+  Public Const VK_NUMPAD4 As Integer = &H64
+  Public Const VK_NUMPAD5 As Integer = &H65
+  Public Const VK_NUMPAD6 As Integer = &H66
+  Public Const VK_NUMPAD7 As Integer = &H67
+  Public Const VK_NUMPAD8 As Integer = &H68
+  Public Const VK_NUMPAD9 As Integer = &H69
   Public Const VK_F1 As Integer = &H70
   Public Const VK_F2 As Integer = &H71
   Public Const VK_F3 As Integer = &H72
@@ -472,6 +487,14 @@ Public MustInherit Class ConsoleGameEngine
     m_sAppName = "Default"
 
   End Sub
+
+  Public Function GetKey(nKeyID As String) As sKeyState
+    Return m_keys(AscW(nKeyID))
+  End Function
+
+  Public Function GetKey(nKeyID As Char) As sKeyState
+    Return m_keys(AscW(nKeyID))
+  End Function
 
   Public Function GetKey(nKeyID As Integer) As sKeyState
     Return m_keys(nKeyID)
@@ -656,12 +679,12 @@ Public MustInherit Class ConsoleGameEngine
     Fill(0, 0, ScreenWidth, ScreenHeight, AscW(" "), Colour.FG_BLACK)
   End Sub
 
-  Public Sub Fill(x1 As Double, y1 As Double, x2 As Double, y2 As Double, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
-    Fill(CInt(x1), CInt(y1), CInt(x2), CInt(y2), c, col)
+  Public Sub Fill(x1 As Double, y1 As Double, x2 As Double, y2 As Double, c As Char, Optional col As Integer = &HFS)
+    Fill(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), AscW(c), col)
   End Sub
 
-  Public Sub Fill(x1 As Short, y1 As Short, x2 As Short, y2 As Short, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
-    Fill(CInt(x1), CInt(y1), CInt(x2), CInt(y2), c, col)
+  Public Sub Fill(x1 As Double, y1 As Double, x2 As Double, y2 As Double, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
+    Fill(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), c, col)
   End Sub
 
   Public Sub Fill(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
@@ -919,8 +942,9 @@ next2:
     End If
     For i As Integer = 0 To sprite.Width - 1
       For j As Integer = 0 To sprite.Height - 1
-        If sprite.GetGlyph(i, j) <> " "c Then
-          Draw(x + i, y + j, AscW(sprite.GetGlyph(i, j)), sprite.GetColour(i, j))
+        If sprite.GetGlyph(i, j) <> 32 Then '" "c Then
+          'Draw(x + i, y + j, AscW(sprite.GetGlyph(i, j)), sprite.GetColour(i, j))
+          Draw(x + i, y + j, sprite.GetGlyph(i, j), sprite.GetColour(i, j))
         End If
       Next
     Next
@@ -936,8 +960,9 @@ next2:
     End If
     For i = 0 To w - 1
       For j = 0 To h - 1
-        If sprite.GetGlyph(i + ox, j + oy) <> " "c Then
-          Draw(x + i, y + j, AscW(sprite.GetGlyph(i + ox, j + oy)), sprite.GetColour(i + ox, j + oy))
+        If sprite.GetGlyph(i + ox, j + oy) <> 32 Then '" "c Then
+          'Draw(x + i, y + j, AscW(sprite.GetGlyph(i + ox, j + oy)), sprite.GetColour(i + ox, j + oy))
+          Draw(x + i, y + j, sprite.GetGlyph(i + ox, j + oy), sprite.GetColour(i + ox, j + oy))
         End If
       Next
     Next

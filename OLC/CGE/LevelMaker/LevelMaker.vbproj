@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>LevelMaker</RootNamespace>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="javidx9_nesfont8x8.spr" />
+    <None Remove="loztheme.spr" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="javidx9_nesfont8x8.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="loztheme.spr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConsoleGameEngine\ConsoleGameEngine.vbproj" />
+  </ItemGroup>
+
+</Project>
