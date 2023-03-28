@@ -789,66 +789,92 @@ Public MustInherit Class ConsoleGameEngine
     End If
   End Sub
 
-  Private Sub DrawTriangle(ByVal x1 As Integer, ByVal y1 As Integer, ByVal x2 As Integer, ByVal y2 As Integer, ByVal x3 As Integer, ByVal y3 As Integer, Optional ByVal c As Short = &H2588, Optional ByVal col As Short = &HF)
-    DrawLine(x1, y1, x2, y2, c, col)
-    DrawLine(x2, y2, x3, y3, c, col)
-    DrawLine(x3, y3, x1, y1, c, col)
+  Public Sub DrawTriangle(x1 As Single, y1 As Single, x2 As Single, y2 As Single, x3 As Single, y3 As Single, Optional c As Integer = &H2588, Optional col As Integer = &HF)
+    DrawTriangle(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), CInt(Fix(x3)), CInt(Fix(y3)), c, col)
   End Sub
 
-  Private Shared Sub SWAP(ByRef x As Integer, ByRef y As Integer)
+  Public Sub DrawTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, Optional c As Integer = &H2588, Optional col As Integer = &HF)
+    If col = -1 Then
+      DrawLine(x1, y1, x2, y2, c, Colour.FG_RED)
+      DrawLine(x2, y2, x3, y3, c, Colour.FG_BLACK)
+      DrawLine(x3, y3, x1, y1, c, Colour.FG_BLUE)
+    Else
+      DrawLine(x1, y1, x2, y2, c, col)
+      DrawLine(x2, y2, x3, y3, c, col)
+      DrawLine(x3, y3, x1, y1, c, col)
+    End If
+  End Sub
+
+  Private Shared Sub Swap(ByRef x As Integer, ByRef y As Integer)
     Dim t = x
     x = y
     y = t
   End Sub
 
-  Public Sub FillTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, Optional c As Short = &H2588, Optional col As Short = &HF)
+  Public Sub FillTriangle(x1 As Single, y1 As Single, x2 As Single, y2 As Single, x3 As Single, y3 As Single, Optional c As Integer = &H2588, Optional col As Integer = &HF)
+    FillTriangle(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), CInt(Fix(x3)), CInt(Fix(y3)), c, col)
+  End Sub
 
-    Dim drawline As Action(Of Integer, Integer, Integer) = Sub(sx As Integer, ex As Integer, ny As Integer)
-                                                             For i As Integer = sx To ex
+  ' https://www.avrfreaks.net/sites/default/files/triangles.c
+  Public Sub FillTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, Optional c As Integer = &H2588, Optional col As Integer = &HF)
+
+    ' Refactored to be a private shared function due to the byref need on the params.
+    'Dim swap As Action(Of Integer, Integer) = Sub(ByRef x As Integer, ByRef y As Integer)
+    '                                            Dim t As Integer = x
+    '                                            x = y
+    '                                            y = t
+    '                                          End Sub
+
+    Dim drawLine As Action(Of Integer, Integer, Integer) = Sub(sx As Integer, ex As Integer, ny As Integer)
+                                                             For i = sx To ex
                                                                Draw(i, ny, c, col)
                                                              Next
                                                            End Sub
 
     Dim t1x, t2x, y, minx, maxx, t1xp, t2xp As Integer
-    Dim changed1 As Boolean = False
-    Dim changed2 As Boolean = False
+    Dim changed1 = False
+    Dim changed2 = False
     Dim signx1, signx2, dx1, dy1, dx2, dy2 As Integer
     Dim e1, e2 As Integer
+
     ' Sort vertices
-    If y1 > y2 Then SWAP(y1, y2) : SWAP(x1, x2)
-    If y1 > y3 Then SWAP(y1, y3) : SWAP(x1, x3)
-    If y2 > y3 Then SWAP(y2, y3) : SWAP(x2, x3)
+    If y1 > y2 Then Swap(y1, y2) : Swap(x1, x2)
+    If y1 > y3 Then Swap(y1, y3) : Swap(x1, x3)
+    If y2 > y3 Then Swap(y2, y3) : Swap(x2, x3)
 
     t1x = x1 : t2x = x1 : y = y1 ' Starting points
-    dx1 = Math.Abs(x2 - x1) : If dx1 < 0 Then dx1 = -dx1 : signx1 = -1 Else signx1 = 1
-    dy1 = Math.Abs(y2 - y1)
-    dx2 = Math.Abs(x3 - x1) : If dx2 < 0 Then dx2 = -dx2 : signx2 = -1 Else signx2 = 1
-    dy2 = Math.Abs(y3 - y1)
+    dx1 = x2 - x1
+    If dx1 < 0 Then dx1 = -dx1 : signx1 = -1 Else signx1 = 1
+    dy1 = y2 - y1
+
+    dx2 = x3 - x1
+    If dx2 < 0 Then dx2 = -dx2 : signx2 = -1 Else signx2 = 1
+    dy2 = y3 - y1
 
     If dy1 > dx1 Then ' swap values
-      SWAP(dx1, dy1)
+      Swap(dx1, dy1)
       changed1 = True
     End If
     If dy2 > dx2 Then ' swap values
-      SWAP(dy2, dx2)
+      Swap(dy2, dx2)
       changed2 = True
     End If
 
-    e2 = CInt(dx2 \ 2)
+    e2 = dx2 >> 1
     ' Flat top, just process the second half
-    'If y1 = y2 Then GoTo [next]
-    e1 = CInt(dx1 \ 2)
+    If y1 = y2 Then GoTo nextx
+    e1 = dx1 >> 1
 
-    For i As Integer = 0 To dx1 - 1
+    For i = 0 To dx1 - 1
       t1xp = 0 : t2xp = 0
       If t1x < t2x Then minx = t1x : maxx = t2x Else minx = t2x : maxx = t1x
       ' process first line until y value is about to change
       While i < dx1
-        i += 1
+        'i += 1 <------------------- really don't understand why this was here????!!!???
         e1 += dy1
         While e1 >= dx1
           e1 -= dx1
-          If changed1 Then t1xp = signx1 Else GoTo next1 't1x += signx1;
+          If changed1 Then t1xp = signx1 Else GoTo next1 ' t1x += signx1;
         End While
         If changed1 Then Exit While Else t1x += signx1
       End While
@@ -859,19 +885,78 @@ next1:
         e2 += dy2
         While e2 >= dx2
           e2 -= dx2
-          If changed2 Then t2xp = signx2 Else GoTo next2 't2x += signx2;
+          If changed2 Then t2xp = signx2 Else GoTo next2 ' t2x += signx2
         End While
         If changed2 Then Exit While Else t2x += signx2
       End While
 next2:
-      If minx > t1x Then minx = t1x : If minx > t2x Then minx = t2x
-      If maxx < t1x Then maxx = t1x : If maxx < t2x Then maxx = t2x
-      drawline(minx, maxx, y) ' Draw line from min to max points found on current y level
-      If Not changed1 Then t1x += signx1 ' Move endpoint 1 to next position
+      If minx > t1x Then minx = t1x
+      If minx > t2x Then minx = t2x
+      If maxx < t1x Then maxx = t1x
+      If maxx < t2x Then maxx = t2x
+      drawLine(minx, maxx, y) ' Draw line from min to max points found on the y; now increase y
+      If Not changed1 Then t1x += signx1
       t1x += t1xp
-      If Not changed2 Then t2x += signx2 ' Move endpoint 2 to next position
+      If Not changed2 Then t2x += signx2
       t2x += t2xp
+      y += 1
+      If y = y2 Then Exit For
     Next
+nextx:
+    ' Second half
+    dx1 = x3 - x2
+    If dx1 < 0 Then dx1 = -dx1 : signx1 = -1 Else signx1 = 1
+    dy1 = y3 - y2
+    t1x = x2
+
+    If dy1 > dx1 Then   ' swap values
+      Swap(dy1, dx1)
+      changed1 = True
+    Else
+      changed1 = False
+    End If
+
+    e1 = dx1 >> 1
+
+    For i = 0 To dx1 - 1
+      t1xp = 0 : t2xp = 0
+      If t1x < t2x Then minx = t1x : maxx = t2x Else minx = t2x : maxx = t1x
+      ' process first line until y value is about to change
+      While i < dx1
+        e1 += dy1
+        While e1 >= dx1
+          e1 -= dx1
+          If changed1 Then t1xp = signx1 : Exit While Else GoTo next3 ' t1x += signx1
+        End While
+        If changed1 Then Exit While Else t1x += signx1
+        If i < dx1 Then i += 1
+      End While
+next3:
+      ' process second line until y value is about to change
+      While t2x <> x3
+        e2 += dy2
+        While e2 >= dx2
+          e2 -= dx2
+          If changed2 Then t2xp = signx2 Else GoTo next4
+        End While
+        If changed2 Then Exit While Else t2x += signx2
+      End While
+next4:
+      If minx > t1x Then minx = t1x
+      If minx > t2x Then minx = t2x
+      If maxx < t1x Then maxx = t1x
+      If maxx < t2x Then maxx = t2x
+      drawLine(minx, maxx, y)
+      If Not changed1 Then t1x += signx1
+      t1x += t1xp
+      If Not changed2 Then t2x += signx2
+      t2x += t2xp
+      y += 1
+      If y > y3 Then
+        Return
+      End If
+    Next
+
   End Sub
 
   Public Sub DrawCircle(xc As Single, yc As Single, r As Single, Optional c As Integer = &H2588, Optional col As Integer = &HF)

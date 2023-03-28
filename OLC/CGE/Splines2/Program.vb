@@ -134,7 +134,7 @@ Class Spline
       p3 = p2 + 1
       p0 = p1 - 1
     Else
-      p1 = CInt(Fix(t))
+      p1 = CInt(Fix(t)) Mod Points.Count
       p2 = (p1 + 1) Mod Points.Count
       p3 = (p2 + 1) Mod Points.Count
       p0 = If(p1 >= 1, p1 - 1, Points.Count - 1)
@@ -166,7 +166,7 @@ Class Spline
       p3 = p2 + 1
       p0 = p1 - 1
     Else
-      p1 = CInt(Fix(t))
+      p1 = CInt(Fix(t)) Mod Points.Count
       p2 = (p1 + 1) Mod Points.Count
       p3 = (p2 + 1) Mod Points.Count
       p0 = If(p1 >= 1, p1 - 1, Points.Count - 1)
@@ -177,7 +177,7 @@ Class Spline
     Dim tt = t * t
     Dim ttt = tt * t
 
-    Dim q1 = -3.0F * tt + 4.0F * t - 1
+    Dim q1 = -3.0F * tt + 4.0F * t - 1.0F
     Dim q2 = 9.0F * tt - 10.0F * t
     Dim q3 = -9.0F * tt + 8.0F * t + 1.0F
     Dim q4 = 3.0F * tt - 2.0F * t
@@ -197,7 +197,7 @@ Class Spline
 
     oldPoint = GetSplinePoint(node, looped)
 
-    For t = 0 To 1 - stepSize Step stepSize
+    For t = 0 To 1.0F - stepSize Step stepSize
       newPoint = GetSplinePoint(node + t, looped)
       length += Math.Sqrt((newPoint.X - oldPoint.X) * (newPoint.X - oldPoint.X) + (newPoint.Y - oldPoint.Y) * (newPoint.Y - oldPoint.Y))
       oldPoint = newPoint
