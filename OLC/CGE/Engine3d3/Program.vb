@@ -12,7 +12,6 @@ Option Infer On
 Imports ConsoleGameEngine.PIXEL_TYPE
 Imports ConsoleGameEngine.Colour
 Imports ConsoleGameEngine
-Imports System.IO
 
 Module Program
 
@@ -28,11 +27,11 @@ Class Engine3d
   Inherits ConsoleGameEngine.ConsoleGameEngine
 
   Private ReadOnly meshCube As New Mesh
-  Private matProj As New Mat4x4
-
-  Private ReadOnly vCamera As New Vec3d
-
-  Private fTheta As Single
+  Private matProj As New Mat4x4 ' Matrix that converts from view space to screen space
+  Private vCamera As New Vec3d ' Location of camera in the world space
+  Private vLookDir As New Vec3d ' Direction vector along the direction camera points
+  Private fYaw As Single ' FPS Camera rotation in XZ plane
+  Private fTheta As Single ' Spins World transform
 
   Public Sub New()
     m_sAppName = "3D Demo"
@@ -52,92 +51,142 @@ Class Engine3d
 
   Public Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
-    ' Clear Screen
-    Fill(0, 0, ScreenWidth(), ScreenHeight(), PIXEL_SOLID, FG_BLACK)
+    If (GetKey(VK_UP).Held) Then vCamera.Y += 8.0F * elapsedTime ' Travel Upwards
+    If (GetKey(VK_DOWN).Held) Then vCamera.Y -= 8.0F * elapsedTime ' Travel Downwards
 
-    fTheta += 1.0F * elapsedTime ' Uncomment to spin me right round baby right round
+    ' Dont use these two in FPS mode, it is confusing :P
+    If (GetKey(VK_LEFT).Held) Then vCamera.X -= 8.0F * elapsedTime ' Travel Along X-Axis
+    If (GetKey(VK_RIGHT).Held) Then vCamera.X += 8.0F * elapsedTime ' Travel Along X-Axis
+    '///////
 
-    ' Set up rotation matrices
+    Dim vForward = Vector_Mul(vLookDir, 8.0F * elapsedTime)
 
+    ' Standard FPS Control scheme, but turn instead of strafe
+    If (GetKey(AscW("W"c)).Held) Then vCamera = Vector_Add(vCamera, vForward)
+    If (GetKey(AscW("S"c)).Held) Then vCamera = Vector_Sub(vCamera, vForward)
+    If (GetKey(AscW("A"c)).Held) Then fYaw -= 2.0F * elapsedTime
+    If (GetKey(AscW("D"c)).Held) Then fYaw += 2.0F * elapsedTime
+
+    ' Set up "World Tranmsform" though not updating theta 
+    ' makes this a bit redundant
+    'fTheta += 1.0F * elapsedTime ' Uncomment to spin me right round baby right round
     Dim matRotZ = Matrix_MakeRotationZ(fTheta * 0.5F)
     Dim matRotX = Matrix_MakeRotationX(fTheta)
 
-    Dim matTrans = Matrix_MakeTranslation(0.0F, 0.0F, 8.0F) ' Modify Z for "zoom"...
+    Dim matTrans = Matrix_MakeTranslation(0.0F, 0.0F, 5.0F)
 
-    Dim matWorld = Matrix_MakeIdentity()
-    matWorld = Matrix_MultiplyMatrix(matRotZ, matRotX)
-    matWorld = Matrix_MultiplyMatrix(matWorld, matTrans)
+    Dim matWorld = Matrix_MakeIdentity() ' Form World Matrix
+    matWorld = Matrix_MultiplyMatrix(matRotZ, matRotX) ' Transform by rotation
+    matWorld = Matrix_MultiplyMatrix(matWorld, matTrans) ' Transform by translation
 
-    ' Store triangles for rasterizing later
-    Dim vecTrianglesToRaster As New List(Of Triangle)
+    ' Create "Point At" Matrix for camera
+    Dim vUp = New Vec3d(0, 1, 0)
+    Dim vTarget = New Vec3d(0, 0, 1)
+    Dim matCameraRot = Matrix_MakeRotationY(fYaw)
+    vLookDir = Matrix_MultiplyVector(matCameraRot, vTarget)
+    vTarget = Vector_Add(vCamera, vLookDir)
+    Dim matCamera = Matrix_PointAt(vCamera, vTarget, vUp)
+
+    ' Make view matrix from camera
+    Dim matView = Matrix_QuickInverse(matCamera)
+
+    ' Store triagles for rastering later
+    Dim vecTrianglesToRaster = New List(Of Triangle)()
 
     ' Draw Triangles
     For Each tri In meshCube.Tris
 
-      Dim triProjected, triTransformed As New Triangle
+      Dim triProjected, triTransformed, triViewed As New Triangle
 
+      ' World Matrix Transform
       triTransformed.P(0) = Matrix_MultiplyVector(matWorld, tri.P(0))
       triTransformed.P(1) = Matrix_MultiplyVector(matWorld, tri.P(1))
       triTransformed.P(2) = Matrix_MultiplyVector(matWorld, tri.P(2))
 
       ' Calculate triangle Normal
+      Dim normal, line1, line2 As Vec3d
 
       ' Get lines either side of triangle
-      Dim line1 = Vector_Sub(triTransformed.P(1), triTransformed.P(0))
-      Dim line2 = Vector_Sub(triTransformed.P(2), triTransformed.P(0))
+      line1 = Vector_Sub(triTransformed.P(1), triTransformed.P(0))
+      line2 = Vector_Sub(triTransformed.P(2), triTransformed.P(0))
 
       ' Take cross product of lines to get normal to triangle surface
-      Dim normal = Vector_CrossProduct(line1, line2)
+      normal = Vector_CrossProduct(line1, line2)
 
-      ' It's normally normal to normalise the normal
-      Dim l = CSng(Math.Sqrt(normal.X * normal.X + normal.Y * normal.Y + normal.Z * normal.Z))
-      normal.X /= l : normal.Y /= l : normal.Z /= l
+      ' You normally need to normalise a normal!
+      normal = Vector_Normalise(normal)
 
       ' Get Ray from triangle to camera
-      Dim vCameraRay = Vector_Sub(triTransformed.P(0), vCamera)
+      Dim vCameraRay As Vec3d = Vector_Sub(triTransformed.P(0), vCamera)
 
       ' If ray is aligned with normal, then triangle is visible
       If Vector_DotProduct(normal, vCameraRay) < 0.0F Then
-
-        'Illumination
-        Dim light_direction As New Vec3d(0.0F, 0.0F, -1.0F)
+        ' Illumination
+        Dim light_direction As New Vec3d(0.0F, 1.0F, -1.0F)
         light_direction = Vector_Normalise(light_direction)
 
-        'How "aligned" are light direction and triangle surface normal?
-        Dim dp = Single.Max(0.1F, Vector_DotProduct(light_direction, normal))
-        'Choose console colours as required (much easier with RGB)
-        Dim c = GetColour(dp)
-        tritransformed.col = c.Attributes
-        triTransformed.sym = c.Ch '.UnicodeChar
+        ' How "aligned" are light direction and triangle surface normal?
+        Dim dp = Math.Max(0.1F, Vector_DotProduct(light_direction, normal))
 
-        'Project triangles from 3D --> 2D
-        triProjected.P(0) = Matrix_MultiplyVector(matProj, triTransformed.P(0))
-        triProjected.P(1) = Matrix_MultiplyVector(matProj, triTransformed.P(1))
-        triProjected.P(2) = Matrix_MultiplyVector(matProj, triTransformed.P(2))
-        triProjected.col = triTransformed.col
-        triProjected.sym = triTransformed.sym
+        ' Choose console colours as required (much easier with RGB)
+        Dim c As CHAR_INFO = GetColour(dp)
+        triTransformed.col = c.Attributes
+        triTransformed.sym = c.Ch
 
-        ' Scale into view, we moved the normalizing into cartesian space
-        ' out of the matrix.vector function from the previous videos, so
-        ' do this manually
-        triProjected.P(0) = Vector_Div(triProjected.P(0), triProjected.P(0).W)
-        triProjected.P(1) = Vector_Div(triProjected.P(1), triProjected.P(1).W)
-        triProjected.P(2) = Vector_Div(triProjected.P(2), triProjected.P(2).W)
+        ' Convert World Space --> View Space
+        triViewed.P(0) = Matrix_MultiplyVector(matView, triTransformed.P(0))
+        triViewed.P(1) = Matrix_MultiplyVector(matView, triTransformed.P(1))
+        triViewed.P(2) = Matrix_MultiplyVector(matView, triTransformed.P(2))
+        triViewed.sym = triTransformed.sym
+        triViewed.col = triTransformed.col
 
-        ' Offset verts into visible normalized space
-        Dim vOffsetView = New Vec3d(1, 1, 0)
-        triProjected.P(0) = Vector_Add(triProjected.P(0), vOffsetView)
-        triProjected.P(1) = Vector_Add(triProjected.P(1), vOffsetView)
-        triProjected.P(2) = Vector_Add(triProjected.P(2), vOffsetView)
-        triProjected.P(0).X *= 0.5F * ScreenWidth()
-        triProjected.P(0).Y *= 0.5F * ScreenHeight()
-        triProjected.P(1).X *= 0.5F * ScreenWidth()
-        triProjected.P(1).Y *= 0.5F * ScreenHeight()
-        triProjected.P(2).X *= 0.5F * ScreenWidth()
-        triProjected.P(2).Y *= 0.5F * ScreenHeight()
+        ' Clip Viewed Triangle against near plane, this could form two additional
+        ' additional triangles. 
+        Dim clipped(1) As Triangle : clipped(0) = New Triangle : clipped(1) = New Triangle
+        Dim nClippedTriangles = Triangle_ClipAgainstPlane(New Vec3d(0.0F, 0.0F, 0.1F), New Vec3d(0.0F, 0.0F, 1.0F), triViewed, clipped(0), clipped(1))
 
-        'Store triangle for sorting
-        vecTrianglesToRaster.Add(triProjected)
+        ' We may end up with multiple triangles form the clip, so project as
+        ' required
+        For n = 0 To nClippedTriangles - 1
+
+          ' Project triangles from 3D --> 2D
+          triProjected.P(0) = Matrix_MultiplyVector(matProj, clipped(n).P(0))
+          triProjected.P(1) = Matrix_MultiplyVector(matProj, clipped(n).P(1))
+          triProjected.P(2) = Matrix_MultiplyVector(matProj, clipped(n).P(2))
+          triProjected.col = clipped(n).col
+          triProjected.sym = clipped(n).sym
+
+          ' Scale into view, we moved the normalising into cartesian space
+          ' out of the matrix.vector function from the previous videos, so
+          ' do this manually
+          triProjected.P(0) = Vector_Div(triProjected.P(0), triProjected.P(0).W)
+          triProjected.P(1) = Vector_Div(triProjected.P(1), triProjected.P(1).W)
+          triProjected.P(2) = Vector_Div(triProjected.P(2), triProjected.P(2).W)
+
+          ' X/Y are inverted so put them back
+          triProjected.P(0).X *= -1.0F
+          triProjected.P(1).X *= -1.0F
+          triProjected.P(2).X *= -1.0F
+          triProjected.P(0).Y *= -1.0F
+          triProjected.P(1).Y *= -1.0F
+          triProjected.P(2).Y *= -1.0F
+
+          ' Offset verts into visible normalised space
+          Dim vOffsetView = New Vec3d(1, 1, 0)
+          triProjected.P(0) = Vector_Add(triProjected.P(0), vOffsetView)
+          triProjected.P(1) = Vector_Add(triProjected.P(1), vOffsetView)
+          triProjected.P(2) = Vector_Add(triProjected.P(2), vOffsetView)
+          triProjected.P(0).X *= 0.5F * CSng(ScreenWidth())
+          triProjected.P(0).Y *= 0.5F * CSng(ScreenHeight())
+          triProjected.P(1).X *= 0.5F * CSng(ScreenWidth())
+          triProjected.P(1).Y *= 0.5F * CSng(ScreenHeight())
+          triProjected.P(2).X *= 0.5F * CSng(ScreenWidth())
+          triProjected.P(2).Y *= 0.5F * CSng(ScreenHeight())
+
+          ' Store triangle for sorting
+          vecTrianglesToRaster.Add(triProjected)
+
+        Next
 
       End If
 
@@ -146,19 +195,62 @@ Class Engine3d
     ' Sort triangles from back to front
     vecTrianglesToRaster.Sort(New TriangleComparer)
 
-    For Each triProjected In vecTrianglesToRaster
+    ' Clear Screen
+    Fill(0, 0, ScreenWidth(), ScreenHeight(), PIXEL_SOLID, FG_BLACK)
 
-      ' Rasterize triangle
-      FillTriangle(triProjected.P(0).X, triProjected.P(0).Y,
-                   triProjected.P(1).X, triProjected.P(1).Y,
-                   triProjected.P(2).X, triProjected.P(2).Y,
-                   triProjected.sym, triProjected.col)
+    ' Loop through all transformed, viewed, projected, and sorted triangles
+    For Each triToRaster In vecTrianglesToRaster
 
-      'DrawTriangle(triProjected.P(0).X, triProjected.P(0).Y,
-      '             triProjected.P(1).X, triProjected.P(1).Y,
-      '             triProjected.P(2).X, triProjected.P(2).Y,
-      '             PIXEL_SOLID, FG_BLACK)
+      ' Clip triangles against all four screen edges, this could yield
+      ' a bunch of triangles, so create a queue that we traverse to 
+      ' ensure we only test new triangles generated against planes
+      Dim clipped(1) As Triangle : clipped(0) = New Triangle :: clipped(1) = New Triangle
 
+      ' Add initial triangle
+      Dim listTriangles As New List(Of Triangle) From {triToRaster}
+      Dim nNewTriangles = 1
+
+      For p = 0 To 3
+
+        Dim nTrisToAdd = 0
+
+        While nNewTriangles > 0
+
+          ' Take triangle from front of queue
+          Dim test = listTriangles(0)
+          listTriangles.RemoveAt(0)
+          nNewTriangles -= 1
+
+          ' Clip it against a plane. We only need to test each 
+          ' subsequent plane, against subsequent new triangles
+          ' as all triangles after a plane clip are guaranteed
+          ' to lie on the inside of the plane. I like how this
+          ' comment is almost completely and utterly justified
+          Select Case p
+            Case 0 : nTrisToAdd = Triangle_ClipAgainstPlane(New Vec3d(0.0F, 0.0F, 0.0F), New Vec3d(0.0F, 1.0F, 0.0F), test, clipped(0), clipped(1))
+            Case 1 : nTrisToAdd = Triangle_ClipAgainstPlane(New Vec3d(0.0F, ScreenHeight() - 1, 0.0F), New Vec3d(0.0F, -1.0F, 0.0F), test, clipped(0), clipped(1))
+            Case 2 : nTrisToAdd = Triangle_ClipAgainstPlane(New Vec3d(0.0F, 0.0F, 0.0F), New Vec3d(1.0F, 0.0F, 0.0F), test, clipped(0), clipped(1))
+            Case 3 : nTrisToAdd = Triangle_ClipAgainstPlane(New Vec3d(ScreenWidth() - 1, 0.0F, 0.0F), New Vec3d(-1.0F, 0.0F, 0.0F), test, clipped(0), clipped(1))
+          End Select
+
+          ' Clipping may yield a variable number of triangles, so
+          ' add these new ones to the back of the queue for subsequent
+          ' clipping against next planes
+          For w = 0 To nTrisToAdd - 1
+            listTriangles.Add(clipped(w))
+          Next
+
+        End While
+
+        nNewTriangles = listTriangles.Count
+
+      Next
+
+      ' Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
+      For Each t In listTriangles
+        FillTriangle(t.P(0).X, t.P(0).Y, t.P(1).X, t.P(1).Y, t.P(2).X, t.P(2).Y, t.sym, t.col)
+        'DrawTriangle(t.P(0).X, t.P(0).Y, t.P(1).X, t.P(1).Y, t.P(2).X, t.P(2).Y, PIXEL_SOLID, FG_BLACK);
+      Next
     Next
 
     Return True
@@ -595,7 +687,7 @@ Friend Class Mesh
 
   Public Function LoadFromObjectFile(sFilename As String) As Boolean
 
-    Dim f = New StreamReader(sFilename)
+    Dim f = New IO.StreamReader(sFilename)
 
     If f Is Nothing Then Return False
 
