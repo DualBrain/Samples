@@ -23,15 +23,15 @@ Class Splines2
 
   Private m_path As New Spline
   Private m_selectedPoint As Integer
-  Private m_marker As Double
+  Private m_marker As Single
 
   Private m_modelCar As List(Of (Single, Single))
 
   Public Overrides Function OnUserCreate() As Boolean
 
     For i = 0 To 9
-      m_path.Points.Add(New Point2D(30 * Math.Sin(i / 10 * 3.14159 * 2) + ScreenWidth() / 2,
-                                       30 * Math.Cos(i / 10 * 3.14159 * 2) + ScreenHeight() / 2))
+      m_path.Points.Add(New Point2D(30.0F * CSng(Math.Sin(i / 10.0F * 3.14159F * 2.0F)) + ScreenWidth() / 2.0F,
+                                         30.0F * CSng(Math.Cos(i / 10.0F * 3.14159F * 2.0F)) + ScreenHeight() / 2.0F))
     Next
 
     m_modelCar = New List(Of (Single, Single)) From {(1, 1), (1, 3), (3, 0), (0, -3), (-3, 0), (-1, 3), (-1, 1)}
@@ -62,14 +62,14 @@ Class Splines2
     If m_keys(VK_RIGHT).Held Then m_path.Points(m_selectedPoint).X += 30 * elapsedTime
     If m_keys(VK_UP).Held Then m_path.Points(m_selectedPoint).Y -= 30 * elapsedTime
     If m_keys(VK_DOWN).Held Then m_path.Points(m_selectedPoint).Y += 30 * elapsedTime
-    If m_keys(AscW("A")).Held Then m_marker -= 20.0 * elapsedTime
-    If m_keys(AscW("S")).Held Then m_marker += 20.0 * elapsedTime
+    If m_keys(AscW("A")).Held Then m_marker -= 20.0F * elapsedTime
+    If m_keys(AscW("S")).Held Then m_marker += 20.0F * elapsedTime
 
     If m_marker > m_path.TotalSplineLength Then m_marker -= m_path.TotalSplineLength
     If m_marker < 0 Then m_marker += m_path.TotalSplineLength
 
     ' Draw Spline
-    For t = 0.0 To m_path.Points.Count Step 0.005
+    For t = 0.0F To m_path.Points.Count Step 0.005F
       Dim pos = m_path.GetSplinePoint(t, True)
       Draw(pos.X, pos.Y)
     Next
@@ -108,12 +108,12 @@ Class Splines2
 End Class
 
 Class Point2D
-  Public Property X As Double
-  Public Property Y As Double
-  Public Property Length As Double
+  Public Property X As Single
+  Public Property Y As Single
+  Public Property Length As Single
   Public Sub New()
   End Sub
-  Public Sub New(x As Double, y As Double)
+  Public Sub New(x As Single, y As Single)
     Me.X = x
     Me.Y = y
   End Sub
@@ -122,9 +122,9 @@ End Class
 Class Spline
 
   Public Property Points As New List(Of Point2D)
-  Public Property TotalSplineLength As Double
+  Public Property TotalSplineLength As Single
 
-  Public Function GetSplinePoint(t As Double, Optional looped As Boolean = False) As Point2D
+  Public Function GetSplinePoint(t As Single, Optional looped As Boolean = False) As Point2D
 
     Dim p0, p1, p2, p3 As Integer
 
@@ -156,7 +156,7 @@ Class Spline
 
   End Function
 
-  Public Function GetSplineGradient(t As Double, Optional looped As Boolean = False) As Point2D
+  Public Function GetSplineGradient(t As Single, Optional looped As Boolean = False) As Point2D
 
     Dim p0, p1, p2, p3 As Integer
 
@@ -189,17 +189,17 @@ Class Spline
 
   End Function
 
-  Public Function CalculateSegmentLength(node As Integer, Optional looped As Boolean = False) As Double
+  Public Function CalculateSegmentLength(node As Integer, Optional looped As Boolean = False) As Single
 
-    Dim length = 0.0
-    Dim stepSize = 0.005
+    Dim length = 0.0F
+    Dim stepSize = 0.005F
     Dim oldPoint, newPoint As Point2D
 
     oldPoint = GetSplinePoint(node, looped)
 
-    For t = 0 To 1.0F - stepSize Step stepSize
+    For t = 0.0F To 1.0F - stepSize Step stepSize
       newPoint = GetSplinePoint(node + t, looped)
-      length += Math.Sqrt((newPoint.X - oldPoint.X) * (newPoint.X - oldPoint.X) + (newPoint.Y - oldPoint.Y) * (newPoint.Y - oldPoint.Y))
+      length += CSng(Math.Sqrt((newPoint.X - oldPoint.X) * (newPoint.X - oldPoint.X) + (newPoint.Y - oldPoint.Y) * (newPoint.Y - oldPoint.Y)))
       oldPoint = newPoint
     Next
 
@@ -207,7 +207,7 @@ Class Spline
 
   End Function
 
-  Public Function GetNormalisedOffset(p As Double) As Double
+  Public Function GetNormalisedOffset(p As Single) As Single
     ' Which node is the base?
     Dim i = 0
     While p > Points(i).Length

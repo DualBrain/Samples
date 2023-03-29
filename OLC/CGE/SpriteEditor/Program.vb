@@ -156,17 +156,17 @@ Class SpriteEditor
           If (x - m_offsetX < m_sprite.Width AndAlso y - m_offsetY < m_sprite.Height AndAlso x - m_offsetX >= 0 AndAlso y - m_offsetY >= 0) Then
 
             ' Draw Sprite
-            Fill(x * m_zoom + 10, y * m_zoom + 10, (x + 1) * m_zoom + 10, (y + 1) * m_zoom + 10, AscW(m_sprite.GetGlyph(x - m_offsetX, y - m_offsetY)), m_sprite.GetColour(x - m_offsetX, y - m_offsetY))
+            Fill(x * m_zoom + 10, y * m_zoom + 10, (x + 1) * m_zoom + 10, (y + 1) * m_zoom + 10, m_sprite.GetGlyph(x - m_offsetX, y - m_offsetY), m_sprite.GetColour(x - m_offsetX, y - m_offsetY))
 
             ' Draw Pixel Markers
-            If m_sprite.GetGlyph(x - m_offsetX, y - m_offsetY) = " "c Then
-              Draw(x * m_zoom + 10, y * m_zoom + 10, AscW("."))
+            If m_sprite.GetGlyph(x - m_offsetX, y - m_offsetY) = 32 Then
+              Draw(x * m_zoom + 10, y * m_zoom + 10, AscW("."c))
             End If
 
           End If
 
           If (x - m_offsetX = m_posX AndAlso y - m_offsetY = m_posY) Then
-            Draw(x * m_zoom + 10, y * m_zoom + 10, AscW("O"))
+            Draw(x * m_zoom + 10, y * m_zoom + 10, AscW("O"c))
           End If
 
         Next
@@ -177,7 +177,7 @@ Class SpriteEditor
     ' Draw Actual Sprite
     For x = 0 To m_sprite.Width - 1
       For y = 0 To m_sprite.Height - 1
-        Draw(x + 10, y + 80, AscW(m_sprite.GetGlyph(x, y)), m_sprite.GetColour(x, y))
+        Draw(x + 10, y + 80, m_sprite.GetGlyph(x, y), m_sprite.GetColour(x, y))
       Next
     Next
 

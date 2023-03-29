@@ -221,16 +221,16 @@ Class LevelMaker
 #Region "New Map Size Popup"
 
           ' New Map Size Popup
-          Fill(110, 70, 290, 150, " "c, FG_DARK_GREY Or BG_DARK_GREY)
+          Fill(110, 70, 290, 150, 32, FG_DARK_GREY Or BG_DARK_GREY)
           DrawStringFont(150, 75, "New Map Size")
           DrawStringFont(125, 90, "Width")
           DrawStringFont(210, 90, "Height")
-          Fill(170, 130, 240, 140, " "c, FG_GREY Or BG_GREY)
+          Fill(170, 130, 240, 140, 32, FG_GREY Or BG_GREY)
           DrawStringFont(180, 131, "Create")
           Select Case popup.newMapSize.field
             Case 0
-              Fill(125, 100, 200, 108, " "c, FG_GREY Or BG_GREY)
-              Fill(210, 100, 280, 108, " "c, FG_BLACK Or BG_BLACK)
+              Fill(125, 100, 200, 108, 32, FG_GREY Or BG_GREY)
+              Fill(210, 100, 280, 108, 32, FG_BLACK Or BG_BLACK)
               If IsFocused() Then
                 If GetKey("0").Pressed OrElse GetKey(VK_NUMPAD0).Pressed Then
                   popup.newMapSize.width &= "0"c
@@ -269,8 +269,8 @@ Class LevelMaker
                 End If
               End If
             Case 1
-              Fill(125, 100, 200, 108, " "c, FG_BLACK Or BG_BLACK)
-              Fill(210, 100, 280, 108, " "c, FG_GREY Or BG_GREY)
+              Fill(125, 100, 200, 108, 32, FG_BLACK Or BG_BLACK)
+              Fill(210, 100, 280, 108, 32, FG_GREY Or BG_GREY)
               If IsFocused() Then
                 If GetKey(AscW("0"c)).Pressed OrElse GetKey(VK_NUMPAD0).Pressed Then
                   popup.newMapSize.height &= "0"
@@ -349,7 +349,7 @@ Class LevelMaker
     ElseIf IsFocused() Then
 
       ' fill the menu
-      Fill(uiBase, 0, 400, 200, " "c, BG_GREY Or FG_BLACK)
+      Fill(uiBase, 0, 400, 200, 32, BG_GREY Or FG_BLACK)
 
       If Not GetKey(VK_CONTROL).Held AndAlso ((pickedFirst AndAlso pickedSecond) OrElse (Not pickedFirst AndAlso Not pickedSecond)) Then
         If tool = Tool.TILES Then

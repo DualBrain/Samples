@@ -23,7 +23,7 @@ Class Splines1
 
   Private m_path As New Spline
   Private m_selectedPoint As Integer
-  Private m_marker As Double
+  Private m_marker As Single
 
   Public Overrides Function OnUserCreate() As Boolean
 
@@ -64,14 +64,14 @@ Class Splines1
     If m_keys(VK_RIGHT).Held Then m_path.Points(m_selectedPoint).X += 30 * elapsedTime
     If m_keys(VK_UP).Held Then m_path.Points(m_selectedPoint).Y -= 30 * elapsedTime
     If m_keys(VK_DOWN).Held Then m_path.Points(m_selectedPoint).Y += 30 * elapsedTime
-    If m_keys(AscW("A")).Held Then m_marker -= 5.0 * elapsedTime
-    If m_keys(AscW("S")).Held Then m_marker += 5.0 * elapsedTime
+    If m_keys(AscW("A")).Held Then m_marker -= 5.0F * elapsedTime
+    If m_keys(AscW("S")).Held Then m_marker += 5.0F * elapsedTime
 
     If m_marker > m_path.Points.Count - 1 Then m_marker -= m_path.Points.Count
     If m_marker < 0 Then m_marker += m_path.Points.Count
 
     ' Draw Spline
-    For t = 0.0 To m_path.Points.Count Step 0.005
+    For t = 0.0F To m_path.Points.Count Step 0.005F
       Dim pos = m_path.GetSplinePoint(t, True)
       Draw(pos.X, pos.Y)
     Next
@@ -99,11 +99,11 @@ Class Splines1
 End Class
 
 Class Point2D
-  Public Property X As Double
-  Public Property Y As Double
+  Public Property X As Single
+  Public Property Y As Single
   Public Sub New()
   End Sub
-  Public Sub New(x As Double, y As Double)
+  Public Sub New(x As Single, y As Single)
     Me.X = x
     Me.Y = y
   End Sub
@@ -113,7 +113,7 @@ Class Spline
 
   Public Property Points As New List(Of Point2D)
 
-  Public Function GetSplinePoint(t As Double, Optional bLooped As Boolean = False) As Point2D
+  Public Function GetSplinePoint(t As Single, Optional bLooped As Boolean = False) As Point2D
 
     Dim p0, p1, p2, p3 As Integer
 
@@ -145,7 +145,7 @@ Class Spline
 
   End Function
 
-  Public Function GetSplineGradient(t As Double, Optional bLooped As Boolean = False) As Point2D
+  Public Function GetSplineGradient(t As Single, Optional bLooped As Boolean = False) As Point2D
 
     Dim p0, p1, p2, p3 As Integer
 

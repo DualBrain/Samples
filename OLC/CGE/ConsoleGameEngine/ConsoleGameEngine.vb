@@ -678,11 +678,7 @@ Public MustInherit Class ConsoleGameEngine
     Fill(0, 0, ScreenWidth, ScreenHeight, AscW(" "), Colour.FG_BLACK)
   End Sub
 
-  Public Sub Fill(x1 As Double, y1 As Double, x2 As Double, y2 As Double, c As Char, Optional col As Integer = &HFS)
-    Fill(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), AscW(c), col)
-  End Sub
-
-  Public Sub Fill(x1 As Double, y1 As Double, x2 As Double, y2 As Double, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
+  Public Sub Fill(x1 As Single, y1 As Single, x2 As Single, y2 As Single, Optional c As Integer = &H2588S, Optional col As Integer = &HFS)
     Fill(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), c, col)
   End Sub
 

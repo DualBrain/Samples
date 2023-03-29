@@ -21,11 +21,11 @@ End Module
 Class FlappyBird
   Inherits ConsoleGameEngine.ConsoleGameEngine
 
-  Private m_birdPosition As Double = 0.0
-  Private m_birdVelocity As Double = 0.0
+  Private m_birdPosition As Single = 0.0
+  Private m_birdVelocity As Single = 0.0
   Private m_birdAcceleration As Single = 0.0
   Private ReadOnly m_gravity As Single = 100.0
-  Private m_levelPosition As Double = 0.0
+  Private m_levelPosition As Single = 0.0
 
   Private m_sectionWidth As Single
   Private m_listSection As New List(Of Integer)
@@ -55,7 +55,7 @@ Class FlappyBird
       m_listSection = New List(Of Integer)({0, 0, 0, 0})
       m_birdAcceleration = 0.0
       m_birdVelocity = 0.0
-      m_birdPosition = ScreenHeight() / 2.0
+      m_birdPosition = ScreenHeight() / 2.0F
       m_flapCount = 0
       m_attemptCount += 1
     End If
@@ -68,7 +68,7 @@ Class FlappyBird
 
       If m_keys(VK_SPACE).Pressed AndAlso m_birdVelocity >= m_gravity / 10.0 Then
         m_birdAcceleration = 0.0
-        m_birdVelocity = -m_gravity / 4.0
+        m_birdVelocity = -m_gravity / 4.0F
         m_flapCount += 1
         If m_flapCount > m_maxFlapCount Then m_maxFlapCount = m_flapCount
       Else
@@ -79,7 +79,7 @@ Class FlappyBird
 
       m_birdVelocity += m_birdAcceleration * elapsedTime
       m_birdPosition += m_birdVelocity * elapsedTime
-      m_levelPosition += 14.0 * elapsedTime
+      m_levelPosition += 14.0F * elapsedTime
 
       If m_levelPosition > m_sectionWidth Then
         m_levelPosition -= m_sectionWidth
