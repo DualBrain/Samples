@@ -40,7 +40,7 @@ Class Engine3d
   Public Overrides Function OnUserCreate() As Boolean
 
     ' Load object file
-    meshCube.LoadFromObjectFile("teapot.obj")
+    meshCube.LoadFromObjectFile("mountains.obj")
 
     ' Projection Matrix
     matProj = Matrix_MakeProjection(90.0F, CSng(ScreenHeight() / ScreenWidth()), 0.1F, 1000.0F)
