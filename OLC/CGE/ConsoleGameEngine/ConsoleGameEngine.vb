@@ -2,7 +2,6 @@
 Option Strict On
 Option Infer On
 
-Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.Threading
 
@@ -160,13 +159,13 @@ Public Class Sprite
 
       If f Is Nothing Then Return False
 
-      Using bw As New System.IO.BinaryWriter(f)
+      Using bw As New IO.BinaryWriter(f)
         bw.Write(Width)
         bw.Write(Height)
-        For i As Integer = 0 To (Width * Height) - 1
+        For i = 0 To (Width * Height) - 1
           bw.Write(m_colours(i))
         Next
-        For i As Integer = 0 To (Width * Height) - 1
+        For i = 0 To (Width * Height) - 1
           'bw.Write(CShort(AscW(m_glyphs(i))))
           bw.Write(m_glyphs(i))
         Next
@@ -652,7 +651,7 @@ Public MustInherit Class ConsoleGameEngine
     Dim lastError = GetLastError
     Dim ex As Exception = New System.ComponentModel.Win32Exception()
     Dim errorMessage As String = ex.Message
-    Console.SetOut(New StreamWriter(Console.OpenStandardOutput()))
+    Console.SetOut(New IO.StreamWriter(Console.OpenStandardOutput()))
     Console.WriteLine($"ERROR: {msg}{Environment.NewLine}" & vbTab & $"{errorMessage}")
     Return 1
   End Function

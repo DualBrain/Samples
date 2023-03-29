@@ -4,6 +4,8 @@
 ' https://youtu.be/XgMWc6LumG4
 ' Inspired by "Code-It-Yourself! 3D Graphics Engine Part #3 - Cameras & Clipping" -- @javidx9
 ' https://youtu.be/HXSuNxpCzdM
+' Inspired by "Code-It-Yourself! 3D Graphics Engine Part #4 - Texturing & Depth Buffers" -- @javidx9
+' https://youtu.be/nBzCS-Y0FcY
 
 Option Explicit On
 Option Strict On
@@ -33,14 +35,40 @@ Class Engine3d
   Private m_yaw As Single ' FPS Camera rotation in XZ plane
   Private m_theta As Single ' Spins World transform
 
+  Private m_sprite As Sprite
+
+  Private m_depthBuffer() As Single
+
   Public Sub New()
     m_sAppName = "3D Demo"
   End Sub
 
   Public Overrides Function OnUserCreate() As Boolean
 
+    ReDim m_depthBuffer((ScreenWidth() * ScreenHeight()) - 1)
+
     ' Load object file
-    m_meshCube.LoadFromObjectFile("mountains.obj")
+    'meshCube.LoadFromObjectFile("mountains.obj")
+
+    m_meshCube.Tris = New List(Of Triangle) From {New Triangle({0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F}), ' SOUTH
+                                                  New Triangle({0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F}),
+                                                                                                                                                                                               _
+                                                  New Triangle({1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F}), ' EAST
+                                                  New Triangle({1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F}), _
+                                                                                                                                                                                                _
+                                                  New Triangle({1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F}), ' NORTH
+                                                  New Triangle({1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F}), _
+                                                                                                                                                                                                _
+                                                  New Triangle({0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F}), ' WEST
+                                                  New Triangle({0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F}), _
+                                                                                                                                                                                                _
+                                                  New Triangle({0.0F, 1.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F}), ' TOP
+                                                  New Triangle({0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F}), _
+                                                                                                                                                                                                _
+                                                  New Triangle({1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F}), ' BOTTOM
+                                                  New Triangle({1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F})}
+
+    m_sprite = New Sprite("fps_wall1.spr")
 
     ' Projection Matrix
     m_matProj = Matrix_MakeProjection(90.0F, CSng(ScreenHeight() / ScreenWidth()), 0.1F, 1000.0F)
@@ -59,21 +87,21 @@ Class Engine3d
     If (GetKey(VK_RIGHT).Held) Then m_camera.X += 8.0F * elapsedTime ' Travel Along X-Axis
     '///////
 
-    Dim vForward = Vector_Mul(m_lookDir, 8.0F * elapsedTime)
+    Dim forward = Vector_Mul(m_lookDir, 8.0F * elapsedTime)
 
     ' Standard FPS Control scheme, but turn instead of strafe
-    If (GetKey(AscW("W"c)).Held) Then m_camera = Vector_Add(m_camera, vForward)
-    If (GetKey(AscW("S"c)).Held) Then m_camera = Vector_Sub(m_camera, vForward)
+    If (GetKey(AscW("W"c)).Held) Then m_camera = Vector_Add(m_camera, forward)
+    If (GetKey(AscW("S"c)).Held) Then m_camera = Vector_Sub(m_camera, forward)
     If (GetKey(AscW("A"c)).Held) Then m_yaw -= 2.0F * elapsedTime
     If (GetKey(AscW("D"c)).Held) Then m_yaw += 2.0F * elapsedTime
 
     ' Set up "World Tranmsform" though not updating theta 
     ' makes this a bit redundant
-    'fTheta += 1.0F * elapsedTime ' Uncomment to spin me right round baby right round
+    m_theta += 1.0F * elapsedTime ' Uncomment to spin me right round baby right round
     Dim matRotZ = Matrix_MakeRotationZ(m_theta * 0.5F)
     Dim matRotX = Matrix_MakeRotationX(m_theta)
 
-    Dim matTrans = Matrix_MakeTranslation(0.0F, 0.0F, 5.0F)
+    Dim matTrans = Matrix_MakeTranslation(0.0F, 0.0F, 2.5F)
 
     Dim matWorld = Matrix_MakeIdentity() ' Form World Matrix
     matWorld = Matrix_MultiplyMatrix(matRotZ, matRotX) ' Transform by rotation
@@ -102,6 +130,9 @@ Class Engine3d
       triTransformed.P(0) = Matrix_MultiplyVector(matWorld, tri.P(0))
       triTransformed.P(1) = Matrix_MultiplyVector(matWorld, tri.P(1))
       triTransformed.P(2) = Matrix_MultiplyVector(matWorld, tri.P(2))
+      triTransformed.T(0) = tri.T(0)
+      triTransformed.T(1) = tri.T(1)
+      triTransformed.T(2) = tri.T(2)
 
       ' Calculate triangle Normal
       Dim normal, line1, line2 As Vec3d
@@ -117,10 +148,11 @@ Class Engine3d
       normal = Vector_Normalise(normal)
 
       ' Get Ray from triangle to camera
-      Dim cameraRay As Vec3d = Vector_Sub(triTransformed.P(0), m_camera)
+      Dim cameraRay = Vector_Sub(triTransformed.P(0), m_camera)
 
       ' If ray is aligned with normal, then triangle is visible
       If Vector_DotProduct(normal, cameraRay) < 0.0F Then
+
         ' Illumination
         Dim lightDirection As New Vec3d(0.0F, 1.0F, -1.0F)
         lightDirection = Vector_Normalise(lightDirection)
@@ -139,14 +171,16 @@ Class Engine3d
         triViewed.P(2) = Matrix_MultiplyVector(matView, triTransformed.P(2))
         triViewed.sym = triTransformed.sym
         triViewed.col = triTransformed.col
+        triViewed.T(0) = triTransformed.T(0)
+        triViewed.T(1) = triTransformed.T(1)
+        triViewed.T(2) = triTransformed.T(2)
 
         ' Clip Viewed Triangle against near plane, this could form two additional
         ' additional triangles. 
         Dim clipped(1) As Triangle : clipped(0) = New Triangle : clipped(1) = New Triangle
         Dim clippedTriangles = Triangle_ClipAgainstPlane(New Vec3d(0.0F, 0.0F, 0.1F), New Vec3d(0.0F, 0.0F, 1.0F), triViewed, clipped(0), clipped(1))
 
-        ' We may end up with multiple triangles form the clip, so project as
-        ' required
+        ' We may end up with multiple triangles form the clip, so project as required
         For n = 0 To clippedTriangles - 1
 
           ' Project triangles from 3D --> 2D
@@ -155,6 +189,21 @@ Class Engine3d
           triProjected.P(2) = Matrix_MultiplyVector(m_matProj, clipped(n).P(2))
           triProjected.col = clipped(n).col
           triProjected.sym = clipped(n).sym
+          triProjected.T(0) = clipped(n).T(0)
+          triProjected.T(1) = clipped(n).T(1)
+          triProjected.T(2) = clipped(n).T(2)
+
+          triProjected.T(0).U = triProjected.T(0).U / triProjected.P(0).W
+          triProjected.T(1).U = triProjected.T(1).U / triProjected.P(1).W
+          triProjected.T(2).U = triProjected.T(2).U / triProjected.P(2).W
+
+          triProjected.T(0).V = triProjected.T(0).V / triProjected.P(0).W
+          triProjected.T(1).V = triProjected.T(1).V / triProjected.P(1).W
+          triProjected.T(2).V = triProjected.T(2).V / triProjected.P(2).W
+
+          triProjected.T(0).W = 1.0F / triProjected.P(0).W
+          triProjected.T(1).W = 1.0F / triProjected.P(1).W
+          triProjected.T(2).W = 1.0F / triProjected.P(2).W
 
           ' Scale into view, we moved the normalising into cartesian space
           ' out of the matrix.vector function from the previous videos, so
@@ -193,10 +242,15 @@ Class Engine3d
     Next
 
     ' Sort triangles from back to front
-    trianglesToRaster.Sort(New TriangleComparer)
+    'vecTrianglesToRaster.Sort(New TriangleComparer)
 
     ' Clear Screen
     Fill(0, 0, ScreenWidth(), ScreenHeight(), PIXEL_SOLID, FG_BLACK)
+
+    ' Clear Depth Buffer
+    For i = 0 To (ScreenWidth() * ScreenHeight()) - 1
+      m_depthBuffer(i) = 0.0F
+    Next
 
     ' Loop through all transformed, viewed, projected, and sorted triangles
     For Each triToRaster In trianglesToRaster
@@ -248,8 +302,14 @@ Class Engine3d
 
       ' Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
       For Each t In listTriangles
-        FillTriangle(t.P(0).X, t.P(0).Y, t.P(1).X, t.P(1).Y, t.P(2).X, t.P(2).Y, t.sym, t.col)
-        'DrawTriangle(t.P(0).X, t.P(0).Y, t.P(1).X, t.P(1).Y, t.P(2).X, t.P(2).Y, PIXEL_SOLID, FG_BLACK);
+
+        TexturedTriangle(CInt(Fix(t.P(0).X)), CInt(Fix(t.P(0).Y)), t.T(0).U, t.T(0).V, t.T(0).W,
+                         CInt(Fix(t.P(1).X)), CInt(Fix(t.P(1).Y)), t.T(1).U, t.T(1).V, t.T(1).W,
+                         CInt(Fix(t.P(2).X)), CInt(Fix(t.P(2).Y)), t.T(2).U, t.T(2).V, t.T(2).W, m_sprite)
+
+        'FillTriangle(t.P(0).X, t.P(0).Y, t.P(1).X, t.P(1).Y, t.P(2).X, t.P(2).Y, t.sym, t.col)
+        'DrawTriangle(t.P(0).X, t.P(0).Y, t.P(1).X, t.P(1).Y, t.P(2).X, t.P(2).Y, PIXEL_SOLID, FG_WHITE)
+
       Next
 
     Next
@@ -257,6 +317,198 @@ Class Engine3d
     Return True
 
   End Function
+
+  Private Shared Sub Swap(ByRef x As Integer, ByRef y As Integer)
+    Dim t = x
+    x = y
+    y = t
+  End Sub
+
+  Private Shared Sub Swap(ByRef x As Single, ByRef y As Single)
+    Dim t = x
+    x = y
+    y = t
+  End Sub
+
+  Private Sub TexturedTriangle(x1 As Integer, y1 As Integer, u1 As Single, v1 As Single, w1 As Single,
+                               x2 As Integer, y2 As Integer, u2 As Single, v2 As Single, w2 As Single,
+                               x3 As Integer, y3 As Integer, u3 As Single, v3 As Single, w3 As Single,
+                               tex As Sprite)
+    If y2 < y1 Then
+      Swap(y1, y2)
+      Swap(x1, x2)
+      Swap(u1, u2)
+      Swap(v1, v2)
+      Swap(w1, w2)
+    End If
+
+    If y3 < y1 Then
+      Swap(y1, y3)
+      Swap(x1, x3)
+      Swap(u1, u3)
+      Swap(v1, v3)
+      Swap(w1, w3)
+    End If
+
+    If y3 < y2 Then
+      Swap(y2, y3)
+      Swap(x2, x3)
+      Swap(u2, u3)
+      Swap(v2, v3)
+      Swap(w2, w3)
+    End If
+
+    Dim dy1 = y2 - y1
+    Dim dx1 = x2 - x1
+    Dim dv1 = v2 - v1
+    Dim du1 = u2 - u1
+    Dim dw1 = w2 - w1
+
+    Dim dy2 = y3 - y1
+    Dim dx2 = x3 - x1
+    Dim dv2 = v3 - v1
+    Dim du2 = u3 - u1
+    Dim dw2 = w3 - w1
+
+    Dim dax_step = 0.0F, dbx_step = 0.0F,
+        du1_step = 0.0F, dv1_step = 0.0F,
+        du2_step = 0.0F, dv2_step = 0.0F,
+        dw1_step = 0.0F, dw2_step = 0.0F
+
+    If dy1 <> 0 Then dax_step = dx1 / CSng(Math.Abs(dy1))
+    If dy2 <> 0 Then dbx_step = dx2 / CSng(Math.Abs(dy2))
+
+    If dy1 <> 0 Then du1_step = du1 / Math.Abs(dy1)
+    If dy1 <> 0 Then dv1_step = dv1 / Math.Abs(dy1)
+    If dy1 <> 0 Then dw1_step = dw1 / Math.Abs(dy1)
+
+    If dy2 <> 0 Then du2_step = du2 / Math.Abs(dy2)
+    If dy2 <> 0 Then dv2_step = dv2 / Math.Abs(dy2)
+    If dy2 <> 0 Then dw2_step = dw2 / Math.Abs(dy2)
+
+    If dy1 <> 0 Then
+
+      For i = y1 To y2
+
+        Dim ax = CInt(Fix(x1 + ((i - y1) * dax_step)))
+        Dim bx = CInt(Fix(x1 + ((i - y1) * dbx_step)))
+
+        Dim tex_su = u1 + ((i - y1) * du1_step)
+        Dim tex_sv = v1 + ((i - y1) * dv1_step)
+        Dim tex_sw = w1 + ((i - y1) * dw1_step)
+
+        Dim tex_eu = u1 + ((i - y1) * du2_step)
+        Dim tex_ev = v1 + ((i - y1) * dv2_step)
+        Dim tex_ew = w1 + ((i - y1) * dw2_step)
+
+        If ax > bx Then
+          Swap(ax, bx)
+          Swap(tex_su, tex_eu)
+          Swap(tex_sv, tex_ev)
+          Swap(tex_sw, tex_ew)
+        End If
+
+        'Dim tex_u = tex_su
+        'Dim tex_v = tex_sv
+        'Dim tex_w = tex_sw
+
+        Dim tstep = 1.0F / (bx - ax)
+        Dim t = 0.0F
+
+        For j = ax To bx - 1
+
+          Dim tex_u = (1.0F - t) * tex_su + (t * tex_eu)
+          Dim tex_v = (1.0F - t) * tex_sv + (t * tex_ev)
+          Dim tex_w = (1.0F - t) * tex_sw + (t * tex_ew)
+
+          If (tex_w > m_depthBuffer((i * ScreenWidth()) + j)) Then
+            Dim glyph = tex.SampleGlyph(tex_u / tex_w, tex_v / tex_w)
+            Dim clr = tex.SampleColour(tex_u / tex_w, tex_v / tex_w)
+            Draw(j, i, glyph, clr)
+            m_depthBuffer((i * ScreenWidth()) + j) = tex_w
+          End If
+
+          t += tstep
+
+        Next
+
+      Next
+
+    End If
+
+    dy1 = y3 - y2
+    dx1 = x3 - x2
+    dv1 = v3 - v2
+    du1 = u3 - u2
+    dw1 = w3 - w2
+
+    If (dy1 <> 0) Then
+      dax_step = CSng(dx1 / Math.Abs(dy1))
+    End If
+
+    If (dy2 <> 0) Then
+      dbx_step = CSng(dx2 / Math.Abs(dy2))
+    End If
+
+    du1_step = 0
+    dv1_step = 0
+
+    If (dy1 <> 0) Then
+      du1_step = du1 / Math.Abs(dy1)
+      dv1_step = dv1 / Math.Abs(dy1)
+      dw1_step = dw1 / Math.Abs(dy1)
+    End If
+
+    If dy1 <> 0 Then
+
+      For i = y2 To y3
+
+        Dim ax = CInt(Fix(x2 + (i - y2) * dax_step))
+        Dim bx = CInt(Fix(x1 + (i - y1) * dbx_step))
+
+        Dim tex_su = u2 + (i - y2) * du1_step
+        Dim tex_sv = v2 + (i - y2) * dv1_step
+        Dim tex_sw = w2 + (i - y2) * dw1_step
+
+        Dim tex_eu = u1 + (i - y1) * du2_step
+        Dim tex_ev = v1 + (i - y1) * dv2_step
+        Dim tex_ew = w1 + (i - y1) * dw2_step
+
+        If ax > bx Then
+          Swap(ax, bx)
+          Swap(tex_su, tex_eu)
+          Swap(tex_sv, tex_ev)
+          Swap(tex_sw, tex_ew)
+        End If
+
+        'Dim tex_u = tex_su
+        'Dim tex_v = tex_sv
+        'Dim tex_w = tex_sw
+
+        Dim tstep = 1.0F / (bx - ax)
+        Dim t = 0.0F
+
+        For j = ax To bx - 1
+
+          Dim tex_u = (1.0F - t) * tex_su + t * tex_eu
+          Dim tex_v = (1.0F - t) * tex_sv + t * tex_ev
+          Dim tex_w = (1.0F - t) * tex_sw + t * tex_ew
+
+          If tex_w > m_depthBuffer(i * ScreenWidth() + j) Then
+            Draw(j, i, tex.SampleGlyph(tex_u / tex_w, tex_v / tex_w), tex.SampleColour(tex_u / tex_w, tex_v / tex_w))
+            m_depthBuffer(i * ScreenWidth() + j) = tex_w
+          End If
+
+          t += tstep
+
+        Next
+
+      Next
+
+    End If
+
+  End Sub
+
 
 #Region "Matrix"
 
@@ -443,124 +695,154 @@ Class Engine3d
     Return v
   End Function
 
-  Private Shared Function Vector_IntersectPlane(plane_p As Vec3d, plane_n As Vec3d, lineStart As Vec3d, lineEnd As Vec3d) As Vec3d
+  Private Shared Function Vector_IntersectPlane(plane_p As Vec3d, plane_n As Vec3d, lineStart As Vec3d, lineEnd As Vec3d, ByRef t As Single) As Vec3d
     plane_n = Vector_Normalise(plane_n)
     Dim plane_d = -Vector_DotProduct(plane_n, plane_p)
     Dim ad = Vector_DotProduct(lineStart, plane_n)
     Dim bd = Vector_DotProduct(lineEnd, plane_n)
-    Dim t = (-plane_d - ad) / (bd - ad)
+    t = (-plane_d - ad) / (bd - ad)
     Dim lineStartToEnd = Vector_Sub(lineEnd, lineStart)
     Dim lineToIntersect = Vector_Mul(lineStartToEnd, t)
     Return Vector_Add(lineStart, lineToIntersect)
   End Function
 
-  Private Shared Function Triangle_ClipAgainstPlane(plane_p As Vec3d, plane_n As Vec3d, in_tri As Triangle, ByRef out_tri1 As Triangle, ByRef out_tri2 As Triangle) As Integer
+  Private Shared Function Triangle_ClipAgainstPlane(planeP As Vec3d, planeN As Vec3d, inTri As Triangle, ByRef outTri1 As Triangle, ByRef outTri2 As Triangle) As Integer
 
     ' Make sure plane normal is indeed normal
-    plane_n = Vector_Normalise(plane_n)
+    planeN = Vector_Normalise(planeN)
 
     ' Return signed shortest distance from point to plane, plane normal must be normalised
     Dim dist = Function(p As Vec3d) As Single
                  Dim n = Vector_Normalise(p)
-                 Return (plane_n.X * p.X + plane_n.Y * p.Y + plane_n.Z * p.Z - Vector_DotProduct(plane_n, plane_p))
+                 Return (planeN.X * p.X + planeN.Y * p.Y + planeN.Z * p.Z - Vector_DotProduct(planeN, planeP))
                End Function
 
     ' Create two temporary storage arrays to classify points either side of plane
     ' If distance sign is positive, point lies on "inside" of plane
-    Dim inside_points(2) As Vec3d, outside_points(2) As Vec3d
-    Dim nInsidePointCount, nOutsidePointCount As Integer
+    Dim insidePoints(2) As Vec3d : Dim insidePointCount = 0
+    Dim outsidePoints(2) As Vec3d : Dim outsidePointCount = 0
+    Dim insideTex(2) As Vec2d : Dim insideTexCount = 0
+    Dim outsideTex(2) As Vec2d : Dim outsideTexCount = 0
+
+    For index = 0 To 2
+      insidePoints(index) = New Vec3d
+      outsidePoints(index) = New Vec3d
+      insideTex(index) = New Vec2d
+      outsideTex(index) = New Vec2d
+    Next
 
     ' Get signed distance of each point in triangle to plane
-    Dim d0 = dist(in_tri.P(0))
-    Dim d1 = dist(in_tri.P(1))
-    Dim d2 = dist(in_tri.P(2))
+    Dim d0 = dist(inTri.P(0))
+    Dim d1 = dist(inTri.P(1))
+    Dim d2 = dist(inTri.P(2))
 
     If d0 >= 0 Then
-      inside_points(nInsidePointCount) = in_tri.P(0)
-      nInsidePointCount += 1
+      insidePoints(insidePointCount).Assign(inTri.P(0)) : insidePointCount += 1
+      insideTex(insideTexCount).Assign(inTri.T(0)) : insideTexCount += 1
     Else
-      outside_points(nOutsidePointCount) = in_tri.P(0)
-      nOutsidePointCount += 1
+      outsidePoints(outsidePointCount).Assign(inTri.P(0)) : outsidePointCount += 1
+      outsideTex(outsideTexCount).Assign(inTri.T(0)) : outsideTexCount += 1
     End If
 
     If d1 >= 0 Then
-      inside_points(nInsidePointCount) = in_tri.P(1)
-      nInsidePointCount += 1
+      insidePoints(insidePointCount).Assign(inTri.P(1)) : insidePointCount += 1
+      insideTex(insideTexCount).Assign(inTri.T(1)) : insideTexCount += 1
     Else
-      outside_points(nOutsidePointCount) = in_tri.P(1)
-      nOutsidePointCount += 1
+      outsidePoints(outsidePointCount).Assign(inTri.P(1)) : outsidePointCount += 1
+      outsideTex(outsideTexCount).Assign(inTri.T(1)) : outsideTexCount += 1
     End If
 
     If d2 >= 0 Then
-      inside_points(nInsidePointCount) = in_tri.P(2)
-      nInsidePointCount += 1
+      insidePoints(insidePointCount).Assign(inTri.P(2)) : insidePointCount += 1
+      insideTex(insideTexCount).Assign(inTri.T(2)) : insideTexCount += 1
     Else
-      outside_points(nOutsidePointCount) = in_tri.P(2)
-      nOutsidePointCount += 1
+      outsidePoints(outsidePointCount).Assign(inTri.P(2)) : outsidePointCount += 1
+      outsideTex(outsideTexCount).Assign(inTri.T(2)) : outsideTexCount += 1
     End If
 
     ' Now classify triangle points, and break the input triangle into 
     ' smaller output triangles if required. There are four possible
     ' outcomes...
-    If nInsidePointCount = 0 Then
+    If insidePointCount = 0 Then
       ' All points lie on the outside of plane, so clip whole triangle
       ' It ceases to exist
       Return 0 ' No returned triangles are valid
     End If
 
-    If nInsidePointCount = 3 Then
+    If insidePointCount = 3 Then
       ' All points lie on the inside of plane, so do nothing
       ' and allow the triangle to simply pass through
-      out_tri1 = in_tri
+      outTri1 = inTri
       Return 1 ' Just the one returned original triangle is valid
     End If
 
-    If nInsidePointCount = 1 AndAlso nOutsidePointCount = 2 Then
+    If insidePointCount = 1 AndAlso outsidePointCount = 2 Then
 
       ' Triangle should be clipped. As two points lie outside
       ' the plane, the triangle simply becomes a smaller triangle
 
       ' Copy appearance info to new triangle
-      out_tri1.col = in_tri.col
-      out_tri1.sym = in_tri.sym
+      outTri1.col = inTri.col
+      outTri1.sym = inTri.sym
 
       ' The inside point is valid, so keep that...
-      out_tri1.P(0) = inside_points(0)
+      outTri1.P(0) = insidePoints(0)
+      outTri1.T(0) = insideTex(0)
 
       ' but the two new points are at the locations where the 
       ' original sides of the triangle (lines) intersect with the plane
-      out_tri1.P(1) = Vector_IntersectPlane(plane_p, plane_n, inside_points(0), outside_points(0))
-      out_tri1.P(2) = Vector_IntersectPlane(plane_p, plane_n, inside_points(0), outside_points(1))
+      Dim t As Single
+      outTri1.P(1) = Vector_IntersectPlane(planeP, planeN, insidePoints(0), outsidePoints(0), t)
+      outTri1.T(1).U = t * (outsideTex(0).U - insideTex(0).U) + insideTex(0).U
+      outTri1.T(1).V = t * (outsideTex(0).V - insideTex(0).V) + insideTex(0).V
+      outTri1.T(1).W = t * (outsideTex(0).W - insideTex(0).W) + insideTex(0).W
+
+      outTri1.P(2) = Vector_IntersectPlane(planeP, planeN, insidePoints(0), outsidePoints(1), t)
+      outTri1.T(2).U = t * (outsideTex(1).U - insideTex(0).U) + insideTex(0).U
+      outTri1.T(2).V = t * (outsideTex(1).V - insideTex(0).V) + insideTex(0).V
+      outTri1.T(2).W = t * (outsideTex(1).W - insideTex(0).W) + insideTex(0).W
 
       Return 1 ' Return the newly formed single triangle
 
     End If
 
-    If nInsidePointCount = 2 AndAlso nOutsidePointCount = 1 Then
+    If insidePointCount = 2 AndAlso outsidePointCount = 1 Then
 
       ' Triangle should be clipped. As two points lie inside the plane,
       ' the clipped triangle becomes a "quad". Fortunately, we can
       ' represent a quad with two new triangles
       ' Copy appearance info to new triangles
-      out_tri1.col = in_tri.col
-      out_tri1.sym = in_tri.sym
+      outTri1.col = inTri.col
+      outTri1.sym = inTri.sym
 
-      out_tri2.col = in_tri.col
-      out_tri2.sym = in_tri.sym
+      outTri2.col = inTri.col
+      outTri2.sym = inTri.sym
 
       ' The first triangle consists of the two inside points and a new
       ' point determined by the location where one side of the triangle
       ' intersects with the plane
-      out_tri1.P(0) = inside_points(0)
-      out_tri1.P(1) = inside_points(1)
-      out_tri1.P(2) = Vector_IntersectPlane(plane_p, plane_n, inside_points(0), outside_points(0))
+      outTri1.P(0) = insidePoints(0)
+      outTri1.P(1) = insidePoints(1)
+      outTri1.T(0) = insideTex(0)
+      outTri1.T(1) = insideTex(1)
+
+      Dim t As Single ' pulled from Vector_IntersectPlane
+      outTri1.P(2) = Vector_IntersectPlane(planeP, planeN, insidePoints(0), outsidePoints(0), t)
+      outTri1.T(2).U = t * (outsideTex(0).U - insideTex(0).U) + insideTex(0).U
+      outTri1.T(2).V = t * (outsideTex(0).V - insideTex(0).V) + insideTex(0).V
+      outTri1.T(2).W = t * (outsideTex(0).W - insideTex(0).W) + insideTex(0).W
 
       ' The second triangle is composed of one of the inside points, a
-      ' new point determined by the intersection of the other side of the 
+      ' new point determined by the intersection of the other side of the
       ' triangle and the plane, and the newly created point above
-      out_tri2.P(0) = inside_points(1)
-      out_tri2.P(1) = out_tri1.P(2)
-      out_tri2.P(2) = Vector_IntersectPlane(plane_p, plane_n, inside_points(1), outside_points(0))
+      outTri2.P(0) = insidePoints(1)
+      outTri2.T(0) = insideTex(1)
+      outTri2.P(1) = outTri1.P(2)
+      outTri2.T(1) = outTri1.T(2)
+      outTri2.P(2) = Vector_IntersectPlane(planeP, planeN, insidePoints(1), outsidePoints(0), t)
+      outTri2.T(2).U = t * (outsideTex(0).U - insideTex(1).U) + insideTex(1).U
+      outTri2.T(2).V = t * (outsideTex(0).V - insideTex(1).V) + insideTex(1).V
+      outTri2.T(2).W = t * (outsideTex(0).W - insideTex(1).W) + insideTex(1).W
 
       Return 2 ' Return two newly formed triangles which form a quad
 
@@ -609,46 +891,77 @@ Class Engine3d
 
 End Class
 
-Friend Class Vec3d
+Friend Class Vec2d
 
-  Friend Property X As Single
-  Friend Property Y As Single
-  Public Property Z As Single
-
-  Public Property W As Single = 1.0F
+  Friend U As Single = 0.0F
+  Friend V As Single = 0.0F
+  Friend W As Single = 1.0F
 
   Friend Sub New()
   End Sub
 
-  Friend Sub New(x As Single, y As Single, z As Single)
-    Me.X = x
-    Me.Y = y
-    Me.Z = z
-    W = 1.0F
+  Friend Sub New(u As Single, v As Single, Optional w As Single = 1.0F)
+    Me.U = u
+    Me.V = v
+    Me.W = w
+  End Sub
+
+  Friend Sub Assign(value As Vec2d)
+    U = value.U
+    V = value.V
+    W = value.W
   End Sub
 
 End Class
 
-Friend Class TriangleComparer
-  Implements IComparer(Of Triangle)
+Friend Class Vec3d
 
-  Public Function Compare(t1 As Triangle, t2 As Triangle) As Integer Implements IComparer(Of Triangle).Compare
-    Dim z1 = (t1.P(0).Z + t1.P(1).Z + t1.P(2).Z) / 3.0F
-    Dim z2 = (t2.P(0).Z + t2.P(1).Z + t2.P(2).Z) / 3.0F
-    If z1 > z2 Then
-      Return -1
-    ElseIf z1 < z2 Then
-      Return 1
-    Else
-      Return 0
-    End If
-  End Function
+  Friend Property X As Single
+  Friend Property Y As Single
+  Friend Property Z As Single
+
+  Friend Property W As Single = 1.0F
+
+  Friend Sub New()
+  End Sub
+
+  Friend Sub New(x As Single, y As Single, z As Single, Optional w As Single = 1.0F)
+    Me.X = x
+    Me.Y = y
+    Me.Z = z
+    Me.W = w
+  End Sub
+
+  Friend Sub Assign(value As Vec3d)
+    X = value.X
+    Y = value.Y
+    Z = value.Z
+    W = value.W
+  End Sub
 
 End Class
+
+'Friend Class TriangleComparer
+'  Implements IComparer(Of Triangle)
+
+'  Public Function Compare(t1 As Triangle, t2 As Triangle) As Integer Implements IComparer(Of Triangle).Compare
+'    Dim z1 = (t1.P(0).Z + t1.P(1).Z + t1.P(2).Z) / 3.0F
+'    Dim z2 = (t2.P(0).Z + t2.P(1).Z + t2.P(2).Z) / 3.0F
+'    If z1 > z2 Then
+'      Return -1
+'    ElseIf z1 < z2 Then
+'      Return 1
+'    Else
+'      Return 0
+'    End If
+'  End Function
+
+'End Class
 
 Friend Class Triangle
 
   Private ReadOnly m_p(2) As Vec3d
+  Private ReadOnly m_t(2) As Vec2d ' Added texture coord per vertex
   Public sym As Integer
   Public col As Integer
 
@@ -657,7 +970,21 @@ Friend Class Triangle
       Return m_p(index)
     End Get
     Set(value As Vec3d)
-      m_p(index) = value
+      m_p(index).X = value.X
+      m_p(index).Y = value.Y
+      m_p(index).Z = value.Z
+      m_p(index).W = value.W
+    End Set
+  End Property
+
+  Public Property T(index As Integer) As Vec2d
+    Get
+      Return m_t(index)
+    End Get
+    Set(value As Vec2d)
+      m_t(index).V = value.V
+      m_t(index).U = value.U
+      m_t(index).W = value.W
     End Set
   End Property
 
@@ -665,18 +992,36 @@ Friend Class Triangle
     m_p(0) = New Vec3d
     m_p(1) = New Vec3d
     m_p(2) = New Vec3d
+    m_t(0) = New Vec2d
+    m_t(1) = New Vec2d
+    m_t(2) = New Vec2d
   End Sub
 
   Friend Sub New(vector0 As Vec3d, vector1 As Vec3d, vector2 As Vec3d)
     m_p(0) = vector0
     m_p(1) = vector1
     m_p(2) = vector2
+    m_t(0) = New Vec2d
+    m_t(1) = New Vec2d
+    m_t(2) = New Vec2d
+  End Sub
+
+  Friend Sub New(vector0 As Vec3d, vector1 As Vec3d, vector2 As Vec3d, texture0 As Vec2d, texture1 As Vec2d, texture2 As Vec2d)
+    m_p(0) = vector0
+    m_p(1) = vector1
+    m_p(2) = vector2
+    m_t(0) = texture0
+    m_t(1) = texture1
+    m_t(2) = texture2
   End Sub
 
   Friend Sub New(values As Single())
     Dim index = 0
-    For tri = 0 To 2
-      m_p(tri) = New Vec3d(values(index), values(index + 1), values(index + 2)) : index += 3
+    For entry = 0 To 2
+      m_p(entry) = New Vec3d(values(index), values(index + 1), values(index + 2), values(index + 3)) : index += 4
+    Next
+    For entry = 0 To 2
+      m_t(entry) = New Vec2d(values(index), values(index + 1), values(index + 2)) : index += 3
     Next
   End Sub
 
@@ -686,14 +1031,15 @@ Friend Class Mesh
 
   Public Property Tris As New List(Of Triangle)
 
-  Public Function LoadFromObjectFile(sFilename As String) As Boolean
+  Public Function LoadFromObjectFile(filename As String, Optional hasTexture As Boolean = False) As Boolean
 
-    Dim f = New IO.StreamReader(sFilename)
+    Dim f = New IO.StreamReader(filename)
 
     If f Is Nothing Then Return False
 
     ' Local cache of verts
     Dim verts = New List(Of Vec3d)()
+    Dim texs = New List(Of Vec2d)()
 
     While Not f.EndOfStream
 
@@ -706,19 +1052,51 @@ Friend Class Mesh
         Dim value = values(index) : index += 1
 
         If value(0) = "v"c Then
-          Dim v = New Vec3d()
-          'index += 1 ' skip junk
-          v.X = Single.Parse(values(index)) : index += 1
-          v.Y = Single.Parse(values(index)) : index += 1
-          v.Z = Single.Parse(values(index))
-          verts.Add(v)
+          If value(1) = "t"c Then
+            Dim v As New Vec2d
+            'index += 1 ' skip junk
+            index += 1 ' skip junk
+            v.U = Single.Parse(values(index)) : index += 1
+            v.V = Single.Parse(values(index))
+            ' A little hack for the spyro texture
+            'v.U = 1.0F - v.U
+            'v.V = 1.0F = v.V
+            texs.Add(v)
+          Else
+            Dim v = New Vec3d()
+            'index += 1 ' skip junk
+            v.X = Single.Parse(values(index)) : index += 1
+            v.Y = Single.Parse(values(index)) : index += 1
+            v.Z = Single.Parse(values(index))
+            verts.Add(v)
+          End If
         ElseIf value(0) = "f"c Then
-          Dim vals() = New Integer(2) {}
-          'index += 1 ' skip junk
-          vals(0) = Integer.Parse(values(index)) : index += 1
-          vals(1) = Integer.Parse(values(index)) : index += 1
-          vals(2) = Integer.Parse(values(index))
-          Tris.Add(New Triangle(verts(vals(0) - 1), verts(vals(1) - 1), verts(vals(2) - 1)))
+          If Not hasTexture Then
+            Dim vals() = New Integer(2) {}
+            'index += 1 ' skip junk
+            vals(0) = Integer.Parse(values(index)) : index += 1
+            vals(1) = Integer.Parse(values(index)) : index += 1
+            vals(2) = Integer.Parse(values(index))
+            Tris.Add(New Triangle(verts(vals(0) - 1), verts(vals(1) - 1), verts(vals(2) - 1)))
+          Else
+            Dim tokens(7) As String
+            Dim tokenCount = -1
+            While index < values.Length - 1
+              Dim c = values(index) : index += 1
+              If c = " "c Or c = "/"c Then
+                tokenCount += 1
+              Else
+                tokens(tokenCount) &= c
+              End If
+            End While
+            tokens(tokenCount) = tokens(tokenCount).Remove(tokens(tokenCount).Length - 1)
+            Tris.Add(New Triangle(verts(CInt(tokens(0)) - 1),
+                                       verts(CInt(tokens(2)) - 1),
+                                       verts(CInt(tokens(4)) - 1),
+                                       texs(CInt(tokens(1)) - 1),
+                                       texs(CInt(tokens(3)) - 1),
+                                       texs(CInt(tokens(5)) - 1)))
+          End If
         End If
 
       End If

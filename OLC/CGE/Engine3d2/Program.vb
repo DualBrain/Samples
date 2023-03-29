@@ -25,12 +25,12 @@ End Module
 Class Engine3d
   Inherits ConsoleGameEngine.ConsoleGameEngine
 
-  Private ReadOnly meshCube As New Mesh
-  Private matProj As New Mat4x4
+  Private ReadOnly m_meshCube As New Mesh
+  Private m_matProj As New Mat4x4
 
-  Private vCamera As New Vec3d
+  Private ReadOnly m_camera As New Vec3d
 
-  Private fTheta As Single
+  Private m_theta As Single
 
   Public Sub New()
     m_sAppName = "3D Demo"
@@ -38,28 +38,7 @@ Class Engine3d
 
   Public Overrides Function OnUserCreate() As Boolean
 
-    'meshCube.Tris = { _ ' SOUTH
-    'New Triangle({0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F}),
-    'New Triangle({0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F, 0.0F, 0.0F}), _
-    '                                                                      _ ' EAST
-    'New Triangle({1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F}),
-    'New Triangle({1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F}), _
-    '                                                                      _ ' NORTH
-    'New Triangle({1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F}),
-    'New Triangle({1.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F}), _
-    '                                                                      _ ' WEST
-    'New Triangle({0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F, 0.0F}),
-    'New Triangle({0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F}), _
-    '                                                                      _ ' TOP
-    'New Triangle({0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F}),
-    'New Triangle({0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F}), _
-    '                                                                      _ ' BOTTOM
-    'New Triangle({1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F}),
-    'New Triangle({1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F})}.ToList
-
-    meshCube.LoadFromObjectFile("VideoShip.obj")
-    'meshCube.LoadFromObjectFile("teapot.obj")
-    'meshCube.LoadFromObjectFile("axis.obj")
+    m_meshCube.LoadFromObjectFile("VideoShip.obj")
 
     ' Projection Matrix
     Dim near = 0.1F
@@ -68,12 +47,12 @@ Class Engine3d
     Dim aspectRatio = CSng(ScreenHeight() / ScreenWidth())
     Dim fovRad = 1.0F / CSng(Math.Tan(fov * 0.5F / 180.0F * 3.14159F))
 
-    matProj.M(0, 0) = aspectRatio * fovRad
-    matProj.M(1, 1) = fovRad
-    matProj.M(2, 2) = far / (far - near)
-    matProj.M(3, 2) = (-far * near) / (far - near)
-    matProj.M(2, 3) = 1.0F
-    matProj.M(3, 3) = 0.0F
+    m_matProj.M(0, 0) = aspectRatio * fovRad
+    m_matProj.M(1, 1) = fovRad
+    m_matProj.M(2, 2) = far / (far - near)
+    m_matProj.M(3, 2) = (-far * near) / (far - near)
+    m_matProj.M(2, 3) = 1.0F
+    m_matProj.M(3, 3) = 0.0F
 
     Return True
 
@@ -87,29 +66,29 @@ Class Engine3d
     ' Set up rotation matrices
     Dim matRotZ As New Mat4x4
     Dim matRotX As New Mat4x4
-    fTheta += 1.0F * elapsedTime
+    m_theta += 1.0F * elapsedTime
 
     ' Rotation Z
-    matRotZ.M(0, 0) = CSng(Math.Cos(fTheta))
-    matRotZ.M(0, 1) = CSng(Math.Sin(fTheta))
-    matRotZ.M(1, 0) = -CSng(Math.Sin(fTheta))
-    matRotZ.M(1, 1) = CSng(Math.Cos(fTheta))
+    matRotZ.M(0, 0) = CSng(Math.Cos(m_theta))
+    matRotZ.M(0, 1) = CSng(Math.Sin(m_theta))
+    matRotZ.M(1, 0) = -CSng(Math.Sin(m_theta))
+    matRotZ.M(1, 1) = CSng(Math.Cos(m_theta))
     matRotZ.M(2, 2) = 1
     matRotZ.M(3, 3) = 1
 
     ' Rotation X
     matRotX.M(0, 0) = 1
-    matRotX.M(1, 1) = CSng(Math.Cos(fTheta * 0.5F))
-    matRotX.M(1, 2) = CSng(Math.Sin(fTheta * 0.5F))
-    matRotX.M(2, 1) = -CSng(Math.Sin(fTheta * 0.5F))
-    matRotX.M(2, 2) = CSng(Math.Cos(fTheta * 0.5F))
+    matRotX.M(1, 1) = CSng(Math.Cos(m_theta * 0.5F))
+    matRotX.M(1, 2) = CSng(Math.Sin(m_theta * 0.5F))
+    matRotX.M(2, 1) = -CSng(Math.Sin(m_theta * 0.5F))
+    matRotX.M(2, 2) = CSng(Math.Cos(m_theta * 0.5F))
     matRotX.M(3, 3) = 1
 
     ' Store triangles for rasterizing later
-    Dim vecTrianglesToRaster As New List(Of Triangle)
+    Dim trianglesToRaster As New List(Of Triangle)
 
     ' Draw Triangles
-    For Each tri In meshCube.Tris
+    For Each tri In m_meshCube.Tris
 
       Dim triProjected, triTranslated, triRotatedZ, triRotatedZX As New Triangle
 
@@ -148,14 +127,14 @@ Class Engine3d
       normal.X /= l : normal.Y /= l : normal.Z /= l
 
       'if (normal.z < 0)
-      If normal.X * (triTranslated.P(0).X - vCamera.X) + normal.Y * (triTranslated.P(0).Y - vCamera.Y) + normal.Z * (triTranslated.P(0).Z - vCamera.Z) < 0.0F Then
+      If normal.X * (triTranslated.P(0).X - m_camera.X) + normal.Y * (triTranslated.P(0).Y - m_camera.Y) + normal.Z * (triTranslated.P(0).Z - m_camera.Z) < 0.0F Then
 
         'Illumination
-        Dim light_direction As New Vec3d(0.0F, 0.0F, -1.0F)
-        l = CSng(Math.Sqrt(light_direction.X * light_direction.X + light_direction.Y * light_direction.Y + light_direction.Z * light_direction.Z))
-        light_direction.X /= l : light_direction.Y /= l : light_direction.Z /= l
+        Dim lightDirection As New Vec3d(0.0F, 0.0F, -1.0F)
+        l = CSng(Math.Sqrt(lightDirection.X * lightDirection.X + lightDirection.Y * lightDirection.Y + lightDirection.Z * lightDirection.Z))
+        lightDirection.X /= l : lightDirection.Y /= l : lightDirection.Z /= l
         'How similar is normal to light direction
-        Dim dp = normal.X * light_direction.X + normal.Y * light_direction.Y + normal.Z * light_direction.Z
+        Dim dp = normal.X * lightDirection.X + normal.Y * lightDirection.Y + normal.Z * lightDirection.Z
 
         'Choose console colours as required (much easier with RGB)
         Dim c = GetColour(dp)
@@ -163,9 +142,9 @@ Class Engine3d
         triTranslated.sym = c.Ch '.UnicodeChar
 
         'Project triangles from 3D --> 2D
-        MultiplyMatrixVector(triTranslated.P(0), triProjected.P(0), matProj)
-        MultiplyMatrixVector(triTranslated.P(1), triProjected.P(1), matProj)
-        MultiplyMatrixVector(triTranslated.P(2), triProjected.P(2), matProj)
+        MultiplyMatrixVector(triTranslated.P(0), triProjected.P(0), m_matProj)
+        MultiplyMatrixVector(triTranslated.P(1), triProjected.P(1), m_matProj)
+        MultiplyMatrixVector(triTranslated.P(2), triProjected.P(2), m_matProj)
         triProjected.col = triTranslated.col
         triProjected.sym = triTranslated.sym
 
@@ -181,16 +160,16 @@ Class Engine3d
         triProjected.P(2).Y *= 0.5F * ScreenHeight()
 
         'Store triangle for sorting
-        vecTrianglesToRaster.Add(triProjected)
+        trianglesToRaster.Add(triProjected)
 
       End If
 
     Next
 
     ' Sort triangles from back to front
-    vecTrianglesToRaster.Sort(New TriangleComparer)
+    trianglesToRaster.Sort(New TriangleComparer)
 
-    For Each triProjected In vecTrianglesToRaster
+    For Each triProjected In trianglesToRaster
 
       ' Rasterize triangle
       FillTriangle(triProjected.P(0).X, triProjected.P(0).Y,
@@ -226,29 +205,29 @@ Class Engine3d
 
   Private Shared Function GetColour(lum As Single) As CHAR_INFO
 
-    Dim bg_col, fg_col As Integer
+    Dim bgCol, fgCol As Integer
     Dim sym As Integer
-    Dim pixel_bw = CInt(13.0F * lum)
+    Dim pixelBw = CInt(13.0F * lum)
 
-    Select Case pixel_bw
-      Case 0 : bg_col = BG_BLACK : fg_col = FG_BLACK : sym = PIXEL_SOLID
-      Case 1 : bg_col = BG_BLACK : fg_col = FG_DARK_GREY : sym = PIXEL_QUARTER
-      Case 2 : bg_col = BG_BLACK : fg_col = FG_DARK_GREY : sym = PIXEL_HALF
-      Case 3 : bg_col = BG_BLACK : fg_col = FG_DARK_GREY : sym = PIXEL_THREEQUARTERS
-      Case 4 : bg_col = BG_BLACK : fg_col = FG_DARK_GREY : sym = PIXEL_SOLID
-      Case 5 : bg_col = BG_DARK_GREY : fg_col = FG_GREY : sym = PIXEL_QUARTER
-      Case 6 : bg_col = BG_DARK_GREY : fg_col = FG_GREY : sym = PIXEL_HALF
-      Case 7 : bg_col = BG_DARK_GREY : fg_col = FG_GREY : sym = PIXEL_THREEQUARTERS
-      Case 8 : bg_col = BG_DARK_GREY : fg_col = FG_GREY : sym = PIXEL_SOLID
-      Case 9 : bg_col = BG_GREY : fg_col = FG_WHITE : sym = PIXEL_QUARTER
-      Case 10 : bg_col = BG_GREY : fg_col = FG_WHITE : sym = PIXEL_HALF
-      Case 11 : bg_col = BG_GREY : fg_col = FG_WHITE : sym = PIXEL_THREEQUARTERS
-      Case 12 : bg_col = BG_GREY : fg_col = FG_WHITE : sym = PIXEL_SOLID
+    Select Case pixelBw
+      Case 0 : bgCol = BG_BLACK : fgCol = FG_BLACK : sym = PIXEL_SOLID
+      Case 1 : bgCol = BG_BLACK : fgCol = FG_DARK_GREY : sym = PIXEL_QUARTER
+      Case 2 : bgCol = BG_BLACK : fgCol = FG_DARK_GREY : sym = PIXEL_HALF
+      Case 3 : bgCol = BG_BLACK : fgCol = FG_DARK_GREY : sym = PIXEL_THREEQUARTERS
+      Case 4 : bgCol = BG_BLACK : fgCol = FG_DARK_GREY : sym = PIXEL_SOLID
+      Case 5 : bgCol = BG_DARK_GREY : fgCol = FG_GREY : sym = PIXEL_QUARTER
+      Case 6 : bgCol = BG_DARK_GREY : fgCol = FG_GREY : sym = PIXEL_HALF
+      Case 7 : bgCol = BG_DARK_GREY : fgCol = FG_GREY : sym = PIXEL_THREEQUARTERS
+      Case 8 : bgCol = BG_DARK_GREY : fgCol = FG_GREY : sym = PIXEL_SOLID
+      Case 9 : bgCol = BG_GREY : fgCol = FG_WHITE : sym = PIXEL_QUARTER
+      Case 10 : bgCol = BG_GREY : fgCol = FG_WHITE : sym = PIXEL_HALF
+      Case 11 : bgCol = BG_GREY : fgCol = FG_WHITE : sym = PIXEL_THREEQUARTERS
+      Case 12 : bgCol = BG_GREY : fgCol = FG_WHITE : sym = PIXEL_SOLID
         'Case Else : bg_col = BG_BLACK : fg_col = FG_BLACK : sym = PIXEL_SOLID
-      Case Else : bg_col = BG_WHITE : fg_col = FG_WHITE : sym = PIXEL_SOLID
+      Case Else : bgCol = BG_WHITE : fgCol = FG_WHITE : sym = PIXEL_SOLID
     End Select
 
-    Dim c = New CHAR_INFO With {.Attributes = bg_col Or fg_col, .Ch = sym}
+    Dim c = New CHAR_INFO With {.Attributes = bgCol Or fgCol, .Ch = sym}
 
     Return c
 
@@ -354,12 +333,12 @@ Friend Class Mesh
           v.Z = Single.Parse(values(index))
           verts.Add(v)
         ElseIf value(0) = "f"c Then
-          Dim fVals() = New Integer(2) {}
+          Dim vals() = New Integer(2) {}
           'index += 1 ' skip junk
-          fVals(0) = Integer.Parse(values(index)) : index += 1
-          fVals(1) = Integer.Parse(values(index)) : index += 1
-          fVals(2) = Integer.Parse(values(index))
-          Tris.Add(New Triangle(verts(fVals(0) - 1), verts(fVals(1) - 1), verts(fVals(2) - 1)))
+          vals(0) = Integer.Parse(values(index)) : index += 1
+          vals(1) = Integer.Parse(values(index)) : index += 1
+          vals(2) = Integer.Parse(values(index))
+          Tris.Add(New Triangle(verts(vals(0) - 1), verts(vals(1) - 1), verts(vals(2) - 1)))
         End If
 
       End If

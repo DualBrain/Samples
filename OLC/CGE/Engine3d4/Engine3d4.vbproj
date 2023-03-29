@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Engine3d2</RootNamespace>
+    <RootNamespace>Engine3d4</RootNamespace>
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="VideoShip.obj" />
+    <None Remove="fps_wall1.spr" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="VideoShip.obj">
+    <Content Include="fps_wall1.spr">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

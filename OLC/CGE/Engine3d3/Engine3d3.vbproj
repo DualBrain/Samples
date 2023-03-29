@@ -7,23 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="axis.obj" />
     <None Remove="mountains.obj" />
-    <None Remove="teapot.obj" />
-    <None Remove="VideoShip.obj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="axis.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="mountains.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="teapot.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="VideoShip.obj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
