@@ -22,7 +22,7 @@ Friend Class Example
   Private playerY As Single
 
   Friend Sub New()
-    sAppName = "Example"
+    AppName = "Example"
   End Sub
 
   Protected Overrides Function OnUserCreate() As Boolean
@@ -36,7 +36,7 @@ Friend Class Example
 
   Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
-    If GetKey(Key.SPACE).bPressed Then
+    If GetKey(Key.SPACE).Pressed Then
       m_state += 1
     End If
 
@@ -78,10 +78,10 @@ Friend Class Example
         ' Simple character movement
         ' ------
 
-        If GetKey(Key.LEFT).bHeld Then playerX -= 15 * elapsedTime
-        If GetKey(Key.RIGHT).bHeld Then playerX += 15 * elapsedTime
-        If GetKey(Key.UP).bHeld Then playerY -= 15 * elapsedTime
-        If GetKey(Key.DOWN).bHeld Then playerY += 15 * elapsedTime
+        If GetKey(Key.LEFT).Held Then playerX -= 15 * elapsedTime
+        If GetKey(Key.RIGHT).Held Then playerX += 15 * elapsedTime
+        If GetKey(Key.UP).Held Then playerY -= 15 * elapsedTime
+        If GetKey(Key.DOWN).Held Then playerY += 15 * elapsedTime
 
         Clear()
 
@@ -101,7 +101,7 @@ Friend Class Example
         Draw(GetMouseX, GetMouseY - 1)
         Draw(GetMouseX, GetMouseY + 1)
 
-        If GetMouse(0).bHeld Then
+        If GetMouse(0).Held Then
           FillRect(20, 20, 50, 50)
         End If
 

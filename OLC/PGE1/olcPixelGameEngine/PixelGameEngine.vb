@@ -585,14 +585,14 @@ Public MustInherit Class PixelGameEngine
 #End Region
 
   ' Singletons...
-  Private Shared bAtomActive As Boolean
-  Private Shared mapKeys As New Dictionary(Of Integer, Integer)
-  Private Shared sge As PixelGameEngine ' Used in Windows message pump.
+  Private Shared m_atomActive As Boolean
+  Private Shared ReadOnly m_mapKeys As New Dictionary(Of Integer, Integer)
+  Private Shared m_sge As PixelGameEngine ' Used in Windows message pump.
 
   Protected Delegate Function PixelModeDelegate(x As Integer, y As Integer, p1 As Pixel, p2 As Pixel) As Pixel
   Private funcPixelMode As PixelModeDelegate
 
-  Protected sAppName As String
+  Protected Property AppName As String
 
   Private olc_hWnd As IntPtr
   Private glBuffer As UInteger
@@ -621,11 +621,11 @@ Public MustInherit Class PixelGameEngine
 
   Private pKeyNewState(255) As Boolean
   Private pKeyOldState(255) As Boolean
-  Private pKeyboardState(255) As HWButton
+  Private pKeyboardState(255) As HwButton
 
   Private pMouseNewState(4) As Boolean
   Private pMouseOldState(4) As Boolean
-  Private pMouseState(4) As HWButton
+  Private pMouseState(4) As HwButton
   Private nMousePosXcache As Integer
   Private nMousePosYcache As Integer
   Private nMousePosX As Integer
@@ -643,10 +643,10 @@ Public MustInherit Class PixelGameEngine
   Private fSubPixelOffsetX As Single
   Private fSubPixelOffsetY As Single
 
-  Protected Structure HWButton
-    Public bPressed As Boolean ' Set once during the frame the event occurs
-    Public bReleased As Boolean ' Set once during the frame the event occurs
-    Public bHeld As Boolean ' Set true for all frames between pressed and released events
+  Protected Structure HwButton
+    Public Pressed As Boolean ' Set once during the frame the event occurs
+    Public Released As Boolean ' Set once during the frame the event occurs
+    Public Held As Boolean ' Set true for all frames between pressed and released events
   End Structure
 
   Public Enum RCode
@@ -756,10 +756,10 @@ Public MustInherit Class PixelGameEngine
     ENUM_END
   End Enum
 
-  Private fontSprite As Sprite
+  Private m_fontSprite As Sprite
 
   Protected Friend Sub New()
-    sAppName = "Undefined"
+    AppName = "Undefined"
     'Olc.PgeX.pge = Me
   End Sub
 
@@ -836,7 +836,7 @@ Public MustInherit Class PixelGameEngine
     End If
 
     ' Start the thread
-    bAtomActive = True
+    m_atomActive = True
     Dim t As New Thread(AddressOf EngineThread)
     t.Start()
 
@@ -901,13 +901,13 @@ Public MustInherit Class PixelGameEngine
     End Get
   End Property
 
-  Protected ReadOnly Property GetKey(k As Key) As HWButton
+  Protected ReadOnly Property GetKey(k As Key) As HwButton
     Get
       Return pKeyboardState(k)
     End Get
   End Property
 
-  Protected ReadOnly Property GetMouse(b As Integer) As HWButton
+  Protected ReadOnly Property GetMouse(b As Integer) As HwButton
     Get
       Return pMouseState(b)
     End Get
@@ -1527,7 +1527,7 @@ next4:
         If scale > 1 Then
           For i = 0 To 7
             For j = 0 To 7
-              If fontSprite.GetPixel(i + ox * 8, j + oy * 8).R > 0 Then
+              If m_fontSprite.GetPixel(i + ox * 8, j + oy * 8).R > 0 Then
                 For iIs = 0 To scale - 1
                   For js = 0 To scale - 1
                     Draw(x + sx + (i * scale) + iIs, y + sy + (j * scale) + js, col)
@@ -1539,7 +1539,7 @@ next4:
         Else
           For i = 0 To 7
             For j = 0 To 7
-              If fontSprite.GetPixel(i + ox * 8, j + oy * 8).R > 0 Then
+              If m_fontSprite.GetPixel(i + ox * 8, j + oy * 8).R > 0 Then
                 Draw(x + sx + i, y + sy + j, col)
               End If
             Next
@@ -1676,16 +1676,16 @@ next4:
 
     ' Create user resources as part of this thread
     If Not OnUserCreate() Then
-      bAtomActive = False
+      m_atomActive = False
     End If
 
     Dim tp1 = Now()
     'Dim tp2 = Now()
 
-    While bAtomActive
+    While m_atomActive
 
       ' Run as fast as possible
-      While bAtomActive
+      While m_atomActive
 
         ' Handle Timing
         Dim tp2 = Now
@@ -1759,15 +1759,15 @@ next4:
 
         ' Handle User Input - Keyboard
         For i = 0 To 255
-          pKeyboardState(i).bPressed = False
-          pKeyboardState(i).bReleased = False
+          pKeyboardState(i).Pressed = False
+          pKeyboardState(i).Released = False
           If pKeyNewState(i) <> pKeyOldState(i) Then
             If pKeyNewState(i) Then
-              pKeyboardState(i).bPressed = Not pKeyboardState(i).bHeld
-              pKeyboardState(i).bHeld = True
+              pKeyboardState(i).Pressed = Not pKeyboardState(i).Held
+              pKeyboardState(i).Held = True
             Else
-              pKeyboardState(i).bReleased = True
-              pKeyboardState(i).bHeld = False
+              pKeyboardState(i).Released = True
+              pKeyboardState(i).Held = False
             End If
           End If
           pKeyOldState(i) = pKeyNewState(i)
@@ -1775,15 +1775,15 @@ next4:
 
         ' Handle User Input - Mouse
         For i = 0 To 4
-          pMouseState(i).bPressed = False
-          pMouseState(i).bReleased = False
+          pMouseState(i).Pressed = False
+          pMouseState(i).Released = False
           If pMouseNewState(i) <> pMouseOldState(i) Then
             If pMouseNewState(i) Then
-              pMouseState(i).bPressed = Not pMouseState(i).bHeld
-              pMouseState(i).bHeld = True
+              pMouseState(i).Pressed = Not pMouseState(i).Held
+              pMouseState(i).Held = True
             Else
-              pMouseState(i).bReleased = True
-              pMouseState(i).bHeld = False
+              pMouseState(i).Released = True
+              pMouseState(i).Held = False
             End If
           End If
           pMouseOldState(i) = pMouseNewState(i)
@@ -1799,7 +1799,7 @@ next4:
 
         ' Handle Frame Update
         If Not OnUserUpdate(elapsedTime) Then
-          bAtomActive = False
+          m_atomActive = False
         End If
 
         ' Display Graphics
@@ -1842,7 +1842,7 @@ next4:
 
           fFrameTimer -= 1.0F
 
-          Dim sTitle = $"olcPixelGameEngineVB v0.1 - AddressOf.com/OneLoneCoder.com - {sAppName} - FPS: {nFrameCount}"
+          Dim sTitle = $"olcPixelGameEngineVB v0.1 - AddressOf.com/OneLoneCoder.com - {AppName} - FPS: {nFrameCount}"
 
           If IsOSPlatform(Windows) Then
             SetWindowText(olc_hWnd, sTitle)
@@ -1861,7 +1861,7 @@ next4:
         ' User has permitted destroy, so exit and clean up
       Else
         ' User denied destroy for some reason, so continue running
-        bAtomActive = True
+        m_atomActive = True
       End If
 
     End While
@@ -1900,7 +1900,7 @@ next4:
     data &= "O`000P08Od400g`<3V=P0G`673IP0`@3>1`00P@6O`P00g`<O`000GP800000000"
     data &= "?P9PL020O`<`N3R0@E4HC7b0@ET<ATB0@@l6C4B0O`H3N7b0?P01L3R000000020"
 
-    fontSprite = New Sprite(128, 48)
+    m_fontSprite = New Sprite(128, 48)
 
     Dim px = 0, py = 0
     For b = 0 To 1023 Step 4
@@ -1913,7 +1913,7 @@ next4:
 
       For i = 0 To 23
         Dim k = If((r And (1 << i)) <> 0, 255, 0)
-        fontSprite.SetPixel(px, py, New Pixel(k, k, k, k))
+        m_fontSprite.SetPixel(px, py, New Pixel(k, k, k, k))
         If System.Threading.Interlocked.Increment(py) = 48 Then
           px += 1 : py = 0
         End If
@@ -1976,7 +1976,7 @@ next4:
     Dim width = rWndRect.Right - rWndRect.Left
     Dim height = rWndRect.Bottom - rWndRect.Top
 
-    sge = Me
+    m_sge = Me
     olc_hWnd = CreateWindowEx(dwExStyle, atom, "", dwStyle,
                               nCosmeticOffset, nCosmeticOffset, width, height, Nothing, Nothing,
                               GetModuleHandle(Nothing), IntPtr.Zero)
@@ -1988,33 +1988,33 @@ next4:
     'TrackMouseEvent(tme)
 
     ' Create Keyboard Mapping
-    mapKeys(&H0) = Key.NONE
-    mapKeys(&H41) = Key.A : mapKeys(&H42) = Key.B : mapKeys(&H43) = Key.C : mapKeys(&H44) = Key.D : mapKeys(&H45) = Key.E
-    mapKeys(&H46) = Key.F : mapKeys(&H47) = Key.G : mapKeys(&H48) = Key.H : mapKeys(&H49) = Key.I : mapKeys(&H50) = Key.J
-    mapKeys(&H4B) = Key.K : mapKeys(&H4C) = Key.L : mapKeys(&H4D) = Key.M : mapKeys(&H4E) = Key.N : mapKeys(&H4F) = Key.O
-    mapKeys(&H50) = Key.P : mapKeys(&H51) = Key.Q : mapKeys(&H52) = Key.R : mapKeys(&H53) = Key.S : mapKeys(&H54) = Key.T
-    mapKeys(&H55) = Key.U : mapKeys(&H56) = Key.V : mapKeys(&H57) = Key.W : mapKeys(&H58) = Key.X : mapKeys(&H59) = Key.Y
-    mapKeys(&H5A) = Key.Z
+    m_mapKeys(&H0) = Key.NONE
+    m_mapKeys(&H41) = Key.A : m_mapKeys(&H42) = Key.B : m_mapKeys(&H43) = Key.C : m_mapKeys(&H44) = Key.D : m_mapKeys(&H45) = Key.E
+    m_mapKeys(&H46) = Key.F : m_mapKeys(&H47) = Key.G : m_mapKeys(&H48) = Key.H : m_mapKeys(&H49) = Key.I : m_mapKeys(&H50) = Key.J
+    m_mapKeys(&H4B) = Key.K : m_mapKeys(&H4C) = Key.L : m_mapKeys(&H4D) = Key.M : m_mapKeys(&H4E) = Key.N : m_mapKeys(&H4F) = Key.O
+    m_mapKeys(&H50) = Key.P : m_mapKeys(&H51) = Key.Q : m_mapKeys(&H52) = Key.R : m_mapKeys(&H53) = Key.S : m_mapKeys(&H54) = Key.T
+    m_mapKeys(&H55) = Key.U : m_mapKeys(&H56) = Key.V : m_mapKeys(&H57) = Key.W : m_mapKeys(&H58) = Key.X : m_mapKeys(&H59) = Key.Y
+    m_mapKeys(&H5A) = Key.Z
 
-    mapKeys(VK_F1) = Key.F1 : mapKeys(VK_F2) = Key.F2 : mapKeys(VK_F3) = Key.F3 : mapKeys(VK_F4) = Key.F4
-    mapKeys(VK_F5) = Key.F5 : mapKeys(VK_F6) = Key.F6 : mapKeys(VK_F7) = Key.F7 : mapKeys(VK_F8) = Key.F8
-    mapKeys(VK_F9) = Key.F9 : mapKeys(VK_F10) = Key.F10 : mapKeys(VK_F11) = Key.F11 : mapKeys(VK_F12) = Key.F12
+    m_mapKeys(VK_F1) = Key.F1 : m_mapKeys(VK_F2) = Key.F2 : m_mapKeys(VK_F3) = Key.F3 : m_mapKeys(VK_F4) = Key.F4
+    m_mapKeys(VK_F5) = Key.F5 : m_mapKeys(VK_F6) = Key.F6 : m_mapKeys(VK_F7) = Key.F7 : m_mapKeys(VK_F8) = Key.F8
+    m_mapKeys(VK_F9) = Key.F9 : m_mapKeys(VK_F10) = Key.F10 : m_mapKeys(VK_F11) = Key.F11 : m_mapKeys(VK_F12) = Key.F12
 
-    mapKeys(VK_DOWN) = Key.DOWN : mapKeys(VK_LEFT) = Key.LEFT : mapKeys(VK_RIGHT) = Key.RIGHT : mapKeys(VK_UP) = Key.UP
-    mapKeys(VK_RETURN) = Key.ENTER 'mapKeys(VK_RETURN) = Key.RETURN
+    m_mapKeys(VK_DOWN) = Key.DOWN : m_mapKeys(VK_LEFT) = Key.LEFT : m_mapKeys(VK_RIGHT) = Key.RIGHT : m_mapKeys(VK_UP) = Key.UP
+    m_mapKeys(VK_RETURN) = Key.ENTER 'mapKeys(VK_RETURN) = Key.RETURN
 
-    mapKeys(VK_BACK) = Key.BACK : mapKeys(VK_ESCAPE) = Key.ESCAPE : mapKeys(VK_RETURN) = Key.ENTER : mapKeys(VK_PAUSE) = Key.PAUSE
-    mapKeys(VK_SCROLL) = Key.SCROLL : mapKeys(VK_TAB) = Key.TAB : mapKeys(VK_DELETE) = Key.DEL : mapKeys(VK_HOME) = Key.HOME
-    mapKeys(VK_END) = Key.END : mapKeys(VK_PRIOR) = Key.PGUP : mapKeys(VK_NEXT) = Key.PGDN : mapKeys(VK_INSERT) = Key.INS
-    mapKeys(VK_SHIFT) = Key.SHIFT : mapKeys(VK_CONTROL) = Key.CTRL
-    mapKeys(VK_SPACE) = Key.SPACE
+    m_mapKeys(VK_BACK) = Key.BACK : m_mapKeys(VK_ESCAPE) = Key.ESCAPE : m_mapKeys(VK_RETURN) = Key.ENTER : m_mapKeys(VK_PAUSE) = Key.PAUSE
+    m_mapKeys(VK_SCROLL) = Key.SCROLL : m_mapKeys(VK_TAB) = Key.TAB : m_mapKeys(VK_DELETE) = Key.DEL : m_mapKeys(VK_HOME) = Key.HOME
+    m_mapKeys(VK_END) = Key.END : m_mapKeys(VK_PRIOR) = Key.PGUP : m_mapKeys(VK_NEXT) = Key.PGDN : m_mapKeys(VK_INSERT) = Key.INS
+    m_mapKeys(VK_SHIFT) = Key.SHIFT : m_mapKeys(VK_CONTROL) = Key.CTRL
+    m_mapKeys(VK_SPACE) = Key.SPACE
 
-    mapKeys(&H30) = Key.K0 : mapKeys(&H31) = Key.K1 : mapKeys(&H32) = Key.K2 : mapKeys(&H33) = Key.K3 : mapKeys(&H34) = Key.K4
-    mapKeys(&H35) = Key.K5 : mapKeys(&H36) = Key.K6 : mapKeys(&H37) = Key.K7 : mapKeys(&H38) = Key.K8 : mapKeys(&H39) = Key.K9
+    m_mapKeys(&H30) = Key.K0 : m_mapKeys(&H31) = Key.K1 : m_mapKeys(&H32) = Key.K2 : m_mapKeys(&H33) = Key.K3 : m_mapKeys(&H34) = Key.K4
+    m_mapKeys(&H35) = Key.K5 : m_mapKeys(&H36) = Key.K6 : m_mapKeys(&H37) = Key.K7 : m_mapKeys(&H38) = Key.K8 : m_mapKeys(&H39) = Key.K9
 
-    mapKeys(VK_NUMPAD0) = Key.NP0 : mapKeys(VK_NUMPAD1) = Key.NP1 : mapKeys(VK_NUMPAD2) = Key.NP2 : mapKeys(VK_NUMPAD3) = Key.NP3 : mapKeys(VK_NUMPAD4) = Key.NP4
-    mapKeys(VK_NUMPAD5) = Key.NP5 : mapKeys(VK_NUMPAD6) = Key.NP6 : mapKeys(VK_NUMPAD7) = Key.NP7 : mapKeys(VK_NUMPAD8) = Key.NP8 : mapKeys(VK_NUMPAD9) = Key.NP9
-    mapKeys(VK_MULTIPLY) = Key.NP_MUL : mapKeys(VK_ADD) = Key.NP_ADD : mapKeys(VK_DIVIDE) = Key.NP_DIV : mapKeys(VK_SUBTRACT) = Key.NP_SUB : mapKeys(VK_DECIMAL) = Key.NP_DECIMAL
+    m_mapKeys(VK_NUMPAD0) = Key.NP0 : m_mapKeys(VK_NUMPAD1) = Key.NP1 : m_mapKeys(VK_NUMPAD2) = Key.NP2 : m_mapKeys(VK_NUMPAD3) = Key.NP3 : m_mapKeys(VK_NUMPAD4) = Key.NP4
+    m_mapKeys(VK_NUMPAD5) = Key.NP5 : m_mapKeys(VK_NUMPAD6) = Key.NP6 : m_mapKeys(VK_NUMPAD7) = Key.NP7 : m_mapKeys(VK_NUMPAD8) = Key.NP8 : m_mapKeys(VK_NUMPAD9) = Key.NP9
+    m_mapKeys(VK_MULTIPLY) = Key.NP_MUL : m_mapKeys(VK_ADD) = Key.NP_ADD : m_mapKeys(VK_DIVIDE) = Key.NP_DIV : m_mapKeys(VK_SUBTRACT) = Key.NP_SUB : m_mapKeys(VK_DECIMAL) = Key.NP_DECIMAL
 
     Return olc_hWnd
 
@@ -2083,11 +2083,11 @@ next4:
         Dim y = (v >> 16) And &HFFFF
         Dim ix = BitConverter.ToInt16(BitConverter.GetBytes(x), 0)
         Dim iy = BitConverter.ToInt16(BitConverter.GetBytes(y), 0)
-        sge.olc_UpdateMouse(ix, iy)
+        m_sge.olc_UpdateMouse(ix, iy)
         Return IntPtr.Zero
       Case WM_SIZE
         Dim v = CInt(lParam)
-        sge.olc_UpdateWindowSize(v And &HFFFF, (v >> 16) And &HFFFF)
+        m_sge.olc_UpdateWindowSize(v And &HFFFF, (v >> 16) And &HFFFF)
         Return IntPtr.Zero
       Case WM_MOUSEWHEEL
         'TODO: WM_WHEEL not working correctly...
@@ -2096,40 +2096,40 @@ next4:
         Return IntPtr.Zero
       Case WM_MOUSELEAVE
         'TODO: WM_MOUSELEAVE is working *once*, not sure why...
-        sge.bHasMouseFocus = False
+        m_sge.bHasMouseFocus = False
         Return IntPtr.Zero
       Case WM_SETFOCUS
-        sge.bHasInputFocus = True
+        m_sge.bHasInputFocus = True
         Return IntPtr.Zero
       Case WM_KILLFOCUS
-        sge.bHasInputFocus = False
+        m_sge.bHasInputFocus = False
         Return IntPtr.Zero
       Case WM_KEYDOWN
-        sge.pKeyNewState(mapKeys(wParam.ToInt32())) = True
+        m_sge.pKeyNewState(m_mapKeys(wParam.ToInt32())) = True
         Return IntPtr.Zero
       Case WM_KEYUP
-        sge.pKeyNewState(mapKeys(wParam.ToInt32())) = False
+        m_sge.pKeyNewState(m_mapKeys(wParam.ToInt32())) = False
         Return IntPtr.Zero
       Case WM_LBUTTONDOWN
-        sge.pMouseNewState(0) = True
+        m_sge.pMouseNewState(0) = True
         Return IntPtr.Zero
       Case WM_LBUTTONUP
-        sge.pMouseNewState(0) = False
+        m_sge.pMouseNewState(0) = False
         Return IntPtr.Zero
       Case WM_RBUTTONDOWN
-        sge.pMouseNewState(1) = True
+        m_sge.pMouseNewState(1) = True
         Return IntPtr.Zero
       Case WM_RBUTTONUP
-        sge.pMouseNewState(1) = False
+        m_sge.pMouseNewState(1) = False
         Return IntPtr.Zero
       Case WM_MBUTTONDOWN
-        sge.pMouseNewState(2) = True
+        m_sge.pMouseNewState(2) = True
         Return IntPtr.Zero
       Case WM_MBUTTONUP
-        sge.pMouseNewState(2) = False
+        m_sge.pMouseNewState(2) = False
         Return IntPtr.Zero
       Case WM_CLOSE
-        bAtomActive = False
+        m_atomActive = False
         Return IntPtr.Zero
       Case WM_DESTROY
         PostQuitMessage(0)
@@ -2194,33 +2194,33 @@ next4:
     End If
 
     ' Create Keyboard Mapping
-    mapKeys(&H0) = Key.NONE
-    mapKeys(&H61) = Key.A : mapKeys(&H62) = Key.B : mapKeys(&H63) = Key.C : mapKeys(&H64) = Key.D : mapKeys(&H65) = Key.E
-    mapKeys(&H66) = Key.F : mapKeys(&H67) = Key.G : mapKeys(&H68) = Key.H : mapKeys(&H69) = Key.I : mapKeys(&H6A) = Key.J
-    mapKeys(&H6B) = Key.K : mapKeys(&H6C) = Key.L : mapKeys(&H6D) = Key.M : mapKeys(&H6E) = Key.N : mapKeys(&H6F) = Key.O
-    mapKeys(&H70) = Key.P : mapKeys(&H71) = Key.Q : mapKeys(&H72) = Key.R : mapKeys(&H73) = Key.S : mapKeys(&H74) = Key.T
-    mapKeys(&H75) = Key.U : mapKeys(&H76) = Key.V : mapKeys(&H77) = Key.W : mapKeys(&H78) = Key.X : mapKeys(&H79) = Key.Y
-    mapKeys(&H7A) = Key.Z
+    m_mapKeys(&H0) = Key.NONE
+    m_mapKeys(&H61) = Key.A : m_mapKeys(&H62) = Key.B : m_mapKeys(&H63) = Key.C : m_mapKeys(&H64) = Key.D : m_mapKeys(&H65) = Key.E
+    m_mapKeys(&H66) = Key.F : m_mapKeys(&H67) = Key.G : m_mapKeys(&H68) = Key.H : m_mapKeys(&H69) = Key.I : m_mapKeys(&H6A) = Key.J
+    m_mapKeys(&H6B) = Key.K : m_mapKeys(&H6C) = Key.L : m_mapKeys(&H6D) = Key.M : m_mapKeys(&H6E) = Key.N : m_mapKeys(&H6F) = Key.O
+    m_mapKeys(&H70) = Key.P : m_mapKeys(&H71) = Key.Q : m_mapKeys(&H72) = Key.R : m_mapKeys(&H73) = Key.S : m_mapKeys(&H74) = Key.T
+    m_mapKeys(&H75) = Key.U : m_mapKeys(&H76) = Key.V : m_mapKeys(&H77) = Key.W : m_mapKeys(&H78) = Key.X : m_mapKeys(&H79) = Key.Y
+    m_mapKeys(&H7A) = Key.Z
 
-    mapKeys(XK_F1) = Key.F1 : mapKeys(XK_F2) = Key.F2 : mapKeys(XK_F3) = Key.F3 : mapKeys(XK_F4) = Key.F4
-    mapKeys(XK_F5) = Key.F5 : mapKeys(XK_F6) = Key.F6 : mapKeys(XK_F7) = Key.F7 : mapKeys(XK_F8) = Key.F8
-    mapKeys(XK_F9) = Key.F9 : mapKeys(XK_F10) = Key.F10 : mapKeys(XK_F11) = Key.F11 : mapKeys(XK_F12) = Key.F12
+    m_mapKeys(XK_F1) = Key.F1 : m_mapKeys(XK_F2) = Key.F2 : m_mapKeys(XK_F3) = Key.F3 : m_mapKeys(XK_F4) = Key.F4
+    m_mapKeys(XK_F5) = Key.F5 : m_mapKeys(XK_F6) = Key.F6 : m_mapKeys(XK_F7) = Key.F7 : m_mapKeys(XK_F8) = Key.F8
+    m_mapKeys(XK_F9) = Key.F9 : m_mapKeys(XK_F10) = Key.F10 : m_mapKeys(XK_F11) = Key.F11 : m_mapKeys(XK_F12) = Key.F12
 
-    mapKeys(XK_Down) = Key.DOWN : mapKeys(XK_Left) = Key.LEFT : mapKeys(XK_Right) = Key.RIGHT : mapKeys(XK_Up) = Key.UP
-    mapKeys(XK_KP_Enter) = Key.ENTER : mapKeys(XK_Return) = Key.ENTER
+    m_mapKeys(XK_Down) = Key.DOWN : m_mapKeys(XK_Left) = Key.LEFT : m_mapKeys(XK_Right) = Key.RIGHT : m_mapKeys(XK_Up) = Key.UP
+    m_mapKeys(XK_KP_Enter) = Key.ENTER : m_mapKeys(XK_Return) = Key.ENTER
 
-    mapKeys(XK_BackSpace) = Key.BACK : mapKeys(XK_Escape) = Key.ESCAPE : mapKeys(XK_Linefeed) = Key.ENTER : mapKeys(XK_Pause) = Key.PAUSE
-    mapKeys(XK_Scroll_Lock) = Key.SCROLL : mapKeys(XK_Tab) = Key.TAB : mapKeys(XK_Delete) = Key.DEL : mapKeys(XK_Home) = Key.HOME
-    mapKeys(XK_End) = Key.END : mapKeys(XK_Page_Up) = Key.PGUP : mapKeys(XK_Page_Down) = Key.PGDN : mapKeys(XK_Insert) = Key.INS
-    mapKeys(XK_Shift_L) = Key.SHIFT : mapKeys(XK_Shift_R) = Key.SHIFT : mapKeys(XK_Control_L) = Key.CTRL : mapKeys(XK_Control_R) = Key.CTRL
-    mapKeys(XK_space) = Key.SPACE
+    m_mapKeys(XK_BackSpace) = Key.BACK : m_mapKeys(XK_Escape) = Key.ESCAPE : m_mapKeys(XK_Linefeed) = Key.ENTER : m_mapKeys(XK_Pause) = Key.PAUSE
+    m_mapKeys(XK_Scroll_Lock) = Key.SCROLL : m_mapKeys(XK_Tab) = Key.TAB : m_mapKeys(XK_Delete) = Key.DEL : m_mapKeys(XK_Home) = Key.HOME
+    m_mapKeys(XK_End) = Key.END : m_mapKeys(XK_Page_Up) = Key.PGUP : m_mapKeys(XK_Page_Down) = Key.PGDN : m_mapKeys(XK_Insert) = Key.INS
+    m_mapKeys(XK_Shift_L) = Key.SHIFT : m_mapKeys(XK_Shift_R) = Key.SHIFT : m_mapKeys(XK_Control_L) = Key.CTRL : m_mapKeys(XK_Control_R) = Key.CTRL
+    m_mapKeys(XK_space) = Key.SPACE
 
-    mapKeys(XK_0) = Key.K0 : mapKeys(XK_1) = Key.K1 : mapKeys(XK_2) = Key.K2 : mapKeys(XK_3) = Key.K3 : mapKeys(XK_4) = Key.K4
-    mapKeys(XK_5) = Key.K5 : mapKeys(XK_6) = Key.K6 : mapKeys(XK_7) = Key.K7 : mapKeys(XK_8) = Key.K8 : mapKeys(XK_9) = Key.K9
+    m_mapKeys(XK_0) = Key.K0 : m_mapKeys(XK_1) = Key.K1 : m_mapKeys(XK_2) = Key.K2 : m_mapKeys(XK_3) = Key.K3 : m_mapKeys(XK_4) = Key.K4
+    m_mapKeys(XK_5) = Key.K5 : m_mapKeys(XK_6) = Key.K6 : m_mapKeys(XK_7) = Key.K7 : m_mapKeys(XK_8) = Key.K8 : m_mapKeys(XK_9) = Key.K9
 
-    mapKeys(XK_KP_0) = Key.NP0 : mapKeys(XK_KP_1) = Key.NP1 : mapKeys(XK_KP_2) = Key.NP2 : mapKeys(XK_KP_3) = Key.NP3 : mapKeys(XK_KP_4) = Key.NP4
-    mapKeys(XK_KP_5) = Key.NP5 : mapKeys(XK_KP_6) = Key.NP6 : mapKeys(XK_KP_7) = Key.NP7 : mapKeys(XK_KP_8) = Key.NP8 : mapKeys(XK_KP_9) = Key.NP9
-    mapKeys(XK_KP_Multiply) = Key.NP_MUL : mapKeys(XK_KP_Add) = Key.NP_ADD : mapKeys(XK_KP_Divide) = Key.NP_DIV : mapKeys(XK_KP_Subtract) = Key.NP_SUB : mapKeys(XK_KP_Decimal) = Key.NP_DECIMAL
+    m_mapKeys(XK_KP_0) = Key.NP0 : m_mapKeys(XK_KP_1) = Key.NP1 : m_mapKeys(XK_KP_2) = Key.NP2 : m_mapKeys(XK_KP_3) = Key.NP3 : m_mapKeys(XK_KP_4) = Key.NP4
+    m_mapKeys(XK_KP_5) = Key.NP5 : m_mapKeys(XK_KP_6) = Key.NP6 : m_mapKeys(XK_KP_7) = Key.NP7 : m_mapKeys(XK_KP_8) = Key.NP8 : m_mapKeys(XK_KP_9) = Key.NP9
+    m_mapKeys(XK_KP_Multiply) = Key.NP_MUL : m_mapKeys(XK_KP_Add) = Key.NP_ADD : m_mapKeys(XK_KP_Divide) = Key.NP_DIV : m_mapKeys(XK_KP_Subtract) = Key.NP_SUB : m_mapKeys(XK_KP_Decimal) = Key.NP_DECIMAL
 
     Return olc_Display
 
@@ -2268,4 +2268,139 @@ next4:
 
 #End Region
 
+#Region "C++'isms"
+
+  Private ReadOnly m_random As New Random
+  Protected Const RAND_MAX As Integer = 2147483647
+
+  Protected ReadOnly Property Rnd As Double
+    Get
+      Return m_random.NextDouble
+    End Get
+  End Property
+
+  ' Provide for something *similar* to C++.
+  Protected ReadOnly Property Rand As Integer
+    Get
+      Return CInt(Fix(m_random.NextDouble * RAND_MAX))
+    End Get
+  End Property
+
+#End Region
+
+#Region "CGE"
+
+  Private Function ConsoleColor2PixelColor(c As COLOUR) As Pixel
+    Select Case c
+      Case COLOUR.FG_BLACK : Return Presets.Black
+      Case COLOUR.FG_DARK_BLUE : Return Presets.DarkBlue
+      Case COLOUR.FG_DARK_GREEN : Return Presets.DarkGreen
+      Case COLOUR.FG_DARK_CYAN : Return Presets.DarkCyan
+      Case COLOUR.FG_DARK_RED : Return Presets.DarkRed
+      Case COLOUR.FG_DARK_MAGENTA : Return Presets.DarkMagenta
+      Case COLOUR.FG_DARK_YELLOW : Return Presets.DarkYellow
+      Case COLOUR.FG_GREY : Return Presets.Grey
+      Case COLOUR.FG_DARK_GREY : Return Presets.DarkGrey
+      Case COLOUR.FG_BLUE : Return Presets.Blue
+      Case COLOUR.FG_GREEN : Return Presets.Green
+      Case COLOUR.FG_CYAN : Return Presets.Cyan
+      Case COLOUR.FG_RED : Return Presets.Red
+      Case COLOUR.FG_MAGENTA : Return Presets.Magenta
+      Case COLOUR.FG_YELLOW : Return Presets.Yellow
+      Case COLOUR.FG_WHITE : Return Presets.White
+      Case COLOUR.BG_BLACK : Return Presets.Black
+      Case COLOUR.BG_DARK_BLUE : Return Presets.DarkBlue
+      Case COLOUR.BG_DARK_GREEN : Return Presets.DarkGreen
+      Case COLOUR.BG_DARK_CYAN : Return Presets.DarkCyan
+      Case COLOUR.BG_DARK_RED : Return Presets.DarkRed
+      Case COLOUR.BG_DARK_MAGENTA : Return Presets.DarkMagenta
+      Case COLOUR.BG_DARK_YELLOW : Return Presets.DarkYellow
+      Case COLOUR.BG_GREY : Return Presets.Grey
+      Case COLOUR.BG_DARK_GREY : Return Presets.DarkGrey
+      Case COLOUR.BG_BLUE : Return Presets.Blue
+      Case COLOUR.BG_GREEN : Return Presets.Green
+      Case COLOUR.BG_CYAN : Return Presets.Cyan
+      Case COLOUR.BG_RED : Return Presets.Red
+      Case COLOUR.BG_MAGENTA : Return Presets.Magenta
+      Case COLOUR.BG_YELLOW : Return Presets.Yellow
+      Case COLOUR.BG_WHITE : Return Presets.White
+      Case Else
+        Return Presets.White
+    End Select
+  End Function
+
+  Public Function ConstructConsole(w As Integer, h As Integer, pw As Integer, ph As Integer) As Boolean
+    Return Construct(w, h, pw, ph)
+  End Function
+
+  Protected Sub Fill(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, dummy As PIXEL_TYPE, c As COLOUR)
+    Dim w = (x2 - x1) + 1
+    Dim h = (y2 - y1) + 1
+    FillRect(x1, y1, w, h, ConsoleColor2PixelColor(c))
+  End Sub
+
+  Protected Sub FillCircle(x As Single, y As Single, radius As Single, dummy As PIXEL_TYPE, c As COLOUR)
+    FillCircle(CInt(Fix(x)), CInt(Fix(y)), CInt(Fix(radius)), ConsoleColor2PixelColor(c))
+  End Sub
+
+  Protected Sub FillCircle(x As Integer, y As Integer, radius As Single, dummy As PIXEL_TYPE, c As COLOUR)
+    FillCircle(x, y, CInt(Fix(radius)), ConsoleColor2PixelColor(c))
+  End Sub
+
+  Protected Sub DrawLine(x1 As Single, y1 As Single, x2 As Single, y2 As Single, dummy As PIXEL_TYPE, c As COLOUR)
+    DrawLine(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), ConsoleColor2PixelColor(c))
+  End Sub
+
+  Protected Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, dummy As PIXEL_TYPE, c As COLOUR)
+    DrawLine(x1, y1, x2, y2, ConsoleColor2PixelColor(c))
+  End Sub
+
+#End Region
+
 End Class
+
+#Region "CGE"
+
+Public Enum COLOUR As Short
+  FG_BLACK = &H0
+  FG_DARK_BLUE = &H1
+  FG_DARK_GREEN = &H2
+  FG_DARK_CYAN = &H3
+  FG_DARK_RED = &H4
+  FG_DARK_MAGENTA = &H5
+  FG_DARK_YELLOW = &H6
+  FG_GREY = &H7 ' Thanks MS :-/
+  FG_DARK_GREY = &H8
+  FG_BLUE = &H9
+  FG_GREEN = &HA
+  FG_CYAN = &HB
+  FG_RED = &HC
+  FG_MAGENTA = &HD
+  FG_YELLOW = &HE
+  FG_WHITE = &HF
+  BG_BLACK = &H0
+  BG_DARK_BLUE = &H10
+  BG_DARK_GREEN = &H20
+  BG_DARK_CYAN = &H30
+  BG_DARK_RED = &H40
+  BG_DARK_MAGENTA = &H50
+  BG_DARK_YELLOW = &H60
+  BG_GREY = &H70
+  BG_DARK_GREY = &H80
+  BG_BLUE = &H90
+  BG_GREEN = &HA0
+  BG_CYAN = &HB0
+  BG_RED = &HC0
+  BG_MAGENTA = &HD0
+  BG_YELLOW = &HE0
+  BG_WHITE = &HF0
+End Enum
+
+Public Enum PIXEL_TYPE As Short
+  PIXEL_SOLID = &H2588
+  PIXEL_THREEQUARTERS = &H2593
+  PIXEL_HALF = &H2592
+  PIXEL_QUARTER = &H2591
+End Enum
+
+#End Region

@@ -17,7 +17,7 @@ Friend Class Empty
   Inherits Olc.PixelGameEngine
 
   Friend Sub New()
-    sAppName = "Empty"
+    AppName = "Empty"
   End Sub
 
   Protected Overrides Function OnUserCreate() As Boolean

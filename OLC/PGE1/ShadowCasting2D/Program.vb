@@ -1,6 +1,10 @@
 ' Inspired by "Line Of Sight or Shadow Casting in 2D" -- @javidx9
 ' https://youtu.be/fc3nnG2CG8U
 
+'https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+'https://www.redblobgames.com/articles/visibility/
+'https://ncase.me/sight-and-light/
+
 Option Explicit On
 Option Strict On
 Option Infer On
@@ -50,7 +54,7 @@ Friend Class ShadowCasting2D
   Private m_vecVisibilityPolygonPoints As New List(Of (Angle As Single, X As Integer, Y As Integer))
 
   Friend Sub New()
-    sAppName = "ShadowCasting2D"
+    AppName = "ShadowCasting2D"
   End Sub
 
   Private Sub ConvertTileMapToPolyMap(sx As Integer, sy As Integer, w As Integer, h As Integer, blockWidth As Integer, pitch As Integer)
@@ -317,7 +321,7 @@ Friend Class ShadowCasting2D
     Dim sourceY = GetMouseY()
 
     ' Set tile map blocks to on or off
-    If GetMouse(0).bReleased Then
+    If GetMouse(0).Released Then
       ' i = y * width + x
       Dim i = (sourceY \ blockWidth) * m_worldWidth + (sourceX \ blockWidth)
       m_world(i).Exist = Not m_world(i).Exist
@@ -328,7 +332,7 @@ Friend Class ShadowCasting2D
     ' how your final application interacts with tilemaps
     ConvertTileMapToPolyMap(0, 0, 40, 30, blockWidth, m_worldWidth)
 
-    If GetMouse(1).bHeld Then
+    If GetMouse(1).Held Then
       CalculateVisibilityPolygon(sourceX, sourceY, 1000.0F)
     End If
 
@@ -348,7 +352,7 @@ Friend Class ShadowCasting2D
     DrawString(4, 4, "Rays Cast: " & raysCast.ToString() & " Rays Drawn: " & raysCast2.ToString())
 
     ' If drawing rays, set an offscreen texture as our target buffer
-    If (GetMouse(1).bHeld AndAlso m_vecVisibilityPolygonPoints.Count > 1) Then
+    If (GetMouse(1).Held AndAlso m_vecVisibilityPolygonPoints.Count > 1) Then
 
       ' Clear offscreen buffer for sprite
       SetDrawTarget(m_buffLightTex)
