@@ -4,8 +4,41 @@ Option Infer On
 
 Imports System.Runtime.InteropServices
 
+Public Enum Presets As UInteger
+  White = &HFFFFFF
+  Grey = &HA9A9A9
+  Red = &HFF0000
+  Yellow = &HFFFF00
+  Green = &HFF00
+  Cyan = &HFFFF
+  Blue = &HFF
+  Magenta = &HFF00FF
+  Brown = &H9A6324
+  Orange = &HF58231
+  Purple = &H911EB4
+  Lime = &HBFEF45
+  Pink = &HFABEBE
+  Snow = &HFFFAFA
+  Teal = &H469990
+  Lavender = &HE6BEFF
+  Beige = &HFFFAC8
+  Maroon = &H800000
+  Mint = &HAAFFC3
+  Olive = &H808000
+  Apricot = &HFFD8B1
+  Navy = &H75
+  Black = &H0
+  DarkGrey = &H8B8B8B
+  DarkRed = &H8B0000
+  DarkYellow = &H8B8B00
+  DarkGreen = &H8B00
+  DarkCyan = &H8B8B
+  DarkBlue = &H8B
+  DarkMagenta = &H8B008B
+End Enum
+
 <StructLayout(LayoutKind.Explicit)>
-Friend Structure Pixel
+Public Structure Pixel
   <FieldOffset(0)> Public N As Integer
   <FieldOffset(1)> Public R As Byte
   <FieldOffset(2)> Public G As Byte
@@ -37,39 +70,6 @@ Friend Structure Pixel
   End Function
 
 #Region "Presets"
-
-  Friend Enum Presets As UInteger
-    White = &HFFFFFF
-    Grey = &HA9A9A9
-    Red = &HFF0000
-    Yellow = &HFFFF00
-    Green = &HFF00
-    Cyan = &HFFFF
-    Blue = &HFF
-    Magenta = &HFF00FF
-    Brown = &H9A6324
-    Orange = &HF58231
-    Purple = &H911EB4
-    Lime = &HBFEF45
-    Pink = &HFABEBE
-    Snow = &HFFFAFA
-    Teal = &H469990
-    Lavender = &HE6BEFF
-    Beige = &HFFFAC8
-    Maroon = &H800000
-    Mint = &HAAFFC3
-    Olive = &H808000
-    Apricot = &HFFD8B1
-    Navy = &H75
-    Black = &H0
-    DarkGrey = &H8B8B8B
-    DarkRed = &H8B0000
-    DarkYellow = &H8B8B00
-    DarkGreen = &H8B00
-    DarkCyan = &H8B8B
-    DarkBlue = &H8B
-    DarkMagenta = &H8B008B
-  End Enum
 
   Public Shared ReadOnly Empty As New Pixel(0, 0, 0, 0)
 

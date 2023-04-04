@@ -6,7 +6,7 @@ Friend Module Program
 
   Friend Sub Main()
     Dim game = New Example
-    If game.Construct(160, 100, 4, 4) = PixelGameEngine.RCode.OK Then
+    If game.Construct(160, 100, 4, 4) Then
       game.Start()
     End If
   End Sub
@@ -25,7 +25,7 @@ Friend Class Example
     sAppName = "Example"
   End Sub
 
-  Private Protected Overrides Function OnUserCreate() As Boolean
+  Protected Overrides Function OnUserCreate() As Boolean
 
     playerX = 10
     playerY = 10
@@ -34,7 +34,7 @@ Friend Class Example
 
   End Function
 
-  Private Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
+  Protected Overrides Function OnUserUpdate(elapsedTime As Single) As Boolean
 
     If GetKey(Key.SPACE).bPressed Then
       m_state += 1

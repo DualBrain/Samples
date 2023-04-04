@@ -9,7 +9,7 @@ Imports System.Runtime.InteropServices
 Imports System.Runtime.InteropServices.OSPlatform
 Imports System.Runtime.InteropServices.RuntimeInformation
 
-Friend Class Sprite
+Public Class Sprite
 
 #If OLC_DBG_OVERDRAW Then
   Private Shared nOverdrawCount As Integer
@@ -32,7 +32,7 @@ Friend Class Sprite
     Height = 0
   End Sub
 
-  Public Sub New(sImageFile As String, pack As ResourcePack)
+  Public Sub New(sImageFile As String, Optional pack As ResourcePack = Nothing)
     LoadFromFile(sImageFile, pack)
   End Sub
 
@@ -54,7 +54,7 @@ Friend Class Sprite
     End If
   End Sub
 
-  Public Function LoadFromPGESprFile(sImageFile As String, pack As ResourcePack) As PixelGameEngine.RCode
+  Public Function LoadFromPGESprFile(sImageFile As String, Optional pack As ResourcePack = Nothing) As PixelGameEngine.RCode
 
     If pColData IsNot Nothing Then
       Erase pColData

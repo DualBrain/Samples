@@ -1,4 +1,4 @@
-﻿Friend Structure Vf2d
+﻿Public Structure Vf2d
 
   Public x As Single
   Public y As Single

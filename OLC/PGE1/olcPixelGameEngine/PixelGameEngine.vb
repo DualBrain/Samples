@@ -589,7 +589,7 @@ Public MustInherit Class PixelGameEngine
   Private Shared mapKeys As New Dictionary(Of Integer, Integer)
   Private Shared sge As PixelGameEngine ' Used in Windows message pump.
 
-  Private Protected Delegate Function PixelModeDelegate(x As Integer, y As Integer, p1 As Pixel, p2 As Pixel) As Pixel
+  Protected Delegate Function PixelModeDelegate(x As Integer, y As Integer, p1 As Pixel, p2 As Pixel) As Pixel
   Private funcPixelMode As PixelModeDelegate
 
   Protected sAppName As String
@@ -763,7 +763,7 @@ Public MustInherit Class PixelGameEngine
     'Olc.PgeX.pge = Me
   End Sub
 
-  Protected Friend Function Construct(screenW As Integer, screenH As Integer, pixelW As Integer, pixelH As Integer, Optional fullScreen As Boolean = False, Optional vsync As Boolean = False) As RCode
+  Public Function Construct(screenW As Integer, screenH As Integer, pixelW As Integer, pixelH As Integer, Optional fullScreen As Boolean = False, Optional vsync As Boolean = False) As Boolean 'RCode
 
     nScreenWidth = screenW
     nScreenHeight = screenH
@@ -776,7 +776,7 @@ Public MustInherit Class PixelGameEngine
     fPixelY = 2.0F / nScreenHeight
 
     If nPixelWidth = 0 OrElse nPixelHeight = 0 OrElse nScreenWidth = 0 OrElse nScreenHeight = 0 Then
-      Return RCode.FAIL
+      Return False 'RCode.FAIL
     End If
 
     ' Load the default font sheet
@@ -786,11 +786,11 @@ Public MustInherit Class PixelGameEngine
     pDefaultDrawTarget = New Sprite(nScreenWidth, nScreenHeight)
     SetDrawTarget(Nothing)
 
-    Return RCode.OK
+    Return True 'RCode.OK
 
   End Function
 
-  Private Protected Sub SetScreenSize(w As Integer, h As Integer)
+  Protected Sub SetScreenSize(w As Integer, h As Integer)
 
     pDefaultDrawTarget = Nothing '.Dispose()
     nScreenWidth = w
@@ -812,7 +812,7 @@ Public MustInherit Class PixelGameEngine
 
   End Sub
 
-  Protected Friend Function Start() As RCode
+  Public Function Start() As RCode
 
     ' Construct the window
     If IsOSPlatform(Windows) Then
@@ -861,7 +861,7 @@ Public MustInherit Class PixelGameEngine
 
   End Function
 
-  Friend Sub SetDrawTarget(target As Sprite)
+  Public Sub SetDrawTarget(target As Sprite)
     If target IsNot Nothing Then
       pDrawTarget = target
     Else
@@ -895,63 +895,67 @@ Public MustInherit Class PixelGameEngine
     End Get
   End Property
 
-  Private Protected ReadOnly Property IsFocused() As Boolean
+  Protected ReadOnly Property IsFocused() As Boolean
     Get
       Return bHasInputFocus
     End Get
   End Property
 
-  Private Protected ReadOnly Property GetKey(k As Key) As HWButton
+  Protected ReadOnly Property GetKey(k As Key) As HWButton
     Get
       Return pKeyboardState(k)
     End Get
   End Property
 
-  Private Protected ReadOnly Property GetMouse(b As Integer) As HWButton
+  Protected ReadOnly Property GetMouse(b As Integer) As HWButton
     Get
       Return pMouseState(b)
     End Get
   End Property
 
-  Private Protected ReadOnly Property GetMouseX() As Integer
+  Protected ReadOnly Property GetMouseX() As Integer
     Get
       Return nMousePosX
     End Get
   End Property
 
-  Private Protected ReadOnly Property GetMouseY() As Integer
+  Protected ReadOnly Property GetMouseY() As Integer
     Get
       Return nMousePosY
     End Get
   End Property
 
-  Private Protected ReadOnly Property GetMouseWheel() As Integer
+  Protected ReadOnly Property GetMouseWheel() As Integer
     Get
       Return nMouseWheelDelta
     End Get
   End Property
 
-  Private Protected ReadOnly Property ScreenWidth As Integer
+  Protected ReadOnly Property ScreenWidth As Integer
     Get
       Return nScreenWidth
     End Get
   End Property
 
-  Private Protected ReadOnly Property ScreenHeight As Integer
+  Protected ReadOnly Property ScreenHeight As Integer
     Get
       Return nScreenHeight
     End Get
   End Property
 
-  Private Protected Function Draw(pos As Vi2d, p As Pixel) As Boolean
+  Protected Function Draw(pos As Vi2d) As Boolean
+    Return Draw(pos.x, pos.y, Presets.White)
+  End Function
+
+  Protected Function Draw(pos As Vi2d, p As Pixel) As Boolean
     Return Draw(pos.x, pos.y, p)
   End Function
 
-  Private Protected Function Draw(x As Integer, y As Integer) As Boolean
-    Return Draw(x, y, Pixel.Presets.White)
+  Protected Function Draw(x As Integer, y As Integer) As Boolean
+    Return Draw(x, y, Presets.White)
   End Function
 
-  Private Protected Function Draw(x As Integer, y As Integer, p As Pixel) As Boolean
+  Protected Function Draw(x As Integer, y As Integer, p As Pixel) As Boolean
 
     If pDrawTarget Is Nothing Then
       Return False
@@ -985,24 +989,24 @@ Public MustInherit Class PixelGameEngine
 
   End Function
 
-  Private Protected Sub SetSubPixelOffset(ox As Single, oy As Single)
+  Protected Sub SetSubPixelOffset(ox As Single, oy As Single)
     fSubPixelOffsetX = ox * fPixelX
     fSubPixelOffsetY = oy * fPixelY
   End Sub
 
-  Private Protected Sub DrawLine(pos1 As Vi2d, pos2 As Vi2d)
-    DrawLine(pos1.x, pos1.y, pos2.x, pos2.y, Pixel.Presets.White, &HFFFFFFFFUI)
+  Protected Sub DrawLine(pos1 As Vi2d, pos2 As Vi2d)
+    DrawLine(pos1.x, pos1.y, pos2.x, pos2.y, Presets.White, &HFFFFFFFFUI)
   End Sub
 
-  Private Protected Sub DrawLine(pos1 As Vi2d, pos2 As Vi2d, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
+  Protected Sub DrawLine(pos1 As Vi2d, pos2 As Vi2d, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
     DrawLine(pos1.x, pos1.y, pos2.x, pos2.y, p, pattern)
   End Sub
 
-  Private Protected Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer)
-    DrawLine(x1, y1, x2, y2, Pixel.Presets.White, &HFFFFFFFFUI)
+  Protected Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer)
+    DrawLine(x1, y1, x2, y2, Presets.White, &HFFFFFFFFUI)
   End Sub
 
-  Private Protected Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
+  Protected Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
 
     Dim dx = x2 - x1
     Dim dy = y2 - y1
@@ -1091,11 +1095,19 @@ Public MustInherit Class PixelGameEngine
 
   End Sub
 
-  Private Protected Sub DrawCircle(pos As Vi2d, radius As Integer, p As Pixel, mask As Byte)
+  Protected Sub DrawCircle(pos As Vi2d, radius As Integer)
+    DrawCircle(pos.x, pos.y, radius, Presets.White, &HFF)
+  End Sub
+
+  Protected Sub DrawCircle(pos As Vi2d, radius As Integer, p As Pixel, Optional mask As Byte = &HFF)
     DrawCircle(pos.x, pos.y, radius, p, mask)
   End Sub
 
-  Private Protected Sub DrawCircle(x As Integer, y As Integer, radius As Integer, p As Pixel, mask As Byte)
+  Protected Sub DrawCircle(x As Integer, y As Integer, radius As Integer)
+    DrawCircle(x, y, radius, Presets.White, &HFF)
+  End Sub
+
+  Protected Sub DrawCircle(x As Integer, y As Integer, radius As Integer, p As Pixel, Optional mask As Byte = &HFF)
 
     Dim x0 = 0
     Dim y0 = radius
@@ -1120,11 +1132,11 @@ Public MustInherit Class PixelGameEngine
 
   End Sub
 
-  Private Protected Sub FillCircle(pos As Vi2d, radius As Integer, p As Pixel)
-    FillCircle(pos.x, pos.y, radius, p)
+  Protected Sub FillCircle(pos As Vi2d, radius As Integer)
+    FillCircle(pos.x, pos.y, radius, Presets.White)
   End Sub
 
-  Private Protected Sub FillCircle(x As Integer, y As Integer, radius As Integer, p As Pixel)
+  Protected Sub FillCircle(x As Integer, y As Integer, radius As Integer, p As Pixel)
 
     Dim x0 = 0
     Dim y0 = radius
@@ -1151,22 +1163,30 @@ Public MustInherit Class PixelGameEngine
 
   End Sub
 
-  Private Protected Sub DrawRect(pos As Vi2d, size As Vi2d, p As Pixel)
+  Protected Sub DrawRect(pos As Vi2d, size As Vi2d)
+    DrawRect(pos.x, pos.y, size.x, size.y, Presets.White)
+  End Sub
+
+  Protected Sub DrawRect(pos As Vi2d, size As Vi2d, p As Pixel)
     DrawRect(pos.x, pos.y, size.x, size.y, p)
   End Sub
 
-  Private Protected Sub DrawRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
+  Protected Sub DrawRect(x As Integer, y As Integer, w As Integer, h As Integer)
+    DrawRect(x, y, w, h, Presets.White)
+  End Sub
+
+  Protected Sub DrawRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
     DrawLine(x, y, x + w, y, p)
     DrawLine(x + w, y, x + w, y + h, p)
     DrawLine(x + w, y + h, x, y + h, p)
     DrawLine(x, y + h, x, y, p)
   End Sub
 
-  Private Protected Sub Clear()
-    Clear(Pixel.Presets.Black)
+  Protected Sub Clear()
+    Clear(Presets.Black)
   End Sub
 
-  Private Protected Sub Clear(p As Pixel)
+  Protected Sub Clear(p As Pixel)
     Dim pixels = GetDrawTargetWidth() * GetDrawTargetHeight()
     Dim m() = GetDrawTarget().GetData()
     For i = 0 To pixels - 1
@@ -1177,15 +1197,19 @@ Public MustInherit Class PixelGameEngine
 #End If
   End Sub
 
-  Private Protected Sub FillRect(pos As Vi2d, size As Vi2d, p As Pixel)
+  Protected Sub FillRect(pos As Vi2d, size As Vi2d)
+    FillRect(pos.x, pos.y, size.x, size.y, Presets.White)
+  End Sub
+
+  Protected Sub FillRect(pos As Vi2d, size As Vi2d, p As Pixel)
     FillRect(pos.x, pos.y, size.x, size.y, p)
   End Sub
 
-  Private Protected Sub FillRect(x As Integer, y As Integer, w As Integer, h As Integer)
-    FillRect(x, y, w, h, Pixel.Presets.White)
+  Protected Sub FillRect(x As Integer, y As Integer, w As Integer, h As Integer)
+    FillRect(x, y, w, h, Presets.White)
   End Sub
 
-  Private Protected Sub FillRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
+  Protected Sub FillRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
 
     Dim x2 = x + w
     Dim y2 = y + h
@@ -1208,21 +1232,37 @@ Public MustInherit Class PixelGameEngine
 
   End Sub
 
-  Private Protected Sub DrawTriangle(pos1 As Vi2d, pos2 As Vi2d, pos3 As Vi2d, p As Pixel)
+  Protected Sub DrawTriangle(pos1 As Vi2d, pos2 As Vi2d, pos3 As Vi2d)
+    DrawTriangle(pos1.x, pos1.y, pos2.x, pos2.y, pos3.x, pos3.y, Presets.White)
+  End Sub
+
+  Protected Sub DrawTriangle(pos1 As Vi2d, pos2 As Vi2d, pos3 As Vi2d, p As Pixel)
     DrawTriangle(pos1.x, pos1.y, pos2.x, pos2.y, pos3.x, pos3.y, p)
   End Sub
 
-  Private Protected Sub DrawTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, p As Pixel)
+  Protected Sub DrawTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer)
+    DrawTriangle(x1, y1, x2, y2, x3, y3, Presets.White)
+  End Sub
+
+  Protected Sub DrawTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, p As Pixel)
     DrawLine(x1, y1, x2, y2, p)
     DrawLine(x2, y2, x3, y3, p)
     DrawLine(x3, y3, x1, y1, p)
   End Sub
 
-  Private Protected Sub FillTriangle(pos1 As Vi2d, pos2 As Vi2d, pos3 As Vi2d, p As Pixel)
+  Protected Sub FillTriangle(pos1 As Vi2d, pos2 As Vi2d, pos3 As Vi2d)
+    FillTriangle(pos1.x, pos1.y, pos2.x, pos2.y, pos3.x, pos3.y, Presets.White)
+  End Sub
+
+  Protected Sub FillTriangle(pos1 As Vi2d, pos2 As Vi2d, pos3 As Vi2d, p As Pixel)
     FillTriangle(pos1.x, pos1.y, pos2.x, pos2.y, pos3.x, pos3.y, p)
   End Sub
 
-  Private Protected Sub FillTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, p As Pixel)
+  Protected Sub FillTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer)
+    FillTriangle(x1, y1, x2, y2, x3, y3, Presets.White)
+  End Sub
+
+  Protected Sub FillTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, p As Pixel)
 
     Dim drawline = Sub(sx As Integer, ex As Integer, ny As Integer)
                      For i = sx To ex
@@ -1395,11 +1435,11 @@ next4:
 
   End Sub
 
-  Private Protected Sub DrawSprite(pos As Vi2d, sprite As Sprite, scale As Integer)
+  Protected Sub DrawSprite(pos As Vi2d, sprite As Sprite, Optional scale As Integer = 1)
     DrawSprite(pos.x, pos.y, sprite, scale)
   End Sub
 
-  Private Protected Sub DrawSprite(x As Integer, y As Integer, sprite As Sprite, scale As Integer)
+  Protected Sub DrawSprite(x As Integer, y As Integer, sprite As Sprite, Optional scale As Integer = 1)
     If sprite Is Nothing Then
       Return
     End If
@@ -1423,11 +1463,12 @@ next4:
     End If
   End Sub
 
-  Private Protected Sub DrawPartialSprite(pos As Vi2d, sprite As Sprite, sourcepos As Vi2d, size As Vi2d, scale As Integer)
+  Protected Sub DrawPartialSprite(pos As Vi2d, sprite As Sprite, sourcepos As Vi2d, size As Vi2d, Optional scale As Integer = 1)
     DrawPartialSprite(pos.x, pos.y, sprite, sourcepos.x, sourcepos.y, size.x, size.y, scale)
   End Sub
 
-  Private Protected Sub DrawPartialSprite(x As Integer, y As Integer, sprite As Sprite, ox As Integer, oy As Integer, w As Integer, h As Integer, scale As Integer)
+  Protected Sub DrawPartialSprite(x As Integer, y As Integer, sprite As Sprite, ox As Integer, oy As Integer, w As Integer, h As Integer, Optional scale As Integer = 1)
+
     If sprite Is Nothing Then
       Return
     End If
@@ -1452,11 +1493,19 @@ next4:
 
   End Sub
 
-  Private Protected Sub DrawString(pos As Vi2d, sText As String, col As Pixel, scale As Integer)
+  Protected Sub DrawString(pos As Vi2d, sText As String)
+    DrawString(pos.x, pos.y, sText, Presets.White, 1)
+  End Sub
+
+  Protected Sub DrawString(pos As Vi2d, sText As String, col As Pixel, Optional scale As Integer = 1)
     DrawString(pos.x, pos.y, sText, col, scale)
   End Sub
 
-  Private Protected Sub DrawString(x As Integer, y As Integer, sText As String, col As Pixel, scale As Integer)
+  Protected Sub DrawString(x As Integer, y As Integer, sText As String)
+    DrawString(x, y, sText, Presets.White, 1)
+  End Sub
+
+  Protected Sub DrawString(x As Integer, y As Integer, sText As String, col As Pixel, Optional scale As Integer = 1)
 
     Dim sx = 0
     Dim sy = 0
@@ -1505,33 +1554,33 @@ next4:
 
   End Sub
 
-  Private Protected Sub SetPixelMode(m As Pixel.Mode)
+  Protected Sub SetPixelMode(m As Pixel.Mode)
     nPixelMode = m
   End Sub
 
-  Private Protected ReadOnly Property GetPixelMode() As Pixel.Mode
+  Protected ReadOnly Property GetPixelMode() As Pixel.Mode
     Get
       Return nPixelMode
     End Get
   End Property
 
   'Private Protected Sub SetPixelMode(pixelMode As Func(Of Integer, Integer, Pixel, Pixel, Pixel), m As Pixel.Mode)
-  Private Protected Sub SetPixelMode(pixelMode As PixelModeDelegate, m As Pixel.Mode)
+  Protected Sub SetPixelMode(pixelMode As PixelModeDelegate, m As Pixel.Mode)
     funcPixelMode = pixelMode
     nPixelMode = Pixel.Mode.Custom
   End Sub
 
-  Private Protected Sub SetPixelBlend(blend As Single)
+  Protected Sub SetPixelBlend(blend As Single)
     fBlendFactor = blend
     If fBlendFactor < 0.0F Then fBlendFactor = 0.0F
     If fBlendFactor > 1.0F Then fBlendFactor = 1.0F
   End Sub
 
-  Private Protected Overridable Function OnUserCreate() As Boolean
+  Protected Overridable Function OnUserCreate() As Boolean
     Return True
   End Function
 
-  Private Protected MustOverride Function OnUserUpdate(elapsedTime As Single) As Boolean
+  Protected MustOverride Function OnUserUpdate(elapsedTime As Single) As Boolean
 
   Private Protected Overridable Function OnUserDestroy() As Boolean
     Return True
@@ -1865,9 +1914,8 @@ next4:
       For i = 0 To 23
         Dim k = If((r And (1 << i)) <> 0, 255, 0)
         fontSprite.SetPixel(px, py, New Pixel(k, k, k, k))
-        If (++py = 48) Then
-          px += 1
-          py = 0
+        If System.Threading.Interlocked.Increment(py) = 48 Then
+          px += 1 : py = 0
         End If
       Next
 
@@ -2028,10 +2076,8 @@ next4:
         '      modified the code (at CreateWindowEx) so that a shared reference to self (Me) is created there.
         'Dim createStruct = Marshal.PtrToStructure(Of CREATESTRUCT)(lParam)
         'sge = CType(Marshal.PtrToStructure(createStruct.lpCreateParams, GetType(PixelGameEngine)), PixelGameEngine)
-        Debug.WriteLine("WM_CREATE")
         Return IntPtr.Zero
       Case WM_MOUSEMOVE
-        'Debug.WriteLine("WM_MOUSEMOVE")
         Dim v = CInt(lParam)
         Dim x = v And &HFFFF
         Dim y = (v >> 16) And &HFFFF
@@ -2040,67 +2086,52 @@ next4:
         sge.olc_UpdateMouse(ix, iy)
         Return IntPtr.Zero
       Case WM_SIZE
-        Debug.WriteLine("WM_SIZE")
         Dim v = CInt(lParam)
         sge.olc_UpdateWindowSize(v And &HFFFF, (v >> 16) And &HFFFF)
         Return IntPtr.Zero
       Case WM_MOUSEWHEEL
-        Debug.WriteLine("WM_WHEEL")
         'TODO: WM_WHEEL not working correctly...
         ' remarked out the following line due to overflow error.
         'sge.olc_UpdateMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam))
         Return IntPtr.Zero
       Case WM_MOUSELEAVE
         'TODO: WM_MOUSELEAVE is working *once*, not sure why...
-        Debug.WriteLine("WM_MOUSELEAVE")
         sge.bHasMouseFocus = False
         Return IntPtr.Zero
       Case WM_SETFOCUS
-        Debug.WriteLine("WM_SETFOCUS")
         sge.bHasInputFocus = True
         Return IntPtr.Zero
       Case WM_KILLFOCUS
-        Debug.WriteLine("WM_KILLFOCUS")
         sge.bHasInputFocus = False
         Return IntPtr.Zero
       Case WM_KEYDOWN
-        Debug.WriteLine("WM_KEYDOWN")
         sge.pKeyNewState(mapKeys(wParam.ToInt32())) = True
         Return IntPtr.Zero
       Case WM_KEYUP
-        Debug.WriteLine("WM_KEYUP")
         sge.pKeyNewState(mapKeys(wParam.ToInt32())) = False
         Return IntPtr.Zero
       Case WM_LBUTTONDOWN
-        Debug.WriteLine("WM_LBUTTONDOWN")
         sge.pMouseNewState(0) = True
         Return IntPtr.Zero
       Case WM_LBUTTONUP
-        Debug.WriteLine("WM_LBUTTONUP")
         sge.pMouseNewState(0) = False
         Return IntPtr.Zero
       Case WM_RBUTTONDOWN
-        Debug.WriteLine("WM_RBUTTONDOWN")
         sge.pMouseNewState(1) = True
         Return IntPtr.Zero
       Case WM_RBUTTONUP
-        Debug.WriteLine("WM_RBUTTONUP")
         sge.pMouseNewState(1) = False
         Return IntPtr.Zero
       Case WM_MBUTTONDOWN
-        Debug.WriteLine("WM_MBUTTONDOWN")
         sge.pMouseNewState(2) = True
         Return IntPtr.Zero
       Case WM_MBUTTONUP
-        Debug.WriteLine("WM_MBUTTONUP")
         sge.pMouseNewState(2) = False
         Return IntPtr.Zero
       Case WM_CLOSE
-        Debug.WriteLine("WM_CLOSE")
         bAtomActive = False
         Return IntPtr.Zero
       Case WM_DESTROY
-        Debug.WriteLine("WM_DESTROY")
         PostQuitMessage(0)
         Return IntPtr.Zero
     End Select

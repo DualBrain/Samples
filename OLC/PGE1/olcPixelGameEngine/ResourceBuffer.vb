@@ -2,7 +2,7 @@
 Option Strict On
 Option Infer On
 
-Public Class ResourceBuffer
+Friend Class ResourceBuffer
 
   Friend vMemory As Byte()
 

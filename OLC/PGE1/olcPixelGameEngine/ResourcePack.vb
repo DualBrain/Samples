@@ -183,7 +183,7 @@ Public Class ResourcePack
 
   End Function
 
-  Public Function GetFileBuffer(sFile As String) As ResourceBuffer
+  Friend Function GetFileBuffer(sFile As String) As ResourceBuffer
     Dim e As sResourceFile = mapFiles(sFile)
     Return New ResourceBuffer(baseFile, e.nOffset, e.nSize)
   End Function

@@ -1,4 +1,4 @@
-﻿Friend Structure Vi2d
+﻿Public Structure Vi2d
 
   Public x As Integer
   Public y As Integer
