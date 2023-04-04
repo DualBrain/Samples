@@ -1,13 +1,16 @@
 ﻿# One Lone Coder examples... in VB!
 
-I stumbled across [OneLoneCoder](https://github.com/OneLoneCoder) and I couldn't resist the idea of abusing the Windows Console to act as graphics output device; however, all of his code is written in C++. So the only ways that I could jump in an play with this is to either do it in C++ or, well, rewrite it all in VB. As you can probably guess, I chose the later.
+I stumbled across [OneLoneCoder](https://github.com/OneLoneCoder) and I couldn't resist the idea of abusing the Command Prompt to act as graphics output device; however, all of his code is written in C++. So the only ways that I could jump in an play with this is to either do it in C++ or, well, rewrite it all in VB. As you can probably guess, I chose the later.
 
-Right now the main focus is on the olcConsoleGameEngine (CGE) which as since been retired and replaced with olcPixelGameEngine, which subsequently was replaced by olcPixelGameEngine 2.0. As I work through his videos (in reverse chronological order), I'll continue to update this repo as I progress.
+Now that I've completed the olcConsoleGameEngine-related videos and have a tremendous amount of fun abusing the Command Prompt (as well as essentially completing the process of porting olcConsoleGameEngine for use with VB), I've found that the API design of the olcConsoleConsoleGameEngine/olcPixelGameEngine is pretty straight forward and, well, BASIC.
 
-- [olcConsoleGameEngine](CGE/)
-- [olcPixelGameEngine 1.0](PGE1/)
+Right now the main focus is on the olcPixelGameEngine v1.x (PGE1) which as since been retired and replaced with olcPixelGameEngine v2.x. As I work through his videos (in reverse chronological order), I'll continue to update this repo as I progress.
+
+- [olcPixelGameEngineVB](PGE1/)
+- [olcConsoleGameEngineVB](CGE/)
 - [Other](Other/)
 
 ## Further Research / Exploration
 
-- [OneLoneCoder aka Javidx9 aka David](https://github.com/OneLoneCoder)
+- [OneLoneCoder](https://github.com/OneLoneCoder)
+- [David aka Javid9x](https://github.com/javid9x)

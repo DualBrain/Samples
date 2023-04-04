@@ -1,0 +1,3 @@
+﻿# olcPixelGameEngine 1.x in VB!
+
+Thus far this section represents the very initial effort in getting the v1.24 of olcPixelGameEngine ported from C++ to VB. Stay tuned...
