@@ -208,6 +208,7 @@ Public MustInherit Class PixelGameEngine
   Private Declare Function UpdateWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
   Private Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, cmdShow As Integer) As <MarshalAs(UnmanagedType.Bool)> Boolean
   Private Declare Function DestroyWindow Lib "user32.dll" (hWnd As IntPtr) As Boolean
+  Private Declare Function GetConsoleWindow Lib "kernel32.dll" () As IntPtr
   'Private Declare Function RegisterClassEx Lib "user32.dll" Alias "RegisterClassExA" (<[In]> ByRef wndClass As WNDCLASSEX) As UShort
   'Private Declare Function CreateWindowEx Lib "user32.dll" Alias "CreateWindowExA" (exStyle As Integer,
   '                                                                                  atom As UShort, 'string lpClassName,
@@ -248,36 +249,14 @@ Public MustInherit Class PixelGameEngine
   Private Declare Function GetMonitorInfo Lib "user32.dll" Alias "GetMonitorInfoA" (hMonitor As IntPtr, ByRef lpmi As MONITORINFO) As Boolean
   Private Declare Function AdjustWindowRectEx Lib "user32.dll" (ByRef lpRect As RECT, dwStyle As UInteger, bMenu As Boolean, dwExStyle As UInteger) As Boolean
   Private Declare Function CreateWindow Lib "user32.dll" Alias "CreateWindowA" (lpClassName As String, lpWindowName As String, dwStyle As Integer, x As Integer, y As Integer, nWidth As Integer, nHeight As Integer, hWndParent As IntPtr, hMenu As IntPtr, hInstance As IntPtr, lpParam As IntPtr) As IntPtr
-  Private Declare Function TrackMouseEvent Lib "user32" (ByRef tme As TRACKMOUSEEVENTSTRUCT) As Boolean
+  Private Declare Function TrackMouseEvent Lib "user32.dll" (ByRef tme As TRACKMOUSEEVENTSTRUCT) As Boolean
 
-  Private Shared Function MyWndProc(hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
+  Private Declare Function FreeConsole Lib "kernel32.dll" () As Boolean
+  Private Declare Function FindWindow Lib "user32.dll" (lpClassName As String, lpWindowName As String) As IntPtr
 
-    Select Case msg
-
-      Case WM_PAINT
-        ' All GUI painting must be done here
-        Console.WriteLine("MyWndProc.WM_PAINT")
-
-      Case WM_LBUTTONDBLCLK
-        Console.WriteLine("MyWndProc.WM_LBUTTONDBLCLK")
-
-      Case WM_DESTROY
-        Console.WriteLine("MyWndProc.WM_DESTROY")
-        DestroyWindow(hWnd)
-        m_shutdown = True
-
-        'If you want to shutdown the application, call the next function instead of DestroyWindow
-        'PostQuitMessage(0);
-
-      Case Else
-
-    End Select
-
-    Return DefWindowProc(hWnd, msg, wParam, lParam)
-
-  End Function
-
-  '****************************************
+  'Private Declare Function FindWindow Lib "user32.dll" Alias "FindWindowA" (lpClassName As String, lpWindowName As String) As IntPtr
+  'Private Declare Function ShowWindow Lib "user32.dll" (hWnd As IntPtr, nCmdShow As Integer) As Boolean
+  'Private Const SW_HIDE As Integer = 0
 
   <StructLayout(LayoutKind.Sequential)>
   Private Structure PIXELFORMATDESCRIPTOR
@@ -846,6 +825,14 @@ Public MustInherit Class PixelGameEngine
       End If
     Else
       Return RCode.FAIL
+    End If
+
+    If IsOSPlatform(Windows) Then
+
+      FreeConsole()
+      'Dim ptr = GetConsoleWindow
+      'ShowWindow(ptr, 0)
+
     End If
 
     ' Start the thread
