@@ -951,7 +951,7 @@ Public MustInherit Class PixelGameEngine
     Return Draw(pos.x, pos.y, p)
   End Function
 
-  Protected Function Draw(x As Integer, y As Integer) As Boolean
+  Protected Overridable Function Draw(x As Integer, y As Integer) As Boolean
     Return Draw(x, y, Presets.White)
   End Function
 
