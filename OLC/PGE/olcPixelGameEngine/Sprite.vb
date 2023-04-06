@@ -171,6 +171,34 @@ Public Class Sprite
     End If
   End Function
 
+  Public Function Sample(x As Single, y As Single) As Pixel
+    Dim sx = Math.Min(CInt(Fix(x * Width)), Width - 1)
+    Dim sy = Math.Min(CInt(Fix(y * Height)), Height - 1)
+    Return GetPixel(sx, sy)
+  End Function
+
+  Public Function SampleBL(u As Single, v As Single) As Pixel
+
+    u = u * Width - 0.5F
+    v = v * Height - 0.5F
+    Dim x = CInt(Fix(u))
+    Dim y = CInt(Fix(v))
+    Dim u_ratio = u - x
+    Dim v_ratio = v - y
+    Dim u_opposite = 1.0F - u_ratio
+    Dim v_opposite = 1.0F - v_ratio
+
+    Dim p1 = GetPixel(Math.Max(x, 0), Math.Max(y, 0))
+    Dim p2 = GetPixel(Math.Min(x + 1, Width - 1), Math.Max(y, 0))
+    Dim p3 = GetPixel(Math.Max(x, 0), Math.Min(y + 1, Height - 1))
+    Dim p4 = GetPixel(Math.Min(x + 1, Width - 1), Math.Min(y + 1, Height - 1))
+
+    Return New Pixel(CByte((p1.R * u_opposite + p2.R * u_ratio) * v_opposite + (p3.R * u_opposite + p4.R * u_ratio) * v_ratio),
+                     CByte((p1.G * u_opposite + p2.G * u_ratio) * v_opposite + (p3.G * u_opposite + p4.G * u_ratio) * v_ratio),
+                     CByte((p1.B * u_opposite + p2.B * u_ratio) * v_opposite + (p3.B * u_opposite + p4.B * u_ratio) * v_ratio))
+
+  End Function
+
   Public ReadOnly Property GetData() As Pixel()
     Get
       Return pColData

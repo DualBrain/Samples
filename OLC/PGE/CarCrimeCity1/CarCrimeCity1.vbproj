@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Empty</RootNamespace>
+    <RootNamespace>CarCrimeCity1</RootNamespace>
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 

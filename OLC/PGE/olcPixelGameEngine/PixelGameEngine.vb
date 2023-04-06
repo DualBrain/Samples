@@ -934,13 +934,13 @@ Public MustInherit Class PixelGameEngine
     End Get
   End Property
 
-  Protected ReadOnly Property ScreenWidth As Integer
+  Public ReadOnly Property ScreenWidth As Integer
     Get
       Return nScreenWidth
     End Get
   End Property
 
-  Protected ReadOnly Property ScreenHeight As Integer
+  Public ReadOnly Property ScreenHeight As Integer
     Get
       Return nScreenHeight
     End Get
@@ -1247,7 +1247,11 @@ Public MustInherit Class PixelGameEngine
     DrawTriangle(x1, y1, x2, y2, x3, y3, Presets.White)
   End Sub
 
-  Protected Sub DrawTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, p As Pixel)
+  Public Sub DrawTriangle(x1 As Single, y1 As Single, x2 As Single, y2 As Single, x3 As Single, y3 As Single, p As Pixel)
+    DrawTriangle(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), CInt(Fix(x3)), CInt(Fix(y3)), p)
+  End Sub
+
+  Public Sub DrawTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, p As Pixel)
     DrawLine(x1, y1, x2, y2, p)
     DrawLine(x2, y2, x3, y3, p)
     DrawLine(x3, y3, x1, y1, p)
@@ -1265,7 +1269,11 @@ Public MustInherit Class PixelGameEngine
     FillTriangle(x1, y1, x2, y2, x3, y3, Presets.White)
   End Sub
 
-  Protected Sub FillTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, p As Pixel)
+  Public Sub FillTriangle(x1 As Single, y1 As Single, x2 As Single, y2 As Single, x3 As Single, y3 As Single, p As Pixel)
+    FillTriangle(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), CInt(Fix(x3)), CInt(Fix(y3)), p)
+  End Sub
+
+  Public Sub FillTriangle(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, p As Pixel)
 
     Dim drawline = Sub(sx As Integer, ex As Integer, ny As Integer)
                      For i = sx To ex
