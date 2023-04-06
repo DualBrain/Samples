@@ -14,7 +14,7 @@
   End Sub
 
   Public Function Mag() As Single
-    Return CSng(Math.Sqrt(x * x + y * y))
+    Return MathF.Sqrt(x * x + y * y)
   End Function
 
   Public Function Mag2() As Single
@@ -31,27 +31,27 @@
   End Function
 
   Public Function Floor() As Vf2d
-    Return New Vf2d(Math.Floor(x), Math.Floor(y))
+    Return New Vf2d(MathF.Floor(x), MathF.Floor(y))
   End Function
 
   Public Function Ceil() As Vf2d
-    Return New Vf2d(Math.Ceiling(x), Math.Ceiling(y))
+    Return New Vf2d(MathF.Ceiling(x), MathF.Ceiling(y))
   End Function
 
   Public Function [Max](v As Vf2d) As Vf2d
-    Return New Vf2d(Math.Max(x, v.x), Math.Max(y, v.y))
+    Return New Vf2d(MathF.Max(x, v.x), MathF.Max(y, v.y))
   End Function
 
   Public Function [Min](v As Vf2d) As Vf2d
-    Return New Vf2d(Math.Min(x, v.x), Math.Min(y, v.y))
+    Return New Vf2d(MathF.Min(x, v.x), MathF.Min(y, v.y))
   End Function
 
   Public Function Cart() As Vf2d
-    Return New Vf2d(Math.Cos(y) * x, Math.Sin(y) * x)
+    Return New Vf2d(MathF.Cos(y) * x, MathF.Sin(y) * x)
   End Function
 
   Public Function Polar() As Vf2d
-    Return New Vf2d(Mag(), Math.Atan2(y, x))
+    Return New Vf2d(Mag(), MathF.Atan2(y, x))
   End Function
 
   Public Function Clamp(v1 As Vf2d, v2 As Vf2d) As Vf2d

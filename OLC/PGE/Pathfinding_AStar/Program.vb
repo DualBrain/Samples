@@ -98,7 +98,7 @@ Class PathFinding_AStar
     Next
 
     Dim distance = Function(a As Node, b As Node) ' For convenience
-                     Return Math.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y))
+                     Return MathF.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y))
                    End Function
 
     Dim heuristic = Function(a As Node, b As Node) ' So we can experiement with heuristics

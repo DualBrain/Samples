@@ -14,7 +14,7 @@
   End Sub
 
   Public Function Mag() As Integer
-    Return CInt(Math.Sqrt(x * x + y * y))
+    Return CInt(Fix(MathF.Sqrt(x * x + y * y)))
   End Function
 
   Public Function Mag2() As Integer
@@ -31,27 +31,27 @@
   End Function
 
   Public Function floor() As Vi2d
-    Return New Vi2d(Math.Floor(x), Math.Floor(y))
+    Return New Vi2d(MathF.Floor(x), MathF.Floor(y))
   End Function
 
   Public Function ceil() As Vi2d
-    Return New Vi2d(Math.Ceiling(x), Math.Ceiling(y))
+    Return New Vi2d(MathF.Ceiling(x), MathF.Ceiling(y))
   End Function
 
   Public Function [max](v As Vi2d) As Vi2d
-    Return New Vi2d(Math.Max(x, v.x), Math.Max(y, v.y))
+    Return New Vi2d(MathF.Max(x, v.x), MathF.Max(y, v.y))
   End Function
 
   Public Function [min](v As Vi2d) As Vi2d
-    Return New Vi2d(Math.Min(x, v.x), Math.Min(y, v.y))
+    Return New Vi2d(MathF.Min(x, v.x), MathF.Min(y, v.y))
   End Function
 
   Public Function Cart() As Vi2d
-    Return New Vi2d(Math.Cos(y) * x, Math.Sin(y) * x)
+    Return New Vi2d(MathF.Cos(y) * x, MathF.Sin(y) * x)
   End Function
 
   Public Function Polar() As Vi2d
-    Return New Vi2d(Mag(), Math.Atan2(y, x))
+    Return New Vi2d(Mag(), MathF.Atan2(y, x))
   End Function
 
   Public Function Clamp(v1 As Vi2d, v2 As Vi2d) As Vi2d

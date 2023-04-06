@@ -46,8 +46,8 @@ Public Class Gfx2D
     ' Append a rotation of fTheta radians to this transform
     Public Sub Rotate(theta As Single)
       ' Construct Rotation Matrix
-      m_matrix(2, 0, 0) = CSng(Math.Cos(theta)) : m_matrix(2, 1, 0) = CSng(Math.Sin(theta)) : m_matrix(2, 2, 0) = 0.0F
-      m_matrix(2, 0, 1) = -CSng(Math.Sin(theta)) : m_matrix(2, 1, 1) = CSng(Math.Cos(theta)) : m_matrix(2, 2, 1) = 0.0F
+      m_matrix(2, 0, 0) = MathF.Cos(theta) : m_matrix(2, 1, 0) = MathF.Sin(theta) : m_matrix(2, 2, 0) = 0.0F
+      m_matrix(2, 0, 1) = -MathF.Sin(theta) : m_matrix(2, 1, 1) = MathF.Cos(theta) : m_matrix(2, 2, 1) = 0.0F
       m_matrix(2, 0, 2) = 0.0F : m_matrix(2, 1, 2) = 0.0F : m_matrix(2, 2, 2) = 1.0F
       Multiply()
     End Sub
@@ -161,20 +161,20 @@ Public Class Gfx2D
 
     transform.Forward(0.0F, 0.0F, sx, sy)
     px = sx : py = sy
-    sx = Math.Min(sx, px) : sy = Math.Min(sy, py)
-    ex = Math.Max(ex, px) : ey = Math.Max(ey, py)
+    sx = MathF.Min(sx, px) : sy = MathF.Min(sy, py)
+    ex = MathF.Max(ex, px) : ey = MathF.Max(ey, py)
 
     transform.Forward(sprite.Width, sprite.Height, px, py)
-    sx = Math.Min(sx, px) : sy = Math.Min(sy, py)
-    ex = Math.Max(ex, px) : ey = Math.Max(ey, py)
+    sx = MathF.Min(sx, px) : sy = MathF.Min(sy, py)
+    ex = MathF.Max(ex, px) : ey = MathF.Max(ey, py)
 
     transform.Forward(0.0F, sprite.Height, px, py)
-    sx = Math.Min(sx, px) : sy = Math.Min(sy, py)
-    ex = Math.Max(ex, px) : ey = Math.Max(ey, py)
+    sx = MathF.Min(sx, px) : sy = MathF.Min(sy, py)
+    ex = MathF.Max(ex, px) : ey = MathF.Max(ey, py)
 
     transform.Forward(sprite.Width, 0.0F, px, py)
-    sx = Math.Min(sx, px) : sy = Math.Min(sy, py)
-    ex = Math.Max(ex, px) : ey = Math.Max(ey, py)
+    sx = MathF.Min(sx, px) : sy = MathF.Min(sy, py)
+    ex = MathF.Max(ex, px) : ey = MathF.Max(ey, py)
 
     transform.Invert()
 

@@ -216,7 +216,7 @@ Friend Class ShadowCasting2D
         Dim rdx = If(i = 0, e1.Sx, e1.Ex) - ox
         Dim rdy = If(i = 0, e1.Sy, e1.Ey) - oy
 
-        Dim base_ang = CSng(Math.Atan2(rdy, rdx))
+        Dim base_ang = MathF.Atan2(rdy, rdx)
 
         Dim ang = 0.0F
 
@@ -229,8 +229,8 @@ Friend Class ShadowCasting2D
           If j = 2 Then ang = base_ang + 0.0001F
 
           ' Create ray along angle for required distance
-          rdx = radius * CSng(Math.Cos(ang))
-          rdy = radius * CSng(Math.Sin(ang))
+          rdx = radius * MathF.Cos(ang)
+          rdy = radius * MathF.Sin(ang)
 
           Dim minT1 = Single.PositiveInfinity
           Dim minPx = 0.0F, minPy = 0.0F, minAng = 0.0F
@@ -259,7 +259,7 @@ Friend Class ShadowCasting2D
                   minT1 = t1
                   minPx = ox + rdx * t1
                   minPy = oy + rdy * t1
-                  minAng = CSng(Math.Atan2(minPy - oy, minPx - ox))
+                  minAng = MathF.Atan2(minPy - oy, minPx - ox)
                   valid = True
                 End If
               End If
