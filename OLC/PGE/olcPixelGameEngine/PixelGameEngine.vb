@@ -12,6 +12,14 @@ Imports System.Xml
 
 Delegate Function WndProc(hWnd As IntPtr, msg As UInteger, wParam As IntPtr, lParam As IntPtr) As IntPtr
 
+Public Module Singleton
+
+  Public AtomActive As Boolean
+  Public MapKeys As New Dictionary(Of Integer, Integer)
+  Public Pge As PixelGameEngine
+
+End Module
+
 Public MustInherit Class PixelGameEngine
 
 #Region "Win32"
@@ -584,11 +592,6 @@ Public MustInherit Class PixelGameEngine
 
 #End Region
 
-  ' Singletons...
-  Private Shared m_atomActive As Boolean
-  Private Shared ReadOnly m_mapKeys As New Dictionary(Of Integer, Integer)
-  Private Shared m_sge As PixelGameEngine ' Used in Windows message pump.
-
   Protected Delegate Function PixelModeDelegate(x As Integer, y As Integer, p1 As Pixel, p2 As Pixel) As Pixel
   Private funcPixelMode As PixelModeDelegate
 
@@ -760,7 +763,7 @@ Public MustInherit Class PixelGameEngine
 
   Protected Friend Sub New()
     AppName = "Undefined"
-    'Olc.PgeX.pge = Me
+    Singleton.Pge = Me
   End Sub
 
   Public Function Construct(screenW As Integer, screenH As Integer, pixelW As Integer, pixelH As Integer, Optional fullScreen As Boolean = False, Optional vsync As Boolean = False) As Boolean 'RCode
@@ -829,14 +832,14 @@ Public MustInherit Class PixelGameEngine
 
     If IsOSPlatform(Windows) Then
 
-      FreeConsole()
-      'Dim ptr = GetConsoleWindow
-      'ShowWindow(ptr, 0)
+      'FreeConsole() ' doesn't always work??????
+      Dim ptr = GetConsoleWindow
+      ShowWindow(ptr, 0)
 
     End If
 
     ' Start the thread
-    m_atomActive = True
+    Singleton.AtomActive = True
     Dim t As New Thread(AddressOf EngineThread)
     t.Start()
 
@@ -955,7 +958,7 @@ Public MustInherit Class PixelGameEngine
     Return Draw(x, y, Presets.White)
   End Function
 
-  Protected Function Draw(x As Integer, y As Integer, p As Pixel) As Boolean
+  Public Function Draw(x As Integer, y As Integer, p As Pixel) As Boolean
 
     If pDrawTarget Is Nothing Then
       Return False
@@ -1676,16 +1679,16 @@ next4:
 
     ' Create user resources as part of this thread
     If Not OnUserCreate() Then
-      m_atomActive = False
+      Singleton.AtomActive = False
     End If
 
     Dim tp1 = Now()
     'Dim tp2 = Now()
 
-    While m_atomActive
+    While Singleton.AtomActive
 
       ' Run as fast as possible
-      While m_atomActive
+      While Singleton.AtomActive
 
         ' Handle Timing
         Dim tp2 = Now
@@ -1799,7 +1802,7 @@ next4:
 
         ' Handle Frame Update
         If Not OnUserUpdate(elapsedTime) Then
-          m_atomActive = False
+          Singleton.AtomActive = False
         End If
 
         ' Display Graphics
@@ -1861,7 +1864,7 @@ next4:
         ' User has permitted destroy, so exit and clean up
       Else
         ' User denied destroy for some reason, so continue running
-        m_atomActive = True
+        Singleton.AtomActive = True
       End If
 
     End While
@@ -1976,7 +1979,7 @@ next4:
     Dim width = rWndRect.Right - rWndRect.Left
     Dim height = rWndRect.Bottom - rWndRect.Top
 
-    m_sge = Me
+    'Singleton.Pge = Me
     olc_hWnd = CreateWindowEx(dwExStyle, atom, "", dwStyle,
                               nCosmeticOffset, nCosmeticOffset, width, height, Nothing, Nothing,
                               GetModuleHandle(Nothing), IntPtr.Zero)
@@ -1988,33 +1991,33 @@ next4:
     'TrackMouseEvent(tme)
 
     ' Create Keyboard Mapping
-    m_mapKeys(&H0) = Key.NONE
-    m_mapKeys(&H41) = Key.A : m_mapKeys(&H42) = Key.B : m_mapKeys(&H43) = Key.C : m_mapKeys(&H44) = Key.D : m_mapKeys(&H45) = Key.E
-    m_mapKeys(&H46) = Key.F : m_mapKeys(&H47) = Key.G : m_mapKeys(&H48) = Key.H : m_mapKeys(&H49) = Key.I : m_mapKeys(&H50) = Key.J
-    m_mapKeys(&H4B) = Key.K : m_mapKeys(&H4C) = Key.L : m_mapKeys(&H4D) = Key.M : m_mapKeys(&H4E) = Key.N : m_mapKeys(&H4F) = Key.O
-    m_mapKeys(&H50) = Key.P : m_mapKeys(&H51) = Key.Q : m_mapKeys(&H52) = Key.R : m_mapKeys(&H53) = Key.S : m_mapKeys(&H54) = Key.T
-    m_mapKeys(&H55) = Key.U : m_mapKeys(&H56) = Key.V : m_mapKeys(&H57) = Key.W : m_mapKeys(&H58) = Key.X : m_mapKeys(&H59) = Key.Y
-    m_mapKeys(&H5A) = Key.Z
+    Singleton.MapKeys(&H0) = Key.NONE
+    Singleton.MapKeys(&H41) = Key.A : Singleton.MapKeys(&H42) = Key.B : Singleton.MapKeys(&H43) = Key.C : Singleton.MapKeys(&H44) = Key.D : Singleton.MapKeys(&H45) = Key.E
+    Singleton.MapKeys(&H46) = Key.F : Singleton.MapKeys(&H47) = Key.G : Singleton.MapKeys(&H48) = Key.H : Singleton.MapKeys(&H49) = Key.I : Singleton.MapKeys(&H50) = Key.J
+    Singleton.MapKeys(&H4B) = Key.K : Singleton.MapKeys(&H4C) = Key.L : Singleton.MapKeys(&H4D) = Key.M : Singleton.MapKeys(&H4E) = Key.N : Singleton.MapKeys(&H4F) = Key.O
+    Singleton.MapKeys(&H50) = Key.P : Singleton.MapKeys(&H51) = Key.Q : Singleton.MapKeys(&H52) = Key.R : Singleton.MapKeys(&H53) = Key.S : Singleton.MapKeys(&H54) = Key.T
+    Singleton.MapKeys(&H55) = Key.U : Singleton.MapKeys(&H56) = Key.V : Singleton.MapKeys(&H57) = Key.W : Singleton.MapKeys(&H58) = Key.X : Singleton.MapKeys(&H59) = Key.Y
+    Singleton.MapKeys(&H5A) = Key.Z
 
-    m_mapKeys(VK_F1) = Key.F1 : m_mapKeys(VK_F2) = Key.F2 : m_mapKeys(VK_F3) = Key.F3 : m_mapKeys(VK_F4) = Key.F4
-    m_mapKeys(VK_F5) = Key.F5 : m_mapKeys(VK_F6) = Key.F6 : m_mapKeys(VK_F7) = Key.F7 : m_mapKeys(VK_F8) = Key.F8
-    m_mapKeys(VK_F9) = Key.F9 : m_mapKeys(VK_F10) = Key.F10 : m_mapKeys(VK_F11) = Key.F11 : m_mapKeys(VK_F12) = Key.F12
+    Singleton.MapKeys(VK_F1) = Key.F1 : Singleton.MapKeys(VK_F2) = Key.F2 : Singleton.MapKeys(VK_F3) = Key.F3 : Singleton.MapKeys(VK_F4) = Key.F4
+    Singleton.MapKeys(VK_F5) = Key.F5 : Singleton.MapKeys(VK_F6) = Key.F6 : Singleton.MapKeys(VK_F7) = Key.F7 : Singleton.MapKeys(VK_F8) = Key.F8
+    Singleton.MapKeys(VK_F9) = Key.F9 : Singleton.MapKeys(VK_F10) = Key.F10 : Singleton.MapKeys(VK_F11) = Key.F11 : Singleton.MapKeys(VK_F12) = Key.F12
 
-    m_mapKeys(VK_DOWN) = Key.DOWN : m_mapKeys(VK_LEFT) = Key.LEFT : m_mapKeys(VK_RIGHT) = Key.RIGHT : m_mapKeys(VK_UP) = Key.UP
-    m_mapKeys(VK_RETURN) = Key.ENTER 'mapKeys(VK_RETURN) = Key.RETURN
+    Singleton.MapKeys(VK_DOWN) = Key.DOWN : Singleton.MapKeys(VK_LEFT) = Key.LEFT : Singleton.MapKeys(VK_RIGHT) = Key.RIGHT : Singleton.MapKeys(VK_UP) = Key.UP
+    Singleton.MapKeys(VK_RETURN) = Key.ENTER 'mapKeys(VK_RETURN) = Key.RETURN
 
-    m_mapKeys(VK_BACK) = Key.BACK : m_mapKeys(VK_ESCAPE) = Key.ESCAPE : m_mapKeys(VK_RETURN) = Key.ENTER : m_mapKeys(VK_PAUSE) = Key.PAUSE
-    m_mapKeys(VK_SCROLL) = Key.SCROLL : m_mapKeys(VK_TAB) = Key.TAB : m_mapKeys(VK_DELETE) = Key.DEL : m_mapKeys(VK_HOME) = Key.HOME
-    m_mapKeys(VK_END) = Key.END : m_mapKeys(VK_PRIOR) = Key.PGUP : m_mapKeys(VK_NEXT) = Key.PGDN : m_mapKeys(VK_INSERT) = Key.INS
-    m_mapKeys(VK_SHIFT) = Key.SHIFT : m_mapKeys(VK_CONTROL) = Key.CTRL
-    m_mapKeys(VK_SPACE) = Key.SPACE
+    Singleton.MapKeys(VK_BACK) = Key.BACK : Singleton.MapKeys(VK_ESCAPE) = Key.ESCAPE : Singleton.MapKeys(VK_RETURN) = Key.ENTER : Singleton.MapKeys(VK_PAUSE) = Key.PAUSE
+    Singleton.MapKeys(VK_SCROLL) = Key.SCROLL : Singleton.MapKeys(VK_TAB) = Key.TAB : Singleton.MapKeys(VK_DELETE) = Key.DEL : Singleton.MapKeys(VK_HOME) = Key.HOME
+    Singleton.MapKeys(VK_END) = Key.END : Singleton.MapKeys(VK_PRIOR) = Key.PGUP : Singleton.MapKeys(VK_NEXT) = Key.PGDN : Singleton.MapKeys(VK_INSERT) = Key.INS
+    Singleton.MapKeys(VK_SHIFT) = Key.SHIFT : Singleton.MapKeys(VK_CONTROL) = Key.CTRL
+    Singleton.MapKeys(VK_SPACE) = Key.SPACE
 
-    m_mapKeys(&H30) = Key.K0 : m_mapKeys(&H31) = Key.K1 : m_mapKeys(&H32) = Key.K2 : m_mapKeys(&H33) = Key.K3 : m_mapKeys(&H34) = Key.K4
-    m_mapKeys(&H35) = Key.K5 : m_mapKeys(&H36) = Key.K6 : m_mapKeys(&H37) = Key.K7 : m_mapKeys(&H38) = Key.K8 : m_mapKeys(&H39) = Key.K9
+    Singleton.MapKeys(&H30) = Key.K0 : Singleton.MapKeys(&H31) = Key.K1 : Singleton.MapKeys(&H32) = Key.K2 : Singleton.MapKeys(&H33) = Key.K3 : Singleton.MapKeys(&H34) = Key.K4
+    Singleton.MapKeys(&H35) = Key.K5 : Singleton.MapKeys(&H36) = Key.K6 : Singleton.MapKeys(&H37) = Key.K7 : Singleton.MapKeys(&H38) = Key.K8 : Singleton.MapKeys(&H39) = Key.K9
 
-    m_mapKeys(VK_NUMPAD0) = Key.NP0 : m_mapKeys(VK_NUMPAD1) = Key.NP1 : m_mapKeys(VK_NUMPAD2) = Key.NP2 : m_mapKeys(VK_NUMPAD3) = Key.NP3 : m_mapKeys(VK_NUMPAD4) = Key.NP4
-    m_mapKeys(VK_NUMPAD5) = Key.NP5 : m_mapKeys(VK_NUMPAD6) = Key.NP6 : m_mapKeys(VK_NUMPAD7) = Key.NP7 : m_mapKeys(VK_NUMPAD8) = Key.NP8 : m_mapKeys(VK_NUMPAD9) = Key.NP9
-    m_mapKeys(VK_MULTIPLY) = Key.NP_MUL : m_mapKeys(VK_ADD) = Key.NP_ADD : m_mapKeys(VK_DIVIDE) = Key.NP_DIV : m_mapKeys(VK_SUBTRACT) = Key.NP_SUB : m_mapKeys(VK_DECIMAL) = Key.NP_DECIMAL
+    Singleton.MapKeys(VK_NUMPAD0) = Key.NP0 : Singleton.MapKeys(VK_NUMPAD1) = Key.NP1 : Singleton.MapKeys(VK_NUMPAD2) = Key.NP2 : Singleton.MapKeys(VK_NUMPAD3) = Key.NP3 : Singleton.MapKeys(VK_NUMPAD4) = Key.NP4
+    Singleton.MapKeys(VK_NUMPAD5) = Key.NP5 : Singleton.MapKeys(VK_NUMPAD6) = Key.NP6 : Singleton.MapKeys(VK_NUMPAD7) = Key.NP7 : Singleton.MapKeys(VK_NUMPAD8) = Key.NP8 : Singleton.MapKeys(VK_NUMPAD9) = Key.NP9
+    Singleton.MapKeys(VK_MULTIPLY) = Key.NP_MUL : Singleton.MapKeys(VK_ADD) = Key.NP_ADD : Singleton.MapKeys(VK_DIVIDE) = Key.NP_DIV : Singleton.MapKeys(VK_SUBTRACT) = Key.NP_SUB : Singleton.MapKeys(VK_DECIMAL) = Key.NP_DECIMAL
 
     Return olc_hWnd
 
@@ -2083,11 +2086,11 @@ next4:
         Dim y = (v >> 16) And &HFFFF
         Dim ix = BitConverter.ToInt16(BitConverter.GetBytes(x), 0)
         Dim iy = BitConverter.ToInt16(BitConverter.GetBytes(y), 0)
-        m_sge.olc_UpdateMouse(ix, iy)
+        Singleton.Pge.olc_UpdateMouse(ix, iy)
         Return IntPtr.Zero
       Case WM_SIZE
         Dim v = CInt(lParam)
-        m_sge.olc_UpdateWindowSize(v And &HFFFF, (v >> 16) And &HFFFF)
+        Singleton.Pge.olc_UpdateWindowSize(v And &HFFFF, (v >> 16) And &HFFFF)
         Return IntPtr.Zero
       Case WM_MOUSEWHEEL
         'TODO: WM_WHEEL not working correctly...
@@ -2096,40 +2099,40 @@ next4:
         Return IntPtr.Zero
       Case WM_MOUSELEAVE
         'TODO: WM_MOUSELEAVE is working *once*, not sure why...
-        m_sge.bHasMouseFocus = False
+        Singleton.Pge.bHasMouseFocus = False
         Return IntPtr.Zero
       Case WM_SETFOCUS
-        m_sge.bHasInputFocus = True
+        Singleton.Pge.bHasInputFocus = True
         Return IntPtr.Zero
       Case WM_KILLFOCUS
-        m_sge.bHasInputFocus = False
+        Singleton.Pge.bHasInputFocus = False
         Return IntPtr.Zero
       Case WM_KEYDOWN
-        m_sge.pKeyNewState(m_mapKeys(wParam.ToInt32())) = True
+        Singleton.Pge.pKeyNewState(Singleton.MapKeys(wParam.ToInt32())) = True
         Return IntPtr.Zero
       Case WM_KEYUP
-        m_sge.pKeyNewState(m_mapKeys(wParam.ToInt32())) = False
+        Singleton.Pge.pKeyNewState(Singleton.MapKeys(wParam.ToInt32())) = False
         Return IntPtr.Zero
       Case WM_LBUTTONDOWN
-        m_sge.pMouseNewState(0) = True
+        Singleton.Pge.pMouseNewState(0) = True
         Return IntPtr.Zero
       Case WM_LBUTTONUP
-        m_sge.pMouseNewState(0) = False
+        Singleton.Pge.pMouseNewState(0) = False
         Return IntPtr.Zero
       Case WM_RBUTTONDOWN
-        m_sge.pMouseNewState(1) = True
+        Singleton.Pge.pMouseNewState(1) = True
         Return IntPtr.Zero
       Case WM_RBUTTONUP
-        m_sge.pMouseNewState(1) = False
+        Singleton.Pge.pMouseNewState(1) = False
         Return IntPtr.Zero
       Case WM_MBUTTONDOWN
-        m_sge.pMouseNewState(2) = True
+        Singleton.Pge.pMouseNewState(2) = True
         Return IntPtr.Zero
       Case WM_MBUTTONUP
-        m_sge.pMouseNewState(2) = False
+        Singleton.Pge.pMouseNewState(2) = False
         Return IntPtr.Zero
       Case WM_CLOSE
-        m_atomActive = False
+        Singleton.AtomActive = False
         Return IntPtr.Zero
       Case WM_DESTROY
         PostQuitMessage(0)
@@ -2194,33 +2197,33 @@ next4:
     End If
 
     ' Create Keyboard Mapping
-    m_mapKeys(&H0) = Key.NONE
-    m_mapKeys(&H61) = Key.A : m_mapKeys(&H62) = Key.B : m_mapKeys(&H63) = Key.C : m_mapKeys(&H64) = Key.D : m_mapKeys(&H65) = Key.E
-    m_mapKeys(&H66) = Key.F : m_mapKeys(&H67) = Key.G : m_mapKeys(&H68) = Key.H : m_mapKeys(&H69) = Key.I : m_mapKeys(&H6A) = Key.J
-    m_mapKeys(&H6B) = Key.K : m_mapKeys(&H6C) = Key.L : m_mapKeys(&H6D) = Key.M : m_mapKeys(&H6E) = Key.N : m_mapKeys(&H6F) = Key.O
-    m_mapKeys(&H70) = Key.P : m_mapKeys(&H71) = Key.Q : m_mapKeys(&H72) = Key.R : m_mapKeys(&H73) = Key.S : m_mapKeys(&H74) = Key.T
-    m_mapKeys(&H75) = Key.U : m_mapKeys(&H76) = Key.V : m_mapKeys(&H77) = Key.W : m_mapKeys(&H78) = Key.X : m_mapKeys(&H79) = Key.Y
-    m_mapKeys(&H7A) = Key.Z
+    Singleton.MapKeys(&H0) = Key.NONE
+    Singleton.MapKeys(&H61) = Key.A : Singleton.MapKeys(&H62) = Key.B : Singleton.MapKeys(&H63) = Key.C : Singleton.MapKeys(&H64) = Key.D : Singleton.MapKeys(&H65) = Key.E
+    Singleton.MapKeys(&H66) = Key.F : Singleton.MapKeys(&H67) = Key.G : Singleton.MapKeys(&H68) = Key.H : Singleton.MapKeys(&H69) = Key.I : Singleton.MapKeys(&H6A) = Key.J
+    Singleton.MapKeys(&H6B) = Key.K : Singleton.MapKeys(&H6C) = Key.L : Singleton.MapKeys(&H6D) = Key.M : Singleton.MapKeys(&H6E) = Key.N : Singleton.MapKeys(&H6F) = Key.O
+    Singleton.MapKeys(&H70) = Key.P : Singleton.MapKeys(&H71) = Key.Q : Singleton.MapKeys(&H72) = Key.R : Singleton.MapKeys(&H73) = Key.S : Singleton.MapKeys(&H74) = Key.T
+    Singleton.MapKeys(&H75) = Key.U : Singleton.MapKeys(&H76) = Key.V : Singleton.MapKeys(&H77) = Key.W : Singleton.MapKeys(&H78) = Key.X : Singleton.MapKeys(&H79) = Key.Y
+    Singleton.MapKeys(&H7A) = Key.Z
 
-    m_mapKeys(XK_F1) = Key.F1 : m_mapKeys(XK_F2) = Key.F2 : m_mapKeys(XK_F3) = Key.F3 : m_mapKeys(XK_F4) = Key.F4
-    m_mapKeys(XK_F5) = Key.F5 : m_mapKeys(XK_F6) = Key.F6 : m_mapKeys(XK_F7) = Key.F7 : m_mapKeys(XK_F8) = Key.F8
-    m_mapKeys(XK_F9) = Key.F9 : m_mapKeys(XK_F10) = Key.F10 : m_mapKeys(XK_F11) = Key.F11 : m_mapKeys(XK_F12) = Key.F12
+    Singleton.MapKeys(XK_F1) = Key.F1 : Singleton.MapKeys(XK_F2) = Key.F2 : Singleton.MapKeys(XK_F3) = Key.F3 : Singleton.MapKeys(XK_F4) = Key.F4
+    Singleton.MapKeys(XK_F5) = Key.F5 : Singleton.MapKeys(XK_F6) = Key.F6 : Singleton.MapKeys(XK_F7) = Key.F7 : Singleton.MapKeys(XK_F8) = Key.F8
+    Singleton.MapKeys(XK_F9) = Key.F9 : Singleton.MapKeys(XK_F10) = Key.F10 : Singleton.MapKeys(XK_F11) = Key.F11 : Singleton.MapKeys(XK_F12) = Key.F12
 
-    m_mapKeys(XK_Down) = Key.DOWN : m_mapKeys(XK_Left) = Key.LEFT : m_mapKeys(XK_Right) = Key.RIGHT : m_mapKeys(XK_Up) = Key.UP
-    m_mapKeys(XK_KP_Enter) = Key.ENTER : m_mapKeys(XK_Return) = Key.ENTER
+    Singleton.MapKeys(XK_Down) = Key.DOWN : Singleton.MapKeys(XK_Left) = Key.LEFT : Singleton.MapKeys(XK_Right) = Key.RIGHT : Singleton.MapKeys(XK_Up) = Key.UP
+    Singleton.MapKeys(XK_KP_Enter) = Key.ENTER : Singleton.MapKeys(XK_Return) = Key.ENTER
 
-    m_mapKeys(XK_BackSpace) = Key.BACK : m_mapKeys(XK_Escape) = Key.ESCAPE : m_mapKeys(XK_Linefeed) = Key.ENTER : m_mapKeys(XK_Pause) = Key.PAUSE
-    m_mapKeys(XK_Scroll_Lock) = Key.SCROLL : m_mapKeys(XK_Tab) = Key.TAB : m_mapKeys(XK_Delete) = Key.DEL : m_mapKeys(XK_Home) = Key.HOME
-    m_mapKeys(XK_End) = Key.END : m_mapKeys(XK_Page_Up) = Key.PGUP : m_mapKeys(XK_Page_Down) = Key.PGDN : m_mapKeys(XK_Insert) = Key.INS
-    m_mapKeys(XK_Shift_L) = Key.SHIFT : m_mapKeys(XK_Shift_R) = Key.SHIFT : m_mapKeys(XK_Control_L) = Key.CTRL : m_mapKeys(XK_Control_R) = Key.CTRL
-    m_mapKeys(XK_space) = Key.SPACE
+    Singleton.MapKeys(XK_BackSpace) = Key.BACK : Singleton.MapKeys(XK_Escape) = Key.ESCAPE : Singleton.MapKeys(XK_Linefeed) = Key.ENTER : Singleton.MapKeys(XK_Pause) = Key.PAUSE
+    Singleton.MapKeys(XK_Scroll_Lock) = Key.SCROLL : Singleton.MapKeys(XK_Tab) = Key.TAB : Singleton.MapKeys(XK_Delete) = Key.DEL : Singleton.MapKeys(XK_Home) = Key.HOME
+    Singleton.MapKeys(XK_End) = Key.END : Singleton.MapKeys(XK_Page_Up) = Key.PGUP : Singleton.MapKeys(XK_Page_Down) = Key.PGDN : Singleton.MapKeys(XK_Insert) = Key.INS
+    Singleton.MapKeys(XK_Shift_L) = Key.SHIFT : Singleton.MapKeys(XK_Shift_R) = Key.SHIFT : Singleton.MapKeys(XK_Control_L) = Key.CTRL : Singleton.MapKeys(XK_Control_R) = Key.CTRL
+    Singleton.MapKeys(XK_space) = Key.SPACE
 
-    m_mapKeys(XK_0) = Key.K0 : m_mapKeys(XK_1) = Key.K1 : m_mapKeys(XK_2) = Key.K2 : m_mapKeys(XK_3) = Key.K3 : m_mapKeys(XK_4) = Key.K4
-    m_mapKeys(XK_5) = Key.K5 : m_mapKeys(XK_6) = Key.K6 : m_mapKeys(XK_7) = Key.K7 : m_mapKeys(XK_8) = Key.K8 : m_mapKeys(XK_9) = Key.K9
+    Singleton.MapKeys(XK_0) = Key.K0 : Singleton.MapKeys(XK_1) = Key.K1 : Singleton.MapKeys(XK_2) = Key.K2 : Singleton.MapKeys(XK_3) = Key.K3 : Singleton.MapKeys(XK_4) = Key.K4
+    Singleton.MapKeys(XK_5) = Key.K5 : Singleton.MapKeys(XK_6) = Key.K6 : Singleton.MapKeys(XK_7) = Key.K7 : Singleton.MapKeys(XK_8) = Key.K8 : Singleton.MapKeys(XK_9) = Key.K9
 
-    m_mapKeys(XK_KP_0) = Key.NP0 : m_mapKeys(XK_KP_1) = Key.NP1 : m_mapKeys(XK_KP_2) = Key.NP2 : m_mapKeys(XK_KP_3) = Key.NP3 : m_mapKeys(XK_KP_4) = Key.NP4
-    m_mapKeys(XK_KP_5) = Key.NP5 : m_mapKeys(XK_KP_6) = Key.NP6 : m_mapKeys(XK_KP_7) = Key.NP7 : m_mapKeys(XK_KP_8) = Key.NP8 : m_mapKeys(XK_KP_9) = Key.NP9
-    m_mapKeys(XK_KP_Multiply) = Key.NP_MUL : m_mapKeys(XK_KP_Add) = Key.NP_ADD : m_mapKeys(XK_KP_Divide) = Key.NP_DIV : m_mapKeys(XK_KP_Subtract) = Key.NP_SUB : m_mapKeys(XK_KP_Decimal) = Key.NP_DECIMAL
+    Singleton.MapKeys(XK_KP_0) = Key.NP0 : Singleton.MapKeys(XK_KP_1) = Key.NP1 : Singleton.MapKeys(XK_KP_2) = Key.NP2 : Singleton.MapKeys(XK_KP_3) = Key.NP3 : Singleton.MapKeys(XK_KP_4) = Key.NP4
+    Singleton.MapKeys(XK_KP_5) = Key.NP5 : Singleton.MapKeys(XK_KP_6) = Key.NP6 : Singleton.MapKeys(XK_KP_7) = Key.NP7 : Singleton.MapKeys(XK_KP_8) = Key.NP8 : Singleton.MapKeys(XK_KP_9) = Key.NP9
+    Singleton.MapKeys(XK_KP_Multiply) = Key.NP_MUL : Singleton.MapKeys(XK_KP_Add) = Key.NP_ADD : Singleton.MapKeys(XK_KP_Divide) = Key.NP_DIV : Singleton.MapKeys(XK_KP_Subtract) = Key.NP_SUB : Singleton.MapKeys(XK_KP_Decimal) = Key.NP_DECIMAL
 
     Return olc_Display
 
@@ -2260,7 +2263,13 @@ next4:
     Return CType((CInt(wParam) >> 16), Short)
   End Function
 
-  Private Shared Sub Swap(ByRef a As Integer, ByRef b As Integer)
+  Public Shared Sub Swap(ByRef a As Integer, ByRef b As Integer)
+    Dim t = a
+    a = b
+    b = t
+  End Sub
+
+  Public Shared Sub Swap(ByRef a As Single, ByRef b As Single)
     Dim t = a
     a = b
     b = t
@@ -2356,6 +2365,12 @@ next4:
   End Sub
 
 #End Region
+
+End Class
+
+Public MustInherit Class PgeX
+
+  'Public Shared Property Pge As PixelGameEngine
 
 End Class
 

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Empty</RootNamespace>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PGE1\olcPixelGameEngine\olcPixelGameEngine.vbproj" />
+    <ProjectReference Include="..\olcPixelGameEngine\olcPixelGameEngine.vbproj" />
+  </ItemGroup>
+
+</Project>

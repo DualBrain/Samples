@@ -6,7 +6,7 @@ Now that I've completed the olcConsoleGameEngine-related videos and have a treme
 
 Right now the main focus is on the olcPixelGameEngine v1.x (PGE1) which as since been retired and replaced with olcPixelGameEngine v2.x. As I work through his videos (in reverse chronological order), I'll continue to update this repo as I progress.
 
-- [olcPixelGameEngineVB](PGE1/)
+- [olcPixelGameEngineVB](PGE/)
 - [olcConsoleGameEngineVB](CGE/)
 - [Other](Other/)
 
