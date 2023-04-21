@@ -7,6 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="car_top.png" />
+    <None Remove="City_Roads1_mip0.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="car_top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="City_Roads1_mip0.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\olcPixelGameEngine\olcPixelGameEngine.vbproj" />
   </ItemGroup>
 
