@@ -1,7 +1,7 @@
 ' Inspired by "BIG PROJECT! Top Down City Based Car Crime Game #1" -- @javidx9
 ' https://youtu.be/mD6b_hP17WI
 
-' current at 19:07 in the video...
+' current at 49:25 in the video...
 
 Option Explicit On
 Option Strict On
@@ -62,6 +62,11 @@ Friend Class CarCrime
   Private fCameraX As Single = 0.0F
   Private fCameraY As Single = 0.0F
   Private fCameraZ As Single = -10.0F
+
+  Private fCarAngle As Single = 0.0F
+  Private fCarSpeed As Single = 2.0F
+  Private vecCarVel As Vec3d = New Vec3d(0, 0, 0)
+  Private vecCarPos As Vec3d = New Vec3d(0, 0, 0)
 
   Friend Sub New()
     AppName = "Car Crime City"
@@ -171,12 +176,45 @@ Friend Class CarCrime
 
     'fTheta += elapsedTime
 
-    If GetKey(Key.W).Held Then fCameraY -= 2.0F * elapsedTime
-    If GetKey(Key.S).Held Then fCameraY += 2.0F * elapsedTime
-    If GetKey(Key.A).Held Then fCameraX -= 2.0F * elapsedTime
-    If GetKey(Key.D).Held Then fCameraX += 2.0F * elapsedTime
+    'If GetKey(Key.W).Held Then fCameraY -= 2.0F * elapsedTime
+    'If GetKey(Key.S).Held Then fCameraY += 2.0F * elapsedTime
+    'If GetKey(Key.A).Held Then fCameraX -= 2.0F * elapsedTime
+    'If GetKey(Key.D).Held Then fCameraX += 2.0F * elapsedTime
     If GetKey(Key.X).Held Then fCameraZ -= 5.0F * elapsedTime
     If GetKey(Key.Z).Held Then fCameraZ += 5.0F * elapsedTime
+
+    If GetKey(Key.LEFT).Held Then fCarAngle -= 4.0F * elapsedTime
+    If GetKey(Key.RIGHT).Held Then fCarAngle += 4.0F * elapsedTime
+
+    Dim a = New Vec3d(1, 0, 0)
+    Dim m = Mat_MakeRotationZ(fCarAngle)
+    vecCarVel = Mat_MultiplyVector(m, a)
+
+    If GetKey(Key.UP).Held Then
+      vecCarPos.X += vecCarVel.X * fCarSpeed * elapsedTime
+      vecCarPos.Y += vecCarVel.Y * fCarSpeed * elapsedTime
+    End If
+
+    ' Press "R" to toggle a Road flag for selected cell(s)
+    If GetKey(Key.R).Pressed Then
+      Dim x = CInt(Fix(vecCarPos.X))
+      Dim y = CInt(Fix(vecCarPos.Y))
+      pMap(y * nMapWidth + x).bRoad = Not pMap(y * nMapWidth + x).bRoad
+    End If
+
+    ' Press "T" to raise a building...
+    If GetKey(Key.T).Pressed Then
+      Dim x = CInt(Fix(vecCarPos.X))
+      Dim y = CInt(Fix(vecCarPos.Y))
+      pMap(y * nMapWidth + x).nHeight += 1
+    End If
+
+    ' Press "E" to lower a building...
+    If GetKey(Key.E).Pressed Then
+      Dim x = CInt(Fix(vecCarPos.X))
+      Dim y = CInt(Fix(vecCarPos.Y))
+      pMap(y * nMapWidth + x).nHeight -= 1
+    End If
 
     Clear(Presets.Blue)
     ClearDepth()
@@ -184,6 +222,8 @@ Friend Class CarCrime
     Dim vLookTarget = Vec_Add(vEye, vLookDir)
 
     ' Setup the camera properties for the pipeline - aka "view" transform
+    fCameraX = vecCarPos.X
+    fCameraY = vecCarPos.Y
     vEye = New Vec3d(fCameraX, fCameraY, fCameraZ)
     pipeRender.SetCamera(vEye, vLookTarget, vUp)
 
@@ -197,7 +237,40 @@ Friend Class CarCrime
 
         If pMap(y * nMapWidth + x).bRoad Then
 
+          Dim road = 0
+
+          Dim r = Function(i As Integer, j As Integer) As Boolean
+                    Return pMap((y + j) * nMapWidth + (x + i)).bRoad
+                  End Function
+
+          If r(0, -1) AndAlso r(0, +1) AndAlso Not r(-1, 0) AndAlso Not r(+1, 0) Then road = 0
+          If Not r(0, -1) AndAlso Not r(0, +1) AndAlso r(-1, 0) AndAlso r(+1, 0) Then road = 1
+
+          If Not r(0, -1) AndAlso r(0, +1) AndAlso Not r(-1, 0) AndAlso r(+1, 0) Then road = 3
+          If Not r(0, -1) AndAlso r(0, +1) AndAlso r(-1, 0) AndAlso r(+1, 0) Then road = 4
+
+          If Not r(0, -1) AndAlso r(0, +1) AndAlso r(-1, 0) AndAlso Not r(+1, 0) Then road = 5
+
+          If r(0, -1) AndAlso r(0, +1) AndAlso Not r(-1, 0) AndAlso r(+1, 0) Then road = 6
+          If r(0, -1) AndAlso r(0, +1) AndAlso r(-1, 0) AndAlso r(+1, 0) Then road = 7
+          If r(0, -1) AndAlso r(0, +1) AndAlso r(-1, 0) AndAlso Not r(+1, 0) Then road = 8
+
+          If r(0, -1) AndAlso Not r(0, +1) AndAlso Not r(-1, 0) AndAlso r(+1, 0) Then road = 9
+          If r(0, -1) AndAlso Not r(0, +1) AndAlso r(-1, 0) AndAlso r(+1, 0) Then road = 10
+          If r(0, -1) AndAlso Not r(0, +1) AndAlso r(-1, 0) AndAlso Not r(+1, 0) Then road = 11
+
+          ' Set the appropriate texture to use
+          pipeRender.SetTexture(sprRoad(road))
+          Dim matWorld = Mat_MakeTranslation(x, y, 0.0F)
+          pipeRender.SetTransform(matWorld)
+          pipeRender.Render(meshFlat.Tris)
+
         Else
+
+          If pMap(y * nMapWidth + x).nHeight < 0 Then
+            ' Water?
+          End If
+
           If pMap(y * nMapWidth + x).nHeight = 0 Then
             ' Cell is ground, draw a flat grass quad at height 0
             Dim matWorld = Mat_MakeTranslation(x, y, 0.0F)
@@ -205,17 +278,63 @@ Friend Class CarCrime
             pipeRender.SetTexture(sprGround)
             pipeRender.Render(meshFlat.Tris)
           End If
-        End If
 
+          If pMap(y * nMapWidth + x).nHeight > 0 Then
+
+            ' Cell is a Building, for now, we'll draw each story as a seperate mesh
+            For h = 0 To pMap(y * nMapWidth + x).nHeight - 1
+
+              ' Create a transform that positions the story according to its height
+              Dim matWorld = Mat_MakeTranslation(x, y, -(h + 1) * 0.2F)
+              pipeRender.SetTransform(matWorld)
+
+              ' Choose a texture, if its ground level, use the "street level front", otherwise use windows
+              pipeRender.SetTexture(If(h = 0, sprFrontage, sprWindows))
+              pipeRender.Render(meshWallsOut.Tris)
+
+            Next
+
+            If True Then
+              ' Top the building off with a roof
+              Dim h = pMap(y * nMapWidth + x).nHeight
+              Dim matworld = Mat_MakeTranslation(x, y, -(h) * 0.2F)
+              pipeRender.SetTransform(matworld)
+              pipeRender.SetTexture(sprRoof)
+              pipeRender.Render(meshFlat.Tris)
+            End If
+
+          End If
+
+          End If
       Next
     Next
 
-    'Dim matRotateX = Mat_MakeRotationX(fTheta)
-    'Dim matRotateZ = Mat_MakeRotationZ(fTheta / 3.0F)
-    'Dim matWorld = Mat_MultiplyMatrix(matRotateX, matRotateZ)
-    'pipeRender.SetTransform(matWorld)
-    'pipeRender.SetTexture(sprAll)
-    'pipeRender.Render(meshCube.Tris) ', RenderFlags.RenderWire)
+    ' Draw Car, a few transforms required for this
+
+    ' 1) Offset the car to the middle of the quad
+    Dim matCarOffset = Mat_MakeTranslation(-0.5F, -0.5F, -0.0F)
+    ' 2) The quad is currently unit square, scale it to be more rectangular and smaller than the cells
+    Dim matCarScale = Mat_MakeScale(0.4F, 0.2F, 1.0F)
+    ' 3) Combine into matrix
+    Dim matCar = Mat_MultiplyMatrix(matCarOffset, matCarScale)
+    ' 4) Rotate the car around its offset origin, according to its angle
+    Dim matCarRot = Mat_MakeRotationZ(fCarAngle)
+    matCar = Mat_MultiplyMatrix(matCar, matCarRot)
+    ' 5) Translate the car into its position in the world. Give it a little elevation so its above the ground
+    Dim matCarTrans = Mat_MakeTranslation(vecCarPos.X, vecCarPos.Y, -0.01F)
+    matCar = Mat_MultiplyMatrix(matCar, matCarTrans)
+
+    ' Apply "world" transform to pipeline
+    pipeRender.SetTransform(matCar)
+    ' Set the car texture to the pipeline
+    pipeRender.SetTexture(sprCar)
+
+    ' The car has transparency, so enable it
+    SetPixelMode(Pixel.Mode.Alpha)
+    ' Render the quad
+    pipeRender.Render(meshFlat.Tris)
+    ' Set transparency back to none to optimise drawing other pixels
+    SetPixelMode(Pixel.Mode.Normal)
 
     Return True
 
