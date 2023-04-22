@@ -7,6 +7,7 @@ Option Explicit On
 Option Strict On
 Option Infer On
 
+Imports System.Net.Http
 Imports Olc
 Imports Olc.Gfx3D
 Imports Olc.Gfx3D.Math
@@ -67,6 +68,15 @@ Friend Class CarCrime
   Private fCarSpeed As Single = 2.0F
   Private vecCarVel As Vec3d = New Vec3d(0, 0, 0)
   Private vecCarPos As Vec3d = New Vec3d(0, 0, 0)
+
+  Private nMouseWorldX As Integer = 0
+  Private nMouseWorldY As Integer = 0
+  Private matProj As Mat4x4
+
+  Private setSelectedCells As New HashSet(Of sCell)
+
+  Private viewWorldTopLeft As Vec3d
+  Private viewWorldBottomRight As Vec3d
 
   Friend Sub New()
     AppName = "Car Crime City"
@@ -158,13 +168,15 @@ Friend Class CarCrime
     ' Configure the rendering pipeline with projection and viewport properties
     pipeRender.SetProjection(90.0F, CSng(ScreenHeight / ScreenWidth), 0.1F, 1000.0F, 0.0F, 0.0F, ScreenWidth, ScreenHeight)
 
+    matProj = Mat_MakeProjection(90.0F, CSng(ScreenHeight / ScreenWidth), 0.1F, 1000.0F)
+
     ' Define the city map, a 64x32 array of Cells. Initialize cells to be just grass fields.
     nMapWidth = 64
     nMapHeight = 32
     ReDim pMap(nMapWidth * nMapHeight)
     For x = 0 To nMapWidth - 1
       For y = 0 To nMapHeight - 1
-        pMap(y * nMapWidth + x) = New sCell With {.nHeight = 0, .bRoad = False}
+        pMap(y * nMapWidth + x) = New sCell With {.nHeight = 0, .bRoad = False, .nWorldX = x, .nWorldY = y}
       Next
     Next
 
@@ -195,25 +207,41 @@ Friend Class CarCrime
       vecCarPos.Y += vecCarVel.Y * fCarSpeed * elapsedTime
     End If
 
-    ' Press "R" to toggle a Road flag for selected cell(s)
-    If GetKey(Key.R).Pressed Then
-      Dim x = CInt(Fix(vecCarPos.X))
-      Dim y = CInt(Fix(vecCarPos.Y))
-      pMap(y * nMapWidth + x).bRoad = Not pMap(y * nMapWidth + x).bRoad
-    End If
+    If nMouseWorldX >= 0 AndAlso nMouseWorldX < nMapWidth AndAlso nMouseWorldY >= 0 AndAlso nMouseWorldY < nMapHeight Then
 
-    ' Press "T" to raise a building...
-    If GetKey(Key.T).Pressed Then
-      Dim x = CInt(Fix(vecCarPos.X))
-      Dim y = CInt(Fix(vecCarPos.Y))
-      pMap(y * nMapWidth + x).nHeight += 1
-    End If
+      ' Press "R" to toggle a Road flag for selected cell(s)
+      If GetKey(Key.R).Pressed Then
+        If setSelectedCells.Any Then
+          For Each cell In setSelectedCells
+            cell.bRoad = Not cell.bRoad
+          Next
+        Else
+          pMap(nMouseWorldY * nMapWidth + nMouseWorldX).bRoad = Not pMap(nMouseWorldY * nMapWidth + nMouseWorldX).bRoad
+        End If
+      End If
 
-    ' Press "E" to lower a building...
-    If GetKey(Key.E).Pressed Then
-      Dim x = CInt(Fix(vecCarPos.X))
-      Dim y = CInt(Fix(vecCarPos.Y))
-      pMap(y * nMapWidth + x).nHeight -= 1
+      ' Press "T" to raise a building...
+      If GetKey(Key.T).Pressed Then
+        If setSelectedCells.Any Then
+          For Each cell In setSelectedCells
+            cell.nHeight += 1
+          Next
+        Else
+          pMap(nMouseWorldY * nMapWidth + nMouseWorldX).nHeight += 1
+        End If
+      End If
+
+      ' Press "E" to lower a building...
+      If GetKey(Key.E).Pressed Then
+        If setSelectedCells.Any Then
+          For Each cell In setSelectedCells
+            cell.nHeight -= 1
+          Next
+        Else
+          pMap(nMouseWorldY * nMapWidth + nMouseWorldX).nHeight -= 1
+        End If
+      End If
+
     End If
 
     Clear(Presets.Blue)
@@ -227,10 +255,67 @@ Friend Class CarCrime
     vEye = New Vec3d(fCameraX, fCameraY, fCameraZ)
     pipeRender.SetCamera(vEye, vLookTarget, vUp)
 
-    Dim nStartX = 0
-    Dim nEndX = nMapWidth
-    Dim nStartY = 0
-    Dim nEndY = nMapHeight
+    ' Create a point at matrix, if you recall, this is the inverse of the look at matrix
+    ' used by the camera
+    Dim matView = Mat_PointAt(vEye, vLookTarget, vUp)
+
+    ' Assume the origin of the mouse ray is the middle of the screen...
+    Dim vecMouseOrigin = New Vec3d(0.0F, 0.0F, 0.0F)
+
+    ' ... and that a ray is cast to the mouse location from the origin. Here we translate
+    ' the mouse coordinates into viewport coordinates
+    Dim vecMouseDir = New Vec3d(2.0F * (CSng(GetMouseX() / ScreenWidth) - 0.5F) / matProj.M(0, 0),
+                                2.0F * (CSng(GetMouseY() / ScreenHeight) - 0.5F) / matProj.M(1, 1),
+                                1.0F,
+                                0.0F)
+
+    ' Now transform the origin point and ray direction by the inverse of the camera
+    vecMouseOrigin = Mat_MultiplyVector(matView, vecMouseOrigin)
+    vecMouseDir = Mat_MultiplyVector(matView, vecMouseDir)
+
+    ' Extend the mouse ray to a large length
+    vecMouseDir = Vec_Mul(vecMouseDir, 1000.0F)
+
+    ' Offset the mouse ray by the mouse origin
+    vecMouseDir = Vec_Add(vecMouseOrigin, vecMouseDir)
+
+    ' All of our intersections for mouse checks occur in the ground plane (z=0), so
+    ' define a plane at that location
+    Dim plane_p = New Vec3d(0.0F, 0.0F, 0.0F)
+    Dim plane_n = New Vec3d(0.0F, 0.0F, 1.0F)
+
+    ' Calculate Mouse Location in plane, by doing a line/plane intersection test
+    Dim t = 0.0F
+    Dim mouse3d = Vec_IntersectPlane(plane_p, plane_n, vecMouseOrigin, vecMouseDir, t)
+
+    nMouseWorldX = CInt(Fix(mouse3d.X))
+    nMouseWorldY = CInt(Fix(mouse3d.Y))
+
+    If GetMouse(0).Held Then
+      setSelectedCells.Add(pMap(nMouseWorldY * nMapWidth + nMouseWorldX))
+    End If
+    If GetMouse(1).Released Then
+      setSelectedCells.Clear()
+    End If
+
+    ' Work out the Top Left Ground Cell
+    vecMouseDir = New Vec3d(-1.0F / matProj.M(0, 0), -1.0F / matProj.M(1, 1), 1.0F, 0.0F)
+    vecMouseDir = Mat_MultiplyVector(matView, vecMouseDir)
+    vecMouseDir = Vec_Mul(vecMouseDir, 1000.0F)
+    vecMouseDir = Vec_Add(vecMouseOrigin, vecMouseDir)
+    viewWorldTopLeft = Vec_IntersectPlane(plane_p, plane_n, vecMouseOrigin, vecMouseDir, t)
+
+    ' Work out the Bottom Right Ground Cell
+    vecMouseDir = New Vec3d(1.0F / matProj.M(0, 0), 1.0F / matProj.M(1, 1), 1.0F, 0.0F)
+    vecMouseDir = Mat_MultiplyVector(matView, vecMouseDir)
+    vecMouseDir = Vec_Mul(vecMouseDir, 1000.0F)
+    vecMouseDir = Vec_Add(vecMouseOrigin, vecMouseDir)
+    viewWorldBottomRight = Vec_IntersectPlane(plane_p, plane_n, vecMouseOrigin, vecMouseDir, t)
+
+    Dim nStartX = Integer.Max(0, CInt(Fix(viewWorldTopLeft.X - 1)))
+    Dim nEndX = Integer.Min(nMapWidth, CInt(Fix(viewWorldBottomRight.X + 1)))
+    Dim nStartY = Integer.Max(0, CInt(Fix(viewWorldTopLeft.Y - 1)))
+    Dim nEndY = Integer.Min(nMapHeight, CInt(Fix(viewWorldBottomRight.Y + 1)))
 
     For x = nStartX To nEndX - 1
       For y = nStartY To nEndY - 1
@@ -305,8 +390,16 @@ Friend Class CarCrime
 
           End If
 
-          End If
+        End If
       Next
+    Next
+
+    ' Draw Selected Cells, iterate through the set of cells, and draw a wireframe quad at ground level
+    ' to indicate it is in the selection set
+    For Each cell In setSelectedCells
+      Dim matWorld = Mat_MakeTranslation(cell.nWorldX, cell.nWorldY, 0.0F)
+      pipeRender.SetTransform(matWorld)
+      pipeRender.Render(meshFlat.Tris, RenderFlags.RenderWire)
     Next
 
     ' Draw Car, a few transforms required for this
