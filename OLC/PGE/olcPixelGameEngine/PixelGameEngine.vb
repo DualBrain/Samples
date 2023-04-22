@@ -1009,21 +1009,25 @@ Public MustInherit Class PixelGameEngine
     DrawLine(x1, y1, x2, y2, Presets.White, &HFFFFFFFFUI)
   End Sub
 
+  Protected Sub DrawLine(x1 As Single, y1 As Single, x2 As Single, y2 As Single, p As Pixel)
+    DrawLine(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), p, &HFFFFFFFFUI)
+  End Sub
+
   Protected Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
 
     Dim dx = x2 - x1
     Dim dy = y2 - y1
 
-    Dim rol = New Func(Of Integer)(Function()
+    Dim rol = New Func(Of Boolean)(Function()
                                      pattern = (pattern << 1) Or (pattern >> 31)
-                                     Return CInt(pattern And 1)
+                                     Return CInt(pattern And 1) <> 0
                                    End Function)
 
     ' straight line idea by gurkanctn
     If dx = 0 Then ' Line is vertical
       If y2 < y1 Then Swap(y1, y2)
       For y = y1 To y2
-        If rol() <> 0 Then Draw(x1, y, p)
+        If rol() Then Draw(x1, y, p)
       Next
       Return
     End If
@@ -1031,13 +1035,13 @@ Public MustInherit Class PixelGameEngine
     If dy = 0 Then ' Line is horizontal
       If x2 < x1 Then Swap(x1, x2)
       For x = x1 To x2
-        If rol() <> 0 Then Draw(x, y1, p)
+        If rol() Then Draw(x, y1, p)
       Next
       Return
     End If
 
     ' Line is Funk-aye
-    Dim dx1 = Math.Abs(dx) : Dim dy1 = Math.Abs(dy)
+    Dim dx1 = MathF.Abs(dx) : Dim dy1 = MathF.Abs(dy)
     Dim px = 2 * dy1 - dx1 : Dim py = 2 * dx1 - dy1
 
     If dy1 <= dx1 Then
@@ -1050,7 +1054,7 @@ Public MustInherit Class PixelGameEngine
       Else
         x = x2 : y = y2 : xe = x1
       End If
-      If rol() <> 0 Then Draw(x, y, p)
+      If rol() Then Draw(x, y, p)
 
       For i = 0 To xe - x
         x += 1
@@ -1064,7 +1068,7 @@ Public MustInherit Class PixelGameEngine
           End If
           px += 2 * (dy1 - dx1)
         End If
-        If rol() <> 0 Then Draw(x, y, p)
+        If rol() Then Draw(x, y, p)
       Next
 
     Else
@@ -1077,7 +1081,7 @@ Public MustInherit Class PixelGameEngine
       Else
         x = x2 : y = y2 : ye = y1
       End If
-      If rol() <> 0 Then Draw(x, y, p)
+      If rol() Then Draw(x, y, p)
 
       For i = 0 To ye - y
         y += 1
@@ -1091,7 +1095,7 @@ Public MustInherit Class PixelGameEngine
           End If
           py += 2 * (dx1 - dy1)
         End If
-        If rol() <> 0 Then Draw(x, y, p)
+        If rol() Then Draw(x, y, p)
       Next
 
     End If
