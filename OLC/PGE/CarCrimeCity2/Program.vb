@@ -3,14 +3,15 @@ Module Program
   Sub Main()
 
     ' Load the settings singleton
-    If Not Config.LoadConfigFile("assets/config.lua") Then
+    Dim config = New cGameSettings
+    If Not config.LoadConfigFile("assets/config.lua") Then
       Console.WriteLine("Failed to load '/assets/config.lua'")
       Console.WriteLine("  -> Using default configuration")
     End If
 
     ' Start the PixelGameEngine
     Dim game As New cCarCrimeCity()
-    If game.Construct(Config.nScreenWidth, Config.nScreenHeight, Config.nPixelWidth, Config.nPixelHeight, Config.bFullScreen) Then
+    If game.Construct(cGameSettings.nScreenWidth, cGameSettings.nScreenHeight, cGameSettings.nPixelWidth, cGameSettings.nPixelHeight, cGameSettings.bFullScreen) Then
       game.Start()
     End If
 

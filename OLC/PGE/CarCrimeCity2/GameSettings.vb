@@ -19,7 +19,7 @@ Public Class sAssetTexture
   Public sFile As String
 End Class
 
-Public Class Config
+Public Class cGameSettings
 
   Public Shared Property nScreenWidth As Integer = 768
   Public Shared Property nScreenHeight As Integer = 480
@@ -35,10 +35,10 @@ Public Class Config
   Public Shared Property vecAssetBuildings As New List(Of sAssetModel)()
   Public Shared Property vecAssetVehicles As New List(Of sAssetModel)()
 
-  Private Sub New()
+  Public Sub New()
   End Sub
 
-  Public Shared Function LoadConfigFile(sFile As String) As Boolean
+  Public Function LoadConfigFile(sFile As String) As Boolean
 
     Dim lua = New NLua.Lua
     lua.State.OpenLibs()
@@ -57,14 +57,14 @@ Public Class Config
 
     Dim L = lua.State
 
-    L.GetGlobal("PixelWidth") : If L.IsInteger(-1) Then Config.nPixelWidth = CInt(L.ToInteger(-1))
-    L.GetGlobal("PixelHeight") : If L.IsInteger(-1) Then Config.nPixelHeight = CInt(L.ToInteger(-1))
-    L.GetGlobal("ScreenWidth") : If L.IsInteger(-1) Then Config.nScreenWidth = CInt(L.ToInteger(-1))
-    L.GetGlobal("ScreenHeight") : If L.IsInteger(-1) Then Config.nScreenHeight = CInt(L.ToInteger(-1))
-    L.GetGlobal("DefaultMapWidth") : If L.IsInteger(-1) Then Config.nDefaultMapWidth = CInt(L.ToInteger(-1))
-    L.GetGlobal("DefaultMapHeight") : If L.IsInteger(-1) Then Config.nDefaultMapHeight = CInt(L.ToInteger(-1))
-    L.GetGlobal("DefaultCityFile") : If L.IsString(-1) Then Config.sDefaultCityFile = L.ToString(-1)
-    L.GetGlobal("FullScreen") : If L.IsBoolean(-1) Then Config.bFullScreen = L.ToBoolean(-1)
+    L.GetGlobal("PixelWidth") : If L.IsInteger(-1) Then cGameSettings.nPixelWidth = CInt(L.ToInteger(-1))
+    L.GetGlobal("PixelHeight") : If L.IsInteger(-1) Then cGameSettings.nPixelHeight = CInt(L.ToInteger(-1))
+    L.GetGlobal("ScreenWidth") : If L.IsInteger(-1) Then cGameSettings.nScreenWidth = CInt(L.ToInteger(-1))
+    L.GetGlobal("ScreenHeight") : If L.IsInteger(-1) Then cGameSettings.nScreenHeight = CInt(L.ToInteger(-1))
+    L.GetGlobal("DefaultMapWidth") : If L.IsInteger(-1) Then cGameSettings.nDefaultMapWidth = CInt(L.ToInteger(-1))
+    L.GetGlobal("DefaultMapHeight") : If L.IsInteger(-1) Then cGameSettings.nDefaultMapHeight = CInt(L.ToInteger(-1))
+    L.GetGlobal("DefaultCityFile") : If L.IsString(-1) Then cGameSettings.sDefaultCityFile = L.ToString(-1)
+    L.GetGlobal("FullScreen") : If L.IsBoolean(-1) Then cGameSettings.bFullScreen = L.ToBoolean(-1)
 
     ' Load System Texture files
 
