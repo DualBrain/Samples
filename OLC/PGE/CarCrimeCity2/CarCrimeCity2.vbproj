@@ -1,0 +1,131 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>CarCrimeCity2</RootNamespace>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="assets\buildings\udxs_building1.obj" />
+    <None Remove="assets\buildings\udxs_building1.png" />
+    <None Remove="assets\buildings\unit_building.blend" />
+    <None Remove="assets\buildings\unit_building.blend1" />
+    <None Remove="assets\buildings\unit_building.obj" />
+    <None Remove="assets\cities\example1.city" />
+    <None Remove="assets\config.lua" />
+    <None Remove="assets\system\car_top.png" />
+    <None Remove="assets\system\car_top3.png" />
+    <None Remove="assets\system\ccctitle1.png" />
+    <None Remove="assets\system\clouds1.png" />
+    <None Remove="assets\system\clouds2.png" />
+    <None Remove="assets\system\grass1.png" />
+    <None Remove="assets\system\roads1.png" />
+    <None Remove="assets\system\roads2.png" />
+    <None Remove="assets\system\roads3.png" />
+    <None Remove="assets\system\roads4.png" />
+    <None Remove="assets\system\skidsmoke1.png" />
+    <None Remove="assets\system\water1.png" />
+    <None Remove="assets\system\waterside1.png" />
+    <None Remove="assets\vehicles\CarCrime_Sedan.obj" />
+    <None Remove="assets\vehicles\CarCrime_SUV.obj" />
+    <None Remove="assets\vehicles\CarCrime_Truck_Cab.obj" />
+    <None Remove="assets\vehicles\CarCrime_Truck_Trailer.obj" />
+    <None Remove="assets\vehicles\CarCrime_Ute.obj" />
+    <None Remove="assets\vehicles\CarCrime_Wagon.obj" />
+    <None Remove="assets\vehicles\CarTex_256.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="assets\buildings\udxs_building1.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\buildings\udxs_building1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\buildings\unit_building.blend">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\buildings\unit_building.blend1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\buildings\unit_building.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\cities\example1.city">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\config.lua">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\car_top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\car_top3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\ccctitle1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\clouds1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\clouds2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\grass1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\roads1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\roads2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\roads3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\roads4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\skidsmoke1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\water1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\system\waterside1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\vehicles\CarCrime_Sedan.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\vehicles\CarCrime_SUV.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\vehicles\CarCrime_Truck_Cab.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\vehicles\CarCrime_Truck_Trailer.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\vehicles\CarCrime_Ute.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\vehicles\CarCrime_Wagon.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\vehicles\CarTex_256.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLua" Version="1.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\olcPixelGameEngine\olcPixelGameEngine.vbproj" />
+  </ItemGroup>
+
+</Project>

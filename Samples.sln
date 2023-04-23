@@ -246,9 +246,11 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "ModExtract", "Sound\ModExtr
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "PolygonCollisions1", "OLC\PGE\PolygonCollisions1\PolygonCollisions1.vbproj", "{3BAE539A-45CA-47D6-81F1-1C5544EE5557}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Polymorphism", "OLC\PGE\Polymorphism\Polymorphism.vbproj", "{85821A40-1544-40F8-BE82-1121081708A2}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "Polymorphism", "OLC\PGE\Polymorphism\Polymorphism.vbproj", "{85821A40-1544-40F8-BE82-1121081708A2}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "EmbeddingLua_Part1", "OLC\Other\EmbeddingLua_Part1\EmbeddingLua_Part1.vbproj", "{015404BA-E316-45DE-92CB-D84B98F58310}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "EmbeddingLua_Part1", "OLC\Other\EmbeddingLua_Part1\EmbeddingLua_Part1.vbproj", "{015404BA-E316-45DE-92CB-D84B98F58310}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CarCrimeCity2", "OLC\PGE\CarCrimeCity2\CarCrimeCity2.vbproj", "{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1496,6 +1498,18 @@ Global
 		{015404BA-E316-45DE-92CB-D84B98F58310}.Release|x64.Build.0 = Release|Any CPU
 		{015404BA-E316-45DE-92CB-D84B98F58310}.Release|x86.ActiveCfg = Release|Any CPU
 		{015404BA-E316-45DE-92CB-D84B98F58310}.Release|x86.Build.0 = Release|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Debug|x64.Build.0 = Debug|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Debug|x86.Build.0 = Debug|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Release|x64.ActiveCfg = Release|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Release|x64.Build.0 = Release|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Release|x86.ActiveCfg = Release|Any CPU
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1590,6 +1604,7 @@ Global
 		{3BAE539A-45CA-47D6-81F1-1C5544EE5557} = {2CFFC199-F0A8-4CE9-B688-E12DD024FE7B}
 		{85821A40-1544-40F8-BE82-1121081708A2} = {2CFFC199-F0A8-4CE9-B688-E12DD024FE7B}
 		{015404BA-E316-45DE-92CB-D84B98F58310} = {4B05A1DA-9A51-471B-8770-B7187117F23C}
+		{ADF77633-8D85-4A74-AAA2-707A7F04AFA6} = {2CFFC199-F0A8-4CE9-B688-E12DD024FE7B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDAC410C-0901-447E-8121-BF33A670D583}
