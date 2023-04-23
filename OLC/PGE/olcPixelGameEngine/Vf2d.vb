@@ -74,12 +74,24 @@
     Return New Vf2d(lhs.x + rhs.x, lhs.y + rhs.y)
   End Operator
 
+  Public Shared Operator +(left As Vf2d, right As Single) As Vf2d
+    Return New Vf2d(left.x + right, left.y + right)
+  End Operator
+
+  Public Shared Operator +(left As Single, right As Vf2d) As Vf2d
+    Return New Vf2d(right.x + left, right.y + left)
+  End Operator
+
   Public Shared Operator -(left As Vf2d, right As Vf2d) As Vf2d
     Return New Vf2d(left.x - right.x, left.y - right.y)
   End Operator
 
   Public Shared Operator *(left As Vf2d, right As Single) As Vf2d
     Return New Vf2d(left.x * right, left.y * right)
+  End Operator
+
+  Public Shared Operator *(left As Single, right As Vf2d) As Vf2d
+    Return New Vf2d(right.x * left, right.y * left)
   End Operator
 
   Public Shared Operator *(left As Vf2d, right As Vf2d) As Vf2d

@@ -1013,7 +1013,7 @@ Public MustInherit Class PixelGameEngine
     DrawLine(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), p, &HFFFFFFFFUI)
   End Sub
 
-  Protected Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
+  Public Sub DrawLine(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, p As Pixel, Optional pattern As UInteger = &HFFFFFFFFUI)
 
     Dim dx = x2 - x1
     Dim dy = y2 - y1
@@ -1114,7 +1114,7 @@ Public MustInherit Class PixelGameEngine
     DrawCircle(x, y, radius, Presets.White, &HFF)
   End Sub
 
-  Protected Sub DrawCircle(x As Integer, y As Integer, radius As Integer, p As Pixel, Optional mask As Byte = &HFF)
+  Public Sub DrawCircle(x As Integer, y As Integer, radius As Integer, p As Pixel, Optional mask As Byte = &HFF)
 
     Dim x0 = 0
     Dim y0 = radius
@@ -1143,7 +1143,7 @@ Public MustInherit Class PixelGameEngine
     FillCircle(pos.x, pos.y, radius, Presets.White)
   End Sub
 
-  Protected Sub FillCircle(x As Integer, y As Integer, radius As Integer, p As Pixel)
+  Public Sub FillCircle(x As Integer, y As Integer, radius As Integer, p As Pixel)
 
     Dim x0 = 0
     Dim y0 = radius
@@ -1182,7 +1182,7 @@ Public MustInherit Class PixelGameEngine
     DrawRect(x, y, w, h, Presets.White)
   End Sub
 
-  Protected Sub DrawRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
+  Public Sub DrawRect(x As Integer, y As Integer, w As Integer, h As Integer, p As Pixel)
     DrawLine(x, y, x + w, y, p)
     DrawLine(x + w, y, x + w, y + h, p)
     DrawLine(x + w, y + h, x, y + h, p)
@@ -2105,9 +2105,7 @@ next4:
         Singleton.Pge.olc_UpdateWindowSize(v And &HFFFF, (v >> 16) And &HFFFF)
         Return IntPtr.Zero
       Case WM_MOUSEWHEEL
-        'TODO: WM_WHEEL not working correctly...
-        ' remarked out the following line due to overflow error.
-        'sge.olc_UpdateMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam))
+        Singleton.Pge.olc_UpdateMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam))
         Return IntPtr.Zero
       Case WM_MOUSELEAVE
         'TODO: WM_MOUSELEAVE is working *once*, not sure why...
@@ -2272,7 +2270,9 @@ next4:
 #Region "Additional"
 
   Private Shared Function GET_WHEEL_DELTA_WPARAM(wParam As IntPtr) As Integer
-    Return CType((CInt(wParam) >> 16), Short)
+    Dim l = wParam.ToInt64
+    Dim v = CInt(If(l > Integer.MaxValue, l - UInteger.MaxValue, l))
+    Return CShort(v >> 16)
   End Function
 
   Public Shared Sub Swap(ByRef a As Integer, ByRef b As Integer)
