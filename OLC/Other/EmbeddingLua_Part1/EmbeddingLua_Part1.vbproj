@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>EmbeddingLua_Part1</RootNamespace>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="VideoExample.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="VideoExample.lua">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLua" Version="1.6.2" />
+  </ItemGroup>
+
+</Project>
