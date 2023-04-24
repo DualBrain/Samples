@@ -8,7 +8,7 @@ Public Class sAssetModel
   Public sCreator As String
   Public sDescription As String
   Public sModelOBJ As String
-  Public sModelPNG As String
+  Public Property sModelPNG As String
   Public fRotate(2) As Single
   Public fScale(2) As Single
   Public fTranslate(2) As Single

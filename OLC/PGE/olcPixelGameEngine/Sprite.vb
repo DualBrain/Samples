@@ -111,6 +111,8 @@ Public Class Sprite
 
   Function LoadFromFile(imageFile As String, Optional pack As ResourcePack = Nothing) As PixelGameEngine.RCode
 
+    If String.IsNullOrWhiteSpace(imageFile) Then Return PixelGameEngine.RCode.OK
+
     Dim bmp As Bitmap = Nothing
 
     If IsOSPlatform(Windows) Then

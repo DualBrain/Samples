@@ -1,5 +1,9 @@
+' Inspirted by "BIG PROJECT 2-in-1! Top Down City Based Car Crime Game #2" -- @javidx9
+' https://youtu.be/fIV6P1W-wuo
+
 Module Program
 
+  <DebuggerNonUserCode, DebuggerStepThrough>
   Sub Main()
 
     ' Load the settings singleton

@@ -4,6 +4,9 @@ Option Infer On
 
 Imports Olc.PixelGameEngine
 
+' NOTE: Original version of this was based on v0.1
+'       Recently updated to bring in line with v0.3
+
 ' Container class for Advanced 3D Drawing functions
 Public Class Gfx3D
   Inherits PgeX
@@ -11,7 +14,7 @@ Public Class Gfx3D
   Private Shared m_DepthBuffer As Single()
 
   Public Shared Sub ConfigureDisplay()
-    m_DepthBuffer = New Single(Pge.ScreenWidth() * Pge.ScreenHeight()- 1) {}
+    m_DepthBuffer = New Single(Pge.ScreenWidth() * Pge.ScreenHeight() - 1) {}
   End Sub
 
   Public Shared Sub ClearDepth()
@@ -31,7 +34,7 @@ Public Class Gfx3D
   End Sub
 
   Public Shared Sub DrawTriangleFlat(tri As Triangle)
-    Pge.FillTriangle(tri.P(0).X, tri.P(0).Y, tri.P(1).X, tri.P(1).Y, tri.P(2).X, tri.P(2).Y, tri.Col)
+    Pge.FillTriangle(tri.P(0).X, tri.P(0).Y, tri.P(1).X, tri.P(1).Y, tri.P(2).X, tri.P(2).Y, tri.Col(0))
   End Sub
 
   Public Shared Sub DrawTriangleWire(tri As Triangle)
@@ -44,172 +47,170 @@ Public Class Gfx3D
 
   Public Shared Sub DrawTriangleTex(tri As Triangle, spr As Sprite)
 
-    If tri.P(1).Y < tri.P(0).Y Then
-      Swap(tri.P(0).Y, tri.P(1).Y)
-      Swap(tri.P(0).X, tri.P(1).X)
-      Swap(tri.T(0).X, tri.T(1).X)
-      Swap(tri.T(0).Y, tri.T(1).Y)
-      Swap(tri.T(0).Z, tri.T(1).Z)
-    End If
+    'If tri.P(1).Y < tri.P(0).Y Then
+    '  Swap(tri.P(0).Y, tri.P(1).Y)
+    '  Swap(tri.P(0).X, tri.P(1).X)
+    '  Swap(tri.T(0).X, tri.T(1).X)
+    '  Swap(tri.T(0).Y, tri.T(1).Y)
+    '  Swap(tri.T(0).Z, tri.T(1).Z)
+    'End If
 
-    If tri.P(2).Y < tri.P(0).Y Then
-      Swap(tri.P(0).Y, tri.P(2).Y)
-      Swap(tri.P(0).X, tri.P(2).X)
-      Swap(tri.T(0).X, tri.T(2).X)
-      Swap(tri.T(0).Y, tri.T(2).Y)
-      Swap(tri.T(0).Z, tri.T(2).Z)
-    End If
+    'If tri.P(2).Y < tri.P(0).Y Then
+    '  Swap(tri.P(0).Y, tri.P(2).Y)
+    '  Swap(tri.P(0).X, tri.P(2).X)
+    '  Swap(tri.T(0).X, tri.T(2).X)
+    '  Swap(tri.T(0).Y, tri.T(2).Y)
+    '  Swap(tri.T(0).Z, tri.T(2).Z)
+    'End If
 
-    If tri.P(2).Y < tri.P(1).Y Then
-      Swap(tri.P(1).Y, tri.P(2).Y)
-      Swap(tri.P(1).X, tri.P(2).X)
-      Swap(tri.T(1).X, tri.T(2).X)
-      Swap(tri.T(1).Y, tri.T(2).Y)
-      Swap(tri.T(1).Z, tri.T(2).Z)
-    End If
+    'If tri.P(2).Y < tri.P(1).Y Then
+    '  Swap(tri.P(1).Y, tri.P(2).Y)
+    '  Swap(tri.P(1).X, tri.P(2).X)
+    '  Swap(tri.T(1).X, tri.T(2).X)
+    '  Swap(tri.T(1).Y, tri.T(2).Y)
+    '  Swap(tri.T(1).Z, tri.T(2).Z)
+    'End If
 
-    Dim dy1 = CInt(Fix(tri.P(1).Y - tri.P(0).Y))
-    Dim dx1 = CInt(Fix(tri.P(1).X - tri.P(0).X))
-    Dim dv1 = tri.T(1).Y - tri.T(0).Y
-    Dim du1 = tri.T(1).X - tri.T(0).X
-    Dim dz1 = tri.T(1).Z - tri.T(0).Z
+    'Dim dy1 = CInt(Fix(tri.P(1).Y - tri.P(0).Y))
+    'Dim dx1 = CInt(Fix(tri.P(1).X - tri.P(0).X))
+    'Dim dv1 = tri.T(1).Y - tri.T(0).Y
+    'Dim du1 = tri.T(1).X - tri.T(0).X
+    'Dim dz1 = tri.T(1).Z - tri.T(0).Z
 
-    Dim dy2 = CInt(Fix(tri.P(2).Y - tri.P(0).Y))
-    Dim dx2 = CInt(Fix(tri.P(2).X - tri.P(0).X))
-    Dim dv2 = tri.T(2).Y - tri.T(0).Y
-    Dim du2 = tri.T(2).X - tri.T(0).X
-    Dim dz2 = tri.T(2).Z - tri.T(0).Z
+    'Dim dy2 = CInt(Fix(tri.P(2).Y - tri.P(0).Y))
+    'Dim dx2 = CInt(Fix(tri.P(2).X - tri.P(0).X))
+    'Dim dv2 = tri.T(2).Y - tri.T(0).Y
+    'Dim du2 = tri.T(2).X - tri.T(0).X
+    'Dim dz2 = tri.T(2).Z - tri.T(0).Z
 
-    Dim tex_x, tex_y, tex_z As Single
+    'Dim tex_x, tex_y, tex_z As Single
 
-    Dim du1_step = 0.0F, dv1_step = 0.0F, du2_step = 0.0F, dv2_step = 0.0F, dz1_step = 0.0F, dz2_step = 0.0F
-    Dim dax_step = 0.0F, dbx_step = 0.0F
+    'Dim du1_step = 0.0F, dv1_step = 0.0F, du2_step = 0.0F, dv2_step = 0.0F, dz1_step = 0.0F, dz2_step = 0.0F
+    'Dim dax_step = 0.0F, dbx_step = 0.0F
 
-    If dy1 <> 0 Then dax_step = CInt(Fix(dx1 / System.Math.Abs(dy1)))
-    If dy2 <> 0 Then dbx_step = CInt(Fix(dx2 / System.Math.Abs(dy2)))
+    'If dy1 <> 0 Then dax_step = CInt(Fix(dx1 / System.Math.Abs(dy1)))
+    'If dy2 <> 0 Then dbx_step = CInt(Fix(dx2 / System.Math.Abs(dy2)))
 
-    If dy1 <> 0 Then du1_step = du1 / System.Math.Abs(dy1)
-    If dy1 <> 0 Then dv1_step = dv1 / System.Math.Abs(dy1)
-    If dy1 <> 0 Then dz1_step = dz1 / System.Math.Abs(dy1)
+    'If dy1 <> 0 Then du1_step = du1 / System.Math.Abs(dy1)
+    'If dy1 <> 0 Then dv1_step = dv1 / System.Math.Abs(dy1)
+    'If dy1 <> 0 Then dz1_step = dz1 / System.Math.Abs(dy1)
 
-    If dy2 <> 0 Then du2_step = du2 / System.Math.Abs(dy2)
-    If dy2 <> 0 Then dv2_step = dv2 / System.Math.Abs(dy2)
-    If dy2 <> 0 Then dz2_step = dz2 / System.Math.Abs(dy2)
+    'If dy2 <> 0 Then du2_step = du2 / System.Math.Abs(dy2)
+    'If dy2 <> 0 Then dv2_step = dv2 / System.Math.Abs(dy2)
+    'If dy2 <> 0 Then dz2_step = dz2 / System.Math.Abs(dy2)
 
-    If dy1 <> 0 Then
+    'If dy1 <> 0 Then
 
-      For i = CInt(Fix(tri.P(0).Y)) To CInt(Fix(tri.P(1).Y))
+    '  For i = CInt(Fix(tri.P(0).Y)) To CInt(Fix(tri.P(1).Y))
 
-        Dim ax = CInt(Fix(tri.P(0).X + (i - tri.P(0).Y) * dax_step))
-        Dim bx = CInt(Fix(tri.P(0).X + (i - tri.P(0).Y) * dbx_step))
+    '    Dim ax = CInt(Fix(tri.P(0).X + (i - tri.P(0).Y) * dax_step))
+    '    Dim bx = CInt(Fix(tri.P(0).X + (i - tri.P(0).Y) * dbx_step))
 
-        ' Start and end points in texture space
-        Dim tex_su = tri.T(0).X + (i - tri.P(0).Y) * du1_step
-        Dim tex_sv = tri.T(0).Y + (i - tri.P(0).Y) * dv1_step
-        Dim tex_sz = tri.T(0).Z + (i - tri.P(0).Y) * dz1_step
+    '    ' Start and end points in texture space
+    '    Dim tex_su = tri.T(0).X + (i - tri.P(0).Y) * du1_step
+    '    Dim tex_sv = tri.T(0).Y + (i - tri.P(0).Y) * dv1_step
+    '    Dim tex_sz = tri.T(0).Z + (i - tri.P(0).Y) * dz1_step
 
-        Dim tex_eu = tri.T(0).X + (i - tri.P(0).Y) * du2_step
-        Dim tex_ev = tri.T(0).Y + (i - tri.P(0).Y) * dv2_step
-        Dim tex_ez = tri.T(0).Z + (i - tri.P(0).Y) * dz2_step
+    '    Dim tex_eu = tri.T(0).X + (i - tri.P(0).Y) * du2_step
+    '    Dim tex_ev = tri.T(0).Y + (i - tri.P(0).Y) * dv2_step
+    '    Dim tex_ez = tri.T(0).Z + (i - tri.P(0).Y) * dz2_step
 
-        If ax > bx Then
-          Swap(ax, bx)
-          Swap(tex_su, tex_eu)
-          Swap(tex_sv, tex_ev)
-          Swap(tex_sz, tex_ez)
-        End If
+    '    If ax > bx Then
+    '      Swap(ax, bx)
+    '      Swap(tex_su, tex_eu)
+    '      Swap(tex_sv, tex_ev)
+    '      Swap(tex_sz, tex_ez)
+    '    End If
 
-        'tex_x = tex_su
-        'tex_y = tex_sv
-        'tex_z = tex_sz
+    '    'tex_x = tex_su
+    '    'tex_y = tex_sv
+    '    'tex_z = tex_sz
 
-        Dim tstep = 1.0F / (bx - ax)
-        Dim t = 0.0F
+    '    Dim tstep = 1.0F / (bx - ax)
+    '    Dim t = 0.0F
 
-        For j = ax To bx - 1
+    '    For j = ax To bx - 1
 
-          tex_x = (1.0F - t) * tex_su + t * tex_eu
-          tex_y = (1.0F - t) * tex_sv + t * tex_ev
-          tex_z = (1.0F - t) * tex_sz + t * tex_ez
+    '      tex_x = (1.0F - t) * tex_su + t * tex_eu
+    '      tex_y = (1.0F - t) * tex_sv + t * tex_ev
+    '      tex_z = (1.0F - t) * tex_sz + t * tex_ez
 
-          If tex_z > m_DepthBuffer(i * Pge.ScreenWidth() + j) Then
-            Pge.Draw(j, i, spr.Sample(tex_x / tex_z, tex_y / tex_z))
-            m_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_z
-          End If
-          t += tstep
+    '      If tex_z > m_DepthBuffer(i * Pge.ScreenWidth() + j) Then
+    '        Pge.Draw(j, i, spr.Sample(tex_x / tex_z, tex_y / tex_z))
+    '        m_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_z
+    '      End If
+    '      t += tstep
 
-        Next
+    '    Next
 
-      Next
+    '  Next
 
-    End If
+    'End If
 
-    dy1 = CInt(Fix(tri.P(2).Y - tri.P(1).Y))
-    dx1 = CInt(Fix(tri.P(2).X - tri.P(1).X))
-    dv1 = tri.T(2).Y - tri.T(1).Y
-    du1 = tri.T(2).X - tri.T(1).X
-    dz1 = tri.T(2).Z - tri.T(1).Z
+    'dy1 = CInt(Fix(tri.P(2).Y - tri.P(1).Y))
+    'dx1 = CInt(Fix(tri.P(2).X - tri.P(1).X))
+    'dv1 = tri.T(2).Y - tri.T(1).Y
+    'du1 = tri.T(2).X - tri.T(1).X
+    'dz1 = tri.T(2).Z - tri.T(1).Z
 
-    If dy1 <> 0 Then dax_step = CSng(dx1 / System.Math.Abs(dy1))
-    If dy2 <> 0 Then dbx_step = CSng(dx2 / System.Math.Abs(dy2))
+    'If dy1 <> 0 Then dax_step = CSng(dx1 / System.Math.Abs(dy1))
+    'If dy2 <> 0 Then dbx_step = CSng(dx2 / System.Math.Abs(dy2))
 
-    du1_step = 0 : dv1_step = 0 ' , dz1_step = 0;// , du2_step = 0, dv2_step = 0;
-    If dy1 <> 0 Then
-      du1_step = du1 / System.Math.Abs(dy1)
-      dv1_step = dv1 / System.Math.Abs(dy1)
-      dz1_step = dz1 / System.Math.Abs(dy1)
-    End If
+    'du1_step = 0 : dv1_step = 0 ' , dz1_step = 0;// , du2_step = 0, dv2_step = 0;
+    'If dy1 <> 0 Then
+    '  du1_step = du1 / System.Math.Abs(dy1)
+    '  dv1_step = dv1 / System.Math.Abs(dy1)
+    '  dz1_step = dz1 / System.Math.Abs(dy1)
+    'End If
 
-    If dy1 <> 0 Then
+    'If dy1 <> 0 Then
 
-      For i = CInt(Fix(tri.P(1).Y)) To CInt(Fix(tri.P(2).Y))
+    '  For i = CInt(Fix(tri.P(1).Y)) To CInt(Fix(tri.P(2).Y))
 
-        Dim ax = CInt(Fix(tri.P(1).X + (i - tri.P(1).Y) * dax_step))
-        Dim bx = CInt(Fix(tri.P(0).X + (i - tri.P(0).Y) * dbx_step))
+    '    Dim ax = CInt(Fix(tri.P(1).X + (i - tri.P(1).Y) * dax_step))
+    '    Dim bx = CInt(Fix(tri.P(0).X + (i - tri.P(0).Y) * dbx_step))
 
-        ' Start and end points in texture space
-        Dim tex_su = tri.T(1).X + (i - tri.P(1).Y) * du1_step
-        Dim tex_sv = tri.T(1).Y + (i - tri.P(1).Y) * dv1_step
-        Dim tex_sz = tri.T(1).Z + (i - tri.P(1).Y) * dz1_step
+    '    ' Start and end points in texture space
+    '    Dim tex_su = tri.T(1).X + (i - tri.P(1).Y) * du1_step
+    '    Dim tex_sv = tri.T(1).Y + (i - tri.P(1).Y) * dv1_step
+    '    Dim tex_sz = tri.T(1).Z + (i - tri.P(1).Y) * dz1_step
 
-        Dim tex_eu = tri.T(0).X + (i - tri.P(0).Y) * du2_step
-        Dim tex_ev = tri.T(0).Y + (i - tri.P(0).Y) * dv2_step
-        Dim tex_ez = tri.T(0).Z + (i - tri.P(0).Y) * dz2_step
+    '    Dim tex_eu = tri.T(0).X + (i - tri.P(0).Y) * du2_step
+    '    Dim tex_ev = tri.T(0).Y + (i - tri.P(0).Y) * dv2_step
+    '    Dim tex_ez = tri.T(0).Z + (i - tri.P(0).Y) * dz2_step
 
-        If ax > bx Then
-          Swap(ax, bx)
-          Swap(tex_su, tex_eu)
-          Swap(tex_sv, tex_ev)
-          Swap(tex_sz, tex_ez)
-        End If
+    '    If ax > bx Then
+    '      Swap(ax, bx)
+    '      Swap(tex_su, tex_eu)
+    '      Swap(tex_sv, tex_ev)
+    '      Swap(tex_sz, tex_ez)
+    '    End If
 
-        'tex_x = tex_su
-        'tex_y = tex_sv
-        'tex_z = tex_sz
+    '    'tex_x = tex_su
+    '    'tex_y = tex_sv
+    '    'tex_z = tex_sz
 
-        Dim tstep = 1.0F / ((bx - ax))
-        Dim t = 0.0F
+    '    Dim tstep = 1.0F / ((bx - ax))
+    '    Dim t = 0.0F
 
-        For j = ax To bx - 1
+    '    For j = ax To bx - 1
 
-          tex_x = (1.0F - t) * tex_su + t * tex_eu
-          tex_y = (1.0F - t) * tex_sv + t * tex_ev
-          tex_z = (1.0F - t) * tex_sz + t * tex_ez
+    '      tex_x = (1.0F - t) * tex_su + t * tex_eu
+    '      tex_y = (1.0F - t) * tex_sv + t * tex_ev
+    '      tex_z = (1.0F - t) * tex_sz + t * tex_ez
 
-          If tex_z > m_DepthBuffer(i * Pge.ScreenWidth + j) Then
-            Pge.Draw(j, i, spr.Sample(tex_x / tex_z, tex_y / tex_z))
-            m_DepthBuffer(i * Pge.ScreenWidth + j) = tex_z
-          End If
+    '      If tex_z > m_DepthBuffer(i * Pge.ScreenWidth + j) Then
+    '        Pge.Draw(j, i, spr.Sample(tex_x / tex_z, tex_y / tex_z))
+    '        m_DepthBuffer(i * Pge.ScreenWidth + j) = tex_z
+    '      End If
 
-          t += tstep
+    '      t += tstep
 
-        Next
+    '    Next
 
-      Next
+    '  Next
 
-    End If
-
-    '*
+    'End If
 
   End Sub
 
@@ -320,8 +321,11 @@ Public Class Gfx3D
           Dim tex_w = (1.0F - t) * tex_sw + t * tex_ew
 
           If tex_w > m_DepthBuffer(i * Pge.ScreenWidth() + j) Then
-            Pge.Draw(j, i, spr.Sample(tex_u / tex_w, tex_v / tex_w))
-            m_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
+            'Pge.Draw(j, i, spr.Sample(tex_u / tex_w, tex_v / tex_w))
+            'm_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
+            If (Pge.Draw(j, i, If(spr IsNot Nothing, spr.Sample(tex_u / tex_w, tex_v / tex_w), Presets.Grey))) Then
+              m_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
+            End If
           End If
 
           t += tstep
@@ -382,8 +386,11 @@ Public Class Gfx3D
           Dim tex_w = (1.0F - t) * tex_sw + t * tex_ew
 
           If tex_w > m_DepthBuffer(i * Pge.ScreenWidth() + j) Then
-            Pge.Draw(j, i, spr.Sample(tex_u / tex_w, tex_v / tex_w))
-            m_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
+            'Pge.Draw(j, i, spr.Sample(tex_u / tex_w, tex_v / tex_w))
+            'm_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
+            If (Pge.Draw(j, i, If(spr IsNot Nothing, spr.Sample(tex_u / tex_w, tex_v / tex_w), Presets.Grey))) Then
+              m_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
+            End If
           End If
 
           t += tstep
@@ -403,6 +410,14 @@ Public Class Gfx3D
     RenderCullCw = &H8
     RenderCullCcw = &H10
     RenderDepth = &H20
+    RenderLights = &H40
+  End Enum
+
+  Public Enum Light
+    Disabled
+    Ambient
+    Directional
+    Point
   End Enum
 
   Public Class Vec2d
@@ -459,9 +474,11 @@ Public Class Gfx3D
 
   Public Class Triangle
 
+    Private m_default As Pixel = Presets.White
+
     Public P(2) As Vec3d
     Public T(2) As Vec2d
-    Public Col As Pixel
+    Public Col(2) As Pixel
 
     Public Sub New()
       P(0) = New Vec3d
@@ -470,6 +487,9 @@ Public Class Gfx3D
       T(0) = New Vec2d
       T(1) = New Vec2d
       T(2) = New Vec2d
+      Col(0) = m_default
+      Col(1) = m_default
+      Col(2) = m_default
     End Sub
 
     Public Sub New(values As Single())
@@ -480,16 +500,116 @@ Public Class Gfx3D
       For entry = 0 To 2
         T(entry) = New Vec2d(values(index), values(index + 1), values(index + 2)) : index += 3
       Next
+      Col(0) = m_default
+      Col(1) = m_default
+      Col(2) = m_default
+    End Sub
+
+    Public Sub New(values As Single(), col1 As Pixel, col2 As Pixel, col3 As Pixel)
+      Dim index = 0
+      For entry = 0 To 2
+        P(entry) = New Vec3d(values(index), values(index + 1), values(index + 2), values(index + 3)) : index += 4
+      Next
+      For entry = 0 To 2
+        T(entry) = New Vec2d(values(index), values(index + 1), values(index + 2)) : index += 3
+      Next
+      Col(0) = col1
+      Col(1) = col2
+      Col(2) = col3
     End Sub
 
     Public Sub New(tr As Triangle)
       For entry = 0 To 2
         P(entry) = New Vec3d(tr.P(entry))
-      Next
-      For entry = 0 To 2
         T(entry) = New Vec2d(tr.T(entry))
+        Col(entry) = tr.Col(entry)
       Next
-      Col = tr.Col
+    End Sub
+
+    Public Sub New(v1 As Vec3d,
+                   v2 As Vec3d,
+                   v3 As Vec3d)
+      P(0) = v1
+      P(1) = v2
+      P(2) = v3
+      T(0) = New Vec2d
+      T(1) = New Vec2d
+      T(2) = New Vec2d
+      Col(0) = m_default
+      Col(1) = m_default
+      Col(2) = m_default
+    End Sub
+
+    'Public Sub New(v1 As Vec3d,
+    '               v2 As Vec3d,
+    '               v3 As Vec3d,
+    '               t1 As Vec2d,
+    '               t2 As Vec2d,
+    '               t3 As Vec2d,
+    '               col As Pixel)
+    '  P(0) = v1
+    '  P(1) = v2
+    '  P(2) = v3
+    '  T(0) = t1
+    '  T(1) = t2
+    '  T(2) = t3
+    '  Me.Col(0) = col
+    '  Me.Col(1) = col
+    '  Me.Col(2) = col
+    'End Sub
+
+    Public Sub New(v1 As Vec3d,
+                   v2 As Vec3d,
+                   v3 As Vec3d,
+                   t1 As Vec2d,
+                   t2 As Vec2d,
+                   t3 As Vec2d,
+                   col1 As Pixel, col2 As Pixel, col3 As Pixel)
+      P(0) = v1
+      P(1) = v2
+      P(2) = v3
+      T(0) = t1
+      T(1) = t2
+      T(2) = t3
+      Col(0) = col1
+      Col(1) = col2
+      Col(2) = col3
+    End Sub
+
+    'Public Sub New(v1 As Vec3d,
+    '               v2 As Vec3d,
+    '               v3 As Vec3d,
+    '               x1 As Single, y1 As Single, z1 As Single,
+    '               x2 As Single, y2 As Single, z2 As Single,
+    '               x3 As Single, y3 As Single, z3 As Single, col As Pixel)
+    '  P(0) = v1
+    '  P(1) = v2
+    '  P(2) = v3
+    '  T(0) = New Vec2d(x1, y1, z1)
+    '  T(1) = New Vec2d(x2, y2, z2)
+    '  T(2) = New Vec2d(x3, y3, z3)
+    '  Me.Col(0) = col
+    '  Me.Col(1) = col
+    '  Me.Col(2) = col
+    'End Sub
+
+    Public Sub New(v1 As Vec3d,
+                   v2 As Vec3d,
+                   v3 As Vec3d,
+                   x1 As Single, y1 As Single, z1 As Single,
+                   x2 As Single, y2 As Single, z2 As Single,
+                   x3 As Single, y3 As Single, z3 As Single,
+                   col1 As Pixel, col2 As Pixel, col3 As Pixel)
+
+      P(0) = v1
+      P(1) = v2
+      P(2) = v3
+      T(0) = New Vec2d(x1, y1, z1)
+      T(1) = New Vec2d(x2, y2, z2)
+      T(2) = New Vec2d(x3, y3, z3)
+      Col(0) = col1
+      Col(1) = col2
+      Col(2) = col3
     End Sub
 
   End Class
@@ -499,7 +619,137 @@ Public Class Gfx3D
   End Class
 
   Public Class Mesh
-    Public Tris As List(Of Triangle)
+
+    Public Tris As New List(Of Triangle)
+
+    Private Function ReadWord(s As IO.StringReader) As String
+      Dim accum As String = ""
+      Do
+        Select Case s.Peek
+          Case -1 : Exit Do
+          Case 32, 44, 59 : s.Read() ' read and toss it in the trash...
+          Case Else
+            Exit Do
+        End Select
+      Loop
+      Do
+        Select Case s.Peek
+          Case -1 : Exit Do
+          Case 32, 44, 59 : Exit Do ' space, comma, semicolon
+          Case Else
+            accum &= ChrW(s.Read)
+        End Select
+      Loop
+      Return accum
+    End Function
+
+    Public Function LoadOBJFile(sFilename As String, Optional bHasTexture As Boolean = False) As Boolean
+
+      If Not IO.File.Exists(sFilename) Then Return False
+
+      Using f = New IO.StreamReader(sFilename)
+        'If Not f.IsOpen() Then Return False
+
+        ' Local cache of verts
+        Dim verts As New List(Of Vec3d)()
+        Dim norms As New List(Of Vec3d)()
+        Dim texs As New List(Of Vec2d)()
+
+        While Not f.EndOfStream
+          Dim line As String = f.ReadLine()
+
+          Dim s As New System.IO.StringReader(line)
+
+          'Dim junk As Char
+
+          If line.Chars(0) = "v"c Then
+            If line.Chars(1) = "t"c Then
+              Dim v As New Vec2d()
+              s.Read()
+              s.Read()
+              v.X = CSng(ReadWord(s))
+              v.Y = CSng(ReadWord(s))
+              'v.x = 1.0f - v.x;
+              v.Y = 1.0F - v.Y
+              texs.Add(v)
+            ElseIf line.Chars(1) = "n"c Then
+              Dim v As New Vec3d()
+              s.Read()
+              s.Read()
+              v.X = CSng(ReadWord(s))
+              v.Y = CSng(ReadWord(s))
+              v.Z = CSng(ReadWord(s))
+              norms.Add(v)
+            Else
+              Dim v As New Vec3d()
+              s.Read()
+              v.X = CSng(ReadWord(s))
+              v.Y = CSng(ReadWord(s))
+              v.Z = CSng(ReadWord(s))
+              verts.Add(v)
+            End If
+          End If
+
+          If Not bHasTexture Then
+            If line.Chars(0) = "f"c Then
+              Dim value(2) As Integer
+              s.Read()
+              value(0) = CInt(Val(ReadWord(s)))
+              value(1) = CInt(Val(ReadWord(s)))
+              value(2) = CInt(Val(ReadWord(s)))
+              Tris.Add(New Triangle(verts(value(0) - 1), verts(value(1) - 1), verts(value(2) - 1)))
+            End If
+          Else
+            If line.Chars(0) = "f"c Then
+              s.Read()
+
+              Dim tokens(8) As String
+              Dim nTokenCount As Integer = -1
+
+              While s.Peek() <> -1
+                Dim c As Char = ChrW(s.Read())
+                If c = " "c Or c = "/"c Then
+                  If tokens(nTokenCount).Length > 0 Then
+                    nTokenCount += 1
+                  End If
+                Else
+                  tokens(nTokenCount) += c
+                End If
+              End While
+
+              tokens(nTokenCount) = tokens(nTokenCount).Remove(tokens(nTokenCount).Length - 1)
+
+              Dim stride = 1
+              If Not texs.Any() Then stride += 1
+              If Not norms.Any() Then stride += 1
+
+              If Not texs.Any() Then
+                Tris.Add(New Triangle(verts(CInt(tokens(0 * stride)) - 1),
+                                           verts(CInt(tokens(1 * stride)) - 1),
+                                           verts(CInt(tokens(2 * stride)) - 1),
+                                           New Vec2d(0, 0, 0),
+                                           New Vec2d(0, 0, 0),
+                                           New Vec2d(0, 0, 0),
+                                           Presets.White, Presets.White, Presets.White))
+              Else
+                Tris.Add(New Triangle(verts(CInt(tokens(0 * stride)) - 1),
+                                           verts(CInt(tokens(1 * stride)) - 1),
+                                           verts(CInt(tokens(2 * stride)) - 1),
+                                           New Vec2d(0, 0, 0),
+                                           New Vec2d(0, 0, 0),
+                                           New Vec2d(0, 0, 0),
+                                           Presets.White, Presets.White, Presets.White))
+              End If
+            End If
+          End If
+        End While
+
+        Return True
+
+      End Using
+
+    End Function
+
   End Class
 
   Public Class Math
@@ -813,7 +1063,9 @@ Public Class Gfx3D
         ' Triangle should be clipped. As two points lie outside
         ' the plane, the triangle simply becomes a smaller triangle
         ' Copy appearance info to new triangle
-        out_tri1.Col = Presets.Magenta ' in_tri.col
+        out_tri1.Col(0) = in_tri.Col(0)
+        out_tri1.Col(1) = in_tri.Col(1)
+        out_tri1.Col(2) = in_tri.Col(2)
 
         ' The inside point is valid, so keep that...
         out_tri1.P(0) = New Vec3d(inside_points(0))
@@ -843,8 +1095,12 @@ Public Class Gfx3D
         ' represent a quad with two new triangles
 
         ' Copy appearance info to new triangles
-        out_tri1.Col = Presets.Green ' in_tri.col
-        out_tri2.Col = Presets.Red ' in_tri.col
+        out_tri1.Col(0) = in_tri.Col(0)
+        out_tri2.Col(0) = in_tri.Col(0)
+        out_tri1.Col(1) = in_tri.Col(1)
+        out_tri2.Col(1) = in_tri.Col(1)
+        out_tri1.Col(2) = in_tri.Col(2)
+        out_tri2.Col(2) = in_tri.Col(2)
 
         ' The first triangle consists of the two inside points and a new
         ' point determined by the location where one side of the triangle
@@ -893,8 +1149,21 @@ Public Class Gfx3D
     Private m_viewW As Single
     Private m_viewH As Single
 
-    Public Sub New()
+    Public Class sLight
+      Public type As Integer
+      Public pos As Vec3d
+      Public dir As Vec3d
+      Public col As Pixel
+      Public param As Single
+    End Class
 
+    Private m_lights(3) As sLight
+
+    Public Sub New()
+      m_lights(0) = New sLight
+      m_lights(1) = New sLight
+      m_lights(2) = New sLight
+      m_lights(3) = New sLight
     End Sub
 
     Public Sub SetProjection(fovDegrees As Single, aspectRatio As Single, near As Single, far As Single, left As Single, top As Single, width As Single, height As Single)
@@ -918,10 +1187,287 @@ Public Class Gfx3D
       m_texture = texture
     End Sub
 
-    Public Sub SetLightSource(pos As Vec3d, dir As Vec3d, col As Pixel)
+    'Public Sub SetLightSource(pos As Vec3d, dir As Vec3d, col As Pixel)
+    'End Sub
+
+    Public Sub SetLightSource(nSlot As Integer, nType As Light, col As Pixel, pos As Vec3d, Optional fParam As Single = 0.0F)
+      SetLightSource(nSlot, nType, col, pos, New Vec3d(0.0F, 0.0F, 1.0F), fParam)
     End Sub
 
+    Public Sub SetLightSource(nSlot As Integer, nType As Light, col As Pixel, pos As Vec3d, dir As Vec3d, Optional fParam As Single = 0.0F)
+      If nSlot < 4 Then
+        m_lights(nSlot) = New sLight
+        m_lights(nSlot).type = nType
+        m_lights(nSlot).pos = pos
+        m_lights(nSlot).dir = dir
+        m_lights(nSlot).col = col
+        m_lights(nSlot).param = fParam
+      End If
+    End Sub
+
+    'Public Function Render(triangles As List(Of Triangle), Optional flags As RenderFlags = RenderFlags.RenderCullCw Or RenderFlags.RenderTextured Or RenderFlags.RenderDepth) As Integer
+
+    '  ' Calculate Transformation Matrix
+    '  Dim matWorldView = Math.Mat_MultiplyMatrix(m_matWorld, m_matView)
+
+    '  ' Store triangles for rastering later
+    '  Dim vecTrianglesToRaster As New List(Of Triangle)
+
+    '  Dim nTriangleDrawnCount = 0
+
+    '  ' Process Triangles
+    '  For Each tri In triangles
+
+    '    Dim triTransformed As New Triangle
+
+    '    ' Just copy through texture coordinates
+    '    triTransformed.T(0) = New Vec2d(tri.T(0).X, tri.T(0).Y, tri.T(0).Z)
+    '    triTransformed.T(1) = New Vec2d(tri.T(1).X, tri.T(1).Y, tri.T(1).Z)
+    '    triTransformed.T(2) = New Vec2d(tri.T(2).X, tri.T(2).Y, tri.T(2).Z)
+
+    '    ' Transform Triangle from object into projected space
+    '    triTransformed.P(0) = Math.Mat_MultiplyVector(matWorldView, tri.P(0))
+    '    triTransformed.P(1) = Math.Mat_MultiplyVector(matWorldView, tri.P(1))
+    '    triTransformed.P(2) = Math.Mat_MultiplyVector(matWorldView, tri.P(2))
+
+    '    ' Calculate Triangle Normal in WorldView Space
+    '    Dim line1 = Math.Vec_Sub(triTransformed.P(1), triTransformed.P(0))
+    '    Dim line2 = Math.Vec_Sub(triTransformed.P(2), triTransformed.P(0))
+    '    Dim temp1 = Math.Vec_CrossProduct(line1, line2)
+    '    Dim normal = Math.Vec_Normalise(temp1)
+
+    '    ' Cull triangles that face away from viewer
+    '    If (flags And RenderFlags.RenderCullCw) <> 0 AndAlso Math.Vec_DotProduct(normal, triTransformed.P(0)) > 0.0F Then Continue For
+    '    If (flags And RenderFlags.RenderCullCcw) <> 0 AndAlso Math.Vec_DotProduct(normal, triTransformed.P(0)) < 0.0F Then Continue For
+
+    '    ' If Lighting, calculate shading
+    '    triTransformed.Col = Presets.White
+
+    '    ' Clip triangle against near plane
+    '    Dim nClippedTriangles = 0
+    '    Dim clipped(1) As Triangle : clipped(0) = New Triangle : clipped(1) = New Triangle
+    '    nClippedTriangles = Math.Triangle_ClipAgainstPlane(New Vec3d(0.0F, 0.0F, 0.1F), New Vec3d(0.0F, 0.0F, 1.0F), triTransformed, clipped(0), clipped(1))
+
+    '    ' This may yield two new triangles
+    '    For n = 0 To nClippedTriangles - 1
+
+    '      Dim triProjected As Triangle = clipped(n)
+
+    '      ' Project new triangle
+    '      triProjected.P(0) = Math.Mat_MultiplyVector(m_matProj, clipped(n).P(0))
+    '      triProjected.P(1) = Math.Mat_MultiplyVector(m_matProj, clipped(n).P(1))
+    '      triProjected.P(2) = Math.Mat_MultiplyVector(m_matProj, clipped(n).P(2))
+
+    '      ' Apply Projection to Verts
+    '      triProjected.P(0).X = triProjected.P(0).X / triProjected.P(0).W
+    '      triProjected.P(1).X = triProjected.P(1).X / triProjected.P(1).W
+    '      triProjected.P(2).X = triProjected.P(2).X / triProjected.P(2).W
+
+    '      triProjected.P(0).Y = triProjected.P(0).Y / triProjected.P(0).W
+    '      triProjected.P(1).Y = triProjected.P(1).Y / triProjected.P(1).W
+    '      triProjected.P(2).Y = triProjected.P(2).Y / triProjected.P(2).W
+
+    '      triProjected.P(0).Z = triProjected.P(0).Z / triProjected.P(0).W
+    '      triProjected.P(1).Z = triProjected.P(1).Z / triProjected.P(1).W
+    '      triProjected.P(2).Z = triProjected.P(2).Z / triProjected.P(2).W
+
+    '      ' Apply Projection to Tex coords
+    '      triProjected.T(0).X = triProjected.T(0).X / triProjected.P(0).W
+    '      triProjected.T(1).X = triProjected.T(1).X / triProjected.P(1).W
+    '      triProjected.T(2).X = triProjected.T(2).X / triProjected.P(2).W
+
+    '      triProjected.T(0).Y = triProjected.T(0).Y / triProjected.P(0).W
+    '      triProjected.T(1).Y = triProjected.T(1).Y / triProjected.P(1).W
+    '      triProjected.T(2).Y = triProjected.T(2).Y / triProjected.P(2).W
+
+    '      triProjected.T(0).Z = 1.0F / triProjected.P(0).W
+    '      triProjected.T(1).Z = 1.0F / triProjected.P(1).W
+    '      triProjected.T(2).Z = 1.0F / triProjected.P(2).W
+
+    '      ' Clip against viewport in screen space
+    '      ' Clip triangles against all four screen edges, this could yield
+    '      ' a bunch of triangles, so create a queue that we traverse to 
+    '      ' ensure we only test new triangles generated against planes
+    '      Dim sclipped(1) As Triangle : sclipped(0) = New Triangle : sclipped(1) = New Triangle
+    '      Dim listTriangles As New List(Of Triangle) From {New Triangle(triProjected)} ' Add initial triangle
+    '      Dim nNewTriangles = 1
+
+    '      For p = 0 To 3
+
+    '        Dim nTrisToAdd = 0
+
+    '        While nNewTriangles > 0
+
+    '          ' Take triangle from front of queue
+    '          Dim test = listTriangles(0)
+    '          listTriangles.RemoveAt(0)
+    '          nNewTriangles -= 1
+
+    '          ' Clip it against a plane. We only need to test each 
+    '          ' subsequent plane, against subsequent new triangles
+    '          ' as all triangles after a plane clip are guaranteed
+    '          ' to lie on the inside of the plane. I like how this
+    '          ' comment is almost completely and utterly justified
+    '          Select Case p
+    '            Case 0 : nTrisToAdd = Math.Triangle_ClipAgainstPlane(New Vec3d(0.0F, -1.0F, 0.0F), New Vec3d(0.0F, 1.0F, 0.0F), test, sclipped(0), sclipped(1))
+    '            Case 1 : nTrisToAdd = Math.Triangle_ClipAgainstPlane(New Vec3d(0.0F, +1.0F, 0.0F), New Vec3d(0.0F, -1.0F, 0.0F), test, sclipped(0), sclipped(1))
+    '            Case 2 : nTrisToAdd = Math.Triangle_ClipAgainstPlane(New Vec3d(-1.0F, 0.0F, 0.0F), New Vec3d(1.0F, 0.0F, 0.0F), test, sclipped(0), sclipped(1))
+    '            Case 3 : nTrisToAdd = Math.Triangle_ClipAgainstPlane(New Vec3d(+1.0F, 0.0F, 0.0F), New Vec3d(-1.0F, 0.0F, 0.0F), test, sclipped(0), sclipped(1))
+    '          End Select
+
+    '          ' Clipping may yield a variable number of triangles, so
+    '          ' add these new ones to the back of the queue for subsequent
+    '          ' clipping against next planes
+    '          For w = 0 To nTrisToAdd - 1
+    '            listTriangles.Add(New Triangle(sclipped(w)))
+    '          Next
+
+    '        End While
+
+    '        nNewTriangles = listTriangles.Count
+
+    '      Next
+
+    '      For Each triRaster In listTriangles
+
+    '        ' Scale to viewport
+    '        'triRaster.p(0).x *= -1.0f
+    '        'triRaster.p(1).x *= -1.0f
+    '        'triRaster.p(2).x *= -1.0f
+    '        'triRaster.p(0).y *= -1.0f
+    '        'triRaster.p(1).y *= -1.0f
+    '        'triRaster.p(2).y *= -1.0f
+    '        Dim vOffsetView = New Vec3d(1, 1, 0)
+    '        triRaster.P(0) = Math.Vec_Add(triRaster.P(0), vOffsetView)
+    '        triRaster.P(1) = Math.Vec_Add(triRaster.P(1), vOffsetView)
+    '        triRaster.P(2) = Math.Vec_Add(triRaster.P(2), vOffsetView)
+    '        triRaster.P(0).X *= 0.5F * m_viewW
+    '        triRaster.P(0).Y *= 0.5F * m_viewH
+    '        triRaster.P(1).X *= 0.5F * m_viewW
+    '        triRaster.P(1).Y *= 0.5F * m_viewH
+    '        triRaster.P(2).X *= 0.5F * m_viewW
+    '        triRaster.P(2).Y *= 0.5F * m_viewH
+    '        vOffsetView = New Vec3d(m_viewX, m_viewY, 0)
+    '        triRaster.P(0) = Math.Vec_Add(triRaster.P(0), vOffsetView)
+    '        triRaster.P(1) = Math.Vec_Add(triRaster.P(1), vOffsetView)
+    '        triRaster.P(2) = Math.Vec_Add(triRaster.P(2), vOffsetView)
+
+    '        ' For now, just draw triangle
+    '        If (flags And RenderFlags.RenderTextured) <> 0 Then
+    '          TexturedTriangle(CInt(Fix(triRaster.P(0).X)), CInt(Fix(triRaster.P(0).Y)), triRaster.T(0).X, triRaster.T(0).Y, triRaster.T(0).Z,
+    '                           CInt(Fix(triRaster.P(1).X)), CInt(Fix(triRaster.P(1).Y)), triRaster.T(1).X, triRaster.T(1).Y, triRaster.T(1).Z,
+    '                           CInt(Fix(triRaster.P(2).X)), CInt(Fix(triRaster.P(2).Y)), triRaster.T(2).X, triRaster.T(2).Y, triRaster.T(2).Z,
+    '                           m_texture)
+    '        End If
+
+    '        If (flags And RenderFlags.RenderWire) <> 0 Then
+    '          DrawTriangleWire(triRaster, Presets.Red)
+    '        End If
+
+    '        If (flags And RenderFlags.RenderFlat) <> 0 Then
+    '          DrawTriangleFlat(triRaster)
+    '        End If
+
+    '        nTriangleDrawnCount += 1
+
+    '      Next
+
+    '    Next
+
+    '  Next
+
+    '  Return nTriangleDrawnCount
+
+    'End Function
+
     Public Function Render(triangles As List(Of Triangle), Optional flags As RenderFlags = RenderFlags.RenderCullCw Or RenderFlags.RenderTextured Or RenderFlags.RenderDepth) As Integer
+      Return Render(triangles, flags, 0, triangles.Count)
+    End Function
+
+    Public Function RenderLine(p1 As Vec3d, p2 As Vec3d, col As Pixel) As UInteger
+
+      'Coordinates are assumed to be in world space
+      Dim t1, t2 As Vec3d
+
+      'Transform into view
+      t1 = Math.Mat_MultiplyVector(m_matView, p1)
+      t2 = Math.Mat_MultiplyVector(m_matView, p2)
+
+      'Project onto screen
+      t1 = Math.Mat_MultiplyVector(m_matProj, t1)
+      t2 = Math.Mat_MultiplyVector(m_matProj, t2)
+
+      'Project
+      t1.X = t1.X / t1.W
+      t1.Y = t1.Y / t1.W
+      t1.Z = t1.Z / t1.W
+
+      t2.X = t2.X / t2.W
+      t2.Y = t2.Y / t2.W
+      t2.Z = t2.Z / t2.W
+
+      Dim vOffsetView = New Vec3d(1, 1, 0)
+      t1 = Math.Vec_Add(t1, vOffsetView)
+      t2 = Math.Vec_Add(t2, vOffsetView)
+
+      t1.X *= 0.5F * m_viewW
+      t1.Y *= 0.5F * m_viewH
+      t2.X *= 0.5F * m_viewW
+      t2.Y *= 0.5F * m_viewH
+
+      vOffsetView = New Vec3d(m_viewX, m_viewY, 0)
+      t1 = Math.Vec_Add(t1, vOffsetView)
+      t2 = Math.Vec_Add(t2, vOffsetView)
+
+      Pge.DrawLine(t1.X, t1.Y, t2.X, t2.Y, col)
+
+      Return 0
+
+    End Function
+
+    Public Function RenderCircleXZ(p1 As Vec3d, r As Single, col As Pixel) As UInteger
+
+      ' Coordinates are assumed to be in world space
+      Dim t2 = New Vec3d(p1.X + r, p1.Y, p1.Z)
+
+      ' Transform into view
+      Dim t1 = Math.Mat_MultiplyVector(m_matView, p1)
+      t2 = Math.Mat_MultiplyVector(m_matView, t2)
+
+      ' Project onto screen
+      t1 = Math.Mat_MultiplyVector(m_matProj, t1)
+      t2 = Math.Mat_MultiplyVector(m_matProj, t2)
+
+      ' Project
+      t1.X /= t1.W
+      t1.Y /= t1.W
+      t1.Z /= t1.W
+
+      t2.X /= t2.W
+      t2.Y /= t2.W
+      t2.Z /= t2.W
+
+      Dim vOffsetView = New Vec3d(1, 1, 0)
+      t1 = Math.Vec_Add(t1, vOffsetView)
+      t2 = Math.Vec_Add(t2, vOffsetView)
+
+      t1.X *= 0.5F * m_viewW
+      t1.Y *= 0.5F * m_viewH
+      t2.X *= 0.5F * m_viewW
+      t2.Y *= 0.5F * m_viewH
+
+      vOffsetView = New Vec3d(m_viewX, m_viewY, 0)
+      t1 = Math.Vec_Add(t1, vOffsetView)
+      t2 = Math.Vec_Add(t2, vOffsetView)
+
+      Pge.FillCircle(t1.X, t1.Y, MathF.Abs(t2.X - t1.X), col)
+
+      Return 0
+
+    End Function
+
+    'Public Function Render(triangles As List(Of Triangle), Optional flags As RenderFlags = RenderFlags.RenderCullCw Or RenderFlags.RenderTextured Or RenderFlags.RenderDepth) As Integer
+    Public Function Render(triangles As List(Of Triangle), flags As RenderFlags, nOffset As Integer, nCount As Integer) As Integer
 
       ' Calculate Transformation Matrix
       Dim matWorldView = Math.Mat_MultiplyMatrix(m_matWorld, m_matView)
@@ -932,14 +1478,21 @@ Public Class Gfx3D
       Dim nTriangleDrawnCount = 0
 
       ' Process Triangles
-      For Each tri In triangles
+      'For Each tri In triangles
+      For tx = nOffset To (nOffset + nCount) - 1
 
+        Dim tri = triangles(tx)
         Dim triTransformed As New Triangle
 
         ' Just copy through texture coordinates
         triTransformed.T(0) = New Vec2d(tri.T(0).X, tri.T(0).Y, tri.T(0).Z)
         triTransformed.T(1) = New Vec2d(tri.T(1).X, tri.T(1).Y, tri.T(1).Z)
         triTransformed.T(2) = New Vec2d(tri.T(2).X, tri.T(2).Y, tri.T(2).Z)
+
+        ' Dont forget vertex colours
+        triTransformed.Col(0) = tri.Col(0)
+        triTransformed.Col(1) = tri.Col(1)
+        triTransformed.Col(2) = tri.Col(2)
 
         ' Transform Triangle from object into projected space
         triTransformed.P(0) = Math.Mat_MultiplyVector(matWorldView, tri.P(0))
@@ -957,7 +1510,66 @@ Public Class Gfx3D
         If (flags And RenderFlags.RenderCullCcw) <> 0 AndAlso Math.Vec_DotProduct(normal, triTransformed.P(0)) < 0.0F Then Continue For
 
         ' If Lighting, calculate shading
-        triTransformed.Col = Presets.White
+        If (flags And RenderFlags.RenderLights) <> 0 Then
+
+          Dim ambient_clamp = New Pixel(0, 0, 0)
+          Dim light_combined = New Pixel(0, 0, 0)
+          Dim nLightSources = 0
+
+          Dim nLightR = 0.0F, nLightG = 0.0F, nLightB = 0.0F
+
+          For i = 0 To 3
+            Select Case m_lights(i).type
+
+              Case Light.Disabled
+
+              Case Light.Ambient
+                ambient_clamp = m_lights(i).col
+
+              Case Light.Directional
+                nLightSources += 1
+                Dim light_dir = Math.Vec_Normalise(m_lights(i).dir)
+                Dim light = Math.Vec_DotProduct(light_dir, normal)
+                'If light > 0 Then
+                '  Dim j As Integer = 0
+                'End If
+                light = Single.Max(light, 0.0F)
+                nLightR += light * (m_lights(i).col.R / 255.0F)
+                nLightG += light * (m_lights(i).col.G / 255.0F)
+                nLightB += light * (m_lights(i).col.B / 255.0F)
+
+              Case Light.Point
+
+            End Select
+          Next
+
+          'nLightR /= nLightSources;
+          'nLightG /= nLightSources;
+          'nLightB /= nLightSources;
+
+          If Single.IsNaN(nLightR) Then nLightR = 0
+          If Single.IsNaN(nLightG) Then nLightG = 0
+          If Single.IsNaN(nLightB) Then nLightB = 0
+
+          nLightR = Single.Max(nLightR, ambient_clamp.R / 255.0F)
+          nLightG = Single.Max(nLightG, ambient_clamp.G / 255.0F)
+          nLightB = Single.Max(nLightB, ambient_clamp.B / 255.0F)
+
+          triTransformed.Col(0) = New Pixel(nLightR * triTransformed.Col(0).R, nLightG * triTransformed.Col(0).G, nLightB * triTransformed.Col(0).B)
+          triTransformed.Col(1) = New Pixel(nLightR * triTransformed.Col(1).R, nLightG * triTransformed.Col(1).G, nLightB * triTransformed.Col(1).B)
+          triTransformed.Col(2) = New Pixel(nLightR * triTransformed.Col(2).R, nLightG * triTransformed.Col(2).G, nLightB * triTransformed.Col(2).B)
+
+          '  GFX3D.vec3d light_dir = { 1,1,1 };
+          '  light_dir = GFX3D.Math.Vec_Normalise(light_dir);
+          '  Dim light As Single = GFX3D.Math.Vec_DotProduct(light_dir, normal)
+          '  If light < 0 Then light = 0
+          '  triTransformed.col(0) = New olc.Pixel(light * 255.0F, light * 255.0F, light * 255.0F)
+          '  triTransformed.col(1) = New olc.Pixel(light * 255.0F, light * 255.0F, light * 255.0F)
+          '  triTransformed.col(2) = New olc.Pixel(light * 255.0F, light * 255.0F, light * 255.0F)
+
+          'Else
+          '  triTransformed.Col = Presets.White
+        End If
 
         ' Clip triangle against near plane
         Dim nClippedTriangles = 0
@@ -1069,19 +1681,28 @@ Public Class Gfx3D
             triRaster.P(2) = Math.Vec_Add(triRaster.P(2), vOffsetView)
 
             ' For now, just draw triangle
-            If (flags And RenderFlags.RenderTextured) <> 0 Then
-              TexturedTriangle(CInt(Fix(triRaster.P(0).X)), CInt(Fix(triRaster.P(0).Y)), triRaster.T(0).X, triRaster.T(0).Y, triRaster.T(0).Z,
-                               CInt(Fix(triRaster.P(1).X)), CInt(Fix(triRaster.P(1).Y)), triRaster.T(1).X, triRaster.T(1).Y, triRaster.T(1).Z,
-                               CInt(Fix(triRaster.P(2).X)), CInt(Fix(triRaster.P(2).Y)), triRaster.T(2).X, triRaster.T(2).Y, triRaster.T(2).Z,
-                               m_texture)
-            End If
+            'If (flags And RenderFlags.RenderTextured) <> 0 Then
+            '  TexturedTriangle(CInt(Fix(triRaster.P(0).X)), CInt(Fix(triRaster.P(0).Y)), triRaster.T(0).X, triRaster.T(0).Y, triRaster.T(0).Z,
+            '                   CInt(Fix(triRaster.P(1).X)), CInt(Fix(triRaster.P(1).Y)), triRaster.T(1).X, triRaster.T(1).Y, triRaster.T(1).Z,
+            '                   CInt(Fix(triRaster.P(2).X)), CInt(Fix(triRaster.P(2).Y)), triRaster.T(2).X, triRaster.T(2).Y, triRaster.T(2).Z,
+            '                   m_texture)
+            'End If
+
+            'If (flags And RenderFlags.RenderWire) <> 0 Then
+            '  DrawTriangleWire(triRaster, Presets.Red)
+            'End If
+
+            'If (flags And RenderFlags.RenderFlat) <> 0 Then
+            '  DrawTriangleFlat(triRaster)
+            'End If
 
             If (flags And RenderFlags.RenderWire) <> 0 Then
               DrawTriangleWire(triRaster, Presets.Red)
-            End If
-
-            If (flags And RenderFlags.RenderFlat) <> 0 Then
-              DrawTriangleFlat(triRaster)
+            Else
+              RasterTriangle(triRaster.P(0).X, triRaster.P(0).Y, triRaster.T(0).X, triRaster.T(0).Y, triRaster.T(0).Z, triRaster.Col(0),
+                             triRaster.P(1).X, triRaster.P(1).Y, triRaster.T(1).X, triRaster.T(1).Y, triRaster.T(1).Z, triRaster.Col(1),
+                             triRaster.P(2).X, triRaster.P(2).Y, triRaster.T(2).X, triRaster.T(2).Y, triRaster.T(2).Z, triRaster.Col(2),
+                             m_texture, flags)
             End If
 
             nTriangleDrawnCount += 1
@@ -1095,6 +1716,335 @@ Public Class Gfx3D
       Return nTriangleDrawnCount
 
     End Function
+
+    Public Sub RasterTriangle(x1 As Single, y1 As Single, u1 As Single, v1 As Single, w1 As Single, c1 As Pixel,
+                              x2 As Single, y2 As Single, u2 As Single, v2 As Single, w2 As Single, c2 As Pixel,
+                              x3 As Single, y3 As Single, u3 As Single, v3 As Single, w3 As Single, c3 As Pixel,
+                              spr As Sprite, flags As RenderFlags)
+      RasterTriangle(CInt(Fix(x1)), CInt(Fix(y1)), u1, v1, w1, c1,
+                     CInt(Fix(x2)), CInt(Fix(y2)), u2, v2, w2, c2,
+                     CInt(Fix(x3)), CInt(Fix(y3)), u3, v3, w3, c3,
+                     spr, flags)
+    End Sub
+
+    Public Sub RasterTriangle(x1 As Integer, y1 As Integer, u1 As Single, v1 As Single, w1 As Single, c1 As Pixel,
+                              x2 As Integer, y2 As Integer, u2 As Single, v2 As Single, w2 As Single, c2 As Pixel,
+                              x3 As Integer, y3 As Integer, u3 As Single, v3 As Single, w3 As Single, c3 As Pixel,
+                              spr As Sprite, flags As RenderFlags)
+
+      ' The following block has been added as there seems to be some sort of
+      ' difference between C++ and .NET related to either the math involved and/or
+      ' encountering of *subscript out of range* situations. The below code ensures
+      ' that the maximum x/y is not beyond the screen coordinates.
+      If x1 > Pge.ScreenWidth - 1 Then x1 = Pge.ScreenWidth - 1
+      If x2 > Pge.ScreenWidth - 1 Then x2 = Pge.ScreenWidth - 1
+      If x3 > Pge.ScreenWidth - 1 Then x3 = Pge.ScreenWidth - 1
+      If y1 > Pge.ScreenHeight - 1 Then y1 = Pge.ScreenHeight - 1
+      If y2 > Pge.ScreenHeight - 1 Then y2 = Pge.ScreenHeight - 1
+      If y3 > Pge.ScreenHeight - 1 Then y3 = Pge.ScreenHeight - 1
+
+      If y2 < y1 Then
+        Swap(y1, y2)
+        Swap(x1, x2)
+        Swap(u1, u2)
+        Swap(v1, v2)
+        Swap(w1, w2)
+        Swap(c1, c2)
+      End If
+
+      If y3 < y1 Then
+        Swap(y1, y3)
+        Swap(x1, x3)
+        Swap(u1, u3)
+        Swap(v1, v3)
+        Swap(w1, w3)
+        Swap(c1, c3)
+      End If
+
+      If y3 < y2 Then
+        Swap(y2, y3)
+        Swap(x2, x3)
+        Swap(u2, u3)
+        Swap(v2, v3)
+        Swap(w2, w3)
+        Swap(c2, c3)
+      End If
+
+      Dim dy1 = y2 - y1
+      Dim dx1 = x2 - x1
+      Dim dv1 = v2 - v1
+      Dim du1 = u2 - u1
+      Dim dw1 = w2 - w1
+      Dim dcr1 = c2.R - c1.R
+      Dim dcg1 = c2.G - c1.G
+      Dim dcb1 = c2.B - c1.B
+      Dim dca1 = c2.A - c1.A
+
+      Dim dy2 = y3 - y1
+      Dim dx2 = x3 - x1
+      Dim dv2 = v3 - v1
+      Dim du2 = u3 - u1
+      Dim dw2 = w3 - w1
+      Dim dcr2 = c3.R - c1.R
+      Dim dcg2 = c3.G - c1.G
+      Dim dcb2 = c3.B - c1.B
+      Dim dca2 = c3.A - c1.A
+
+      Dim tex_u, tex_v, tex_w As Single
+      Dim col_r, col_g, col_b, col_a As Single
+
+      Dim dax_step As Single = 0
+      Dim dbx_step As Single = 0
+      Dim du1_step As Single = 0
+      Dim dv1_step As Single = 0
+      Dim du2_step As Single = 0
+      Dim dv2_step As Single = 0
+      Dim dw1_step As Single = 0
+      Dim dw2_step As Single = 0
+      Dim dcr1_step As Single = 0
+      Dim dcr2_step As Single = 0
+      Dim dcg1_step As Single = 0
+      Dim dcg2_step As Single = 0
+      Dim dcb1_step As Single = 0
+      Dim dcb2_step As Single = 0
+      Dim dca1_step As Single = 0
+      Dim dca2_step As Single = 0
+
+      If dy1 <> 0 Then dax_step = dx1 / CSng(MathF.Abs(dy1))
+      If dy2 <> 0 Then dbx_step = dx2 / CSng(MathF.Abs(dy2))
+
+      If dy1 <> 0 Then du1_step = du1 / CSng(MathF.Abs(dy1))
+      If dy1 <> 0 Then dv1_step = dv1 / CSng(MathF.Abs(dy1))
+      If dy1 <> 0 Then dw1_step = dw1 / CSng(MathF.Abs(dy1))
+
+      If dy2 <> 0 Then du2_step = du2 / CSng(MathF.Abs(dy2))
+      If dy2 <> 0 Then dv2_step = dv2 / CSng(MathF.Abs(dy2))
+      If dy2 <> 0 Then dw2_step = dw2 / CSng(MathF.Abs(dy2))
+
+      If dy1 <> 0 Then dcr1_step = dcr1 / CSng(MathF.Abs(dy1))
+      If dy1 <> 0 Then dcg1_step = dcg1 / CSng(MathF.Abs(dy1))
+      If dy1 <> 0 Then dcb1_step = dcb1 / CSng(MathF.Abs(dy1))
+      If dy1 <> 0 Then dca1_step = dca1 / CSng(MathF.Abs(dy1))
+
+      If dy2 <> 0 Then dcr2_step = dcr2 / CSng(MathF.Abs(dy2))
+      If dy2 <> 0 Then dcg2_step = dcg2 / CSng(MathF.Abs(dy2))
+      If dy2 <> 0 Then dcb2_step = dcb2 / CSng(MathF.Abs(dy2))
+      If dy2 <> 0 Then dca2_step = dca2 / CSng(MathF.Abs(dy2))
+
+      Dim pixel_r = 0.0F
+      Dim pixel_g = 0.0F
+      Dim pixel_b = 0.0F
+      Dim pixel_a = 1.0F
+
+      If dy1 <> 0 Then
+
+        For i = y1 To y2
+
+          Dim ax = CInt(Fix(x1 + (i - y1) * dax_step))
+          Dim bx = CInt(Fix(x1 + (i - y1) * dbx_step))
+
+          Dim tex_su = u1 + (i - y1) * du1_step
+          Dim tex_sv = v1 + (i - y1) * dv1_step
+          Dim tex_sw = w1 + (i - y1) * dw1_step
+
+          Dim tex_eu = u1 + (i - y1) * du2_step
+          Dim tex_ev = v1 + (i - y1) * dv2_step
+          Dim tex_ew = w1 + (i - y1) * dw2_step
+
+          Dim col_sr = c1.R + (i - y1) * dcr1_step
+          Dim col_sg = c1.G + (i - y1) * dcg1_step
+          Dim col_sb = c1.B + (i - y1) * dcb1_step
+          Dim col_sa = c1.A + (i - y1) * dca1_step
+
+          Dim col_er = c1.R + (i - y1) * dcr2_step
+          Dim col_eg = c1.G + (i - y1) * dcg2_step
+          Dim col_eb = c1.B + (i - y1) * dcb2_step
+          Dim col_ea = c1.A + (i - y1) * dca2_step
+
+          If ax > bx Then
+            Swap(ax, bx)
+            Swap(tex_su, tex_eu)
+            Swap(tex_sv, tex_ev)
+            Swap(tex_sw, tex_ew)
+            Swap(col_sr, col_er)
+            Swap(col_sg, col_eg)
+            Swap(col_sb, col_eb)
+            Swap(col_sa, col_ea)
+          End If
+
+          tex_u = tex_su
+          tex_v = tex_sv
+          tex_w = tex_sw
+          col_r = col_sr
+          col_g = col_sg
+          col_b = col_sb
+          col_a = col_sa
+
+          Dim tstep = 1.0F / (bx - ax)
+          Dim t = 0.0F
+
+          For j = ax To bx - 1
+
+            tex_u = (1.0F - t) * tex_su + t * tex_eu
+            tex_v = (1.0F - t) * tex_sv + t * tex_ev
+            tex_w = (1.0F - t) * tex_sw + t * tex_ew
+            col_r = (1.0F - t) * col_sr + t * col_er
+            col_g = (1.0F - t) * col_sg + t * col_eg
+            col_b = (1.0F - t) * col_sb + t * col_eb
+            col_a = (1.0F - t) * col_sa + t * col_ea
+
+            pixel_r = col_r
+            pixel_g = col_g
+            pixel_b = col_b
+            pixel_a = col_a
+
+            If (flags And RenderFlags.RenderTextured) <> 0 Then
+              If spr IsNot Nothing Then
+                Dim sample = spr.Sample(tex_u / tex_w, tex_v / tex_w)
+                pixel_r *= sample.R / 255.0F
+                pixel_g *= sample.G / 255.0F
+                pixel_b *= sample.B / 255.0F
+                pixel_a *= sample.A / 255.0F
+              End If
+            End If
+
+            If (flags And RenderFlags.RenderDepth) <> 0 Then
+              If tex_w > m_DepthBuffer(i * Pge.ScreenWidth() + j) Then
+                If Pge.Draw(j, i, New Pixel(pixel_r * 1.0F, pixel_g * 1.0F, pixel_b * 1.0F, pixel_a * 1.0F)) Then
+                  m_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
+                End If
+              End If
+            Else
+              Pge.Draw(j, i, New Pixel(pixel_r * 1.0F, pixel_g * 1.0F, pixel_b * 1.0F, pixel_a * 1.0F))
+            End If
+
+            t += tstep
+
+          Next
+
+        Next
+
+      End If
+
+      dy1 = y3 - y2
+      dx1 = x3 - x2
+      dv1 = v3 - v2
+      du1 = u3 - u2
+      dw1 = w3 - w2
+      dcr1 = c3.R - c2.R
+      dcg1 = c3.G - c2.G
+      dcb1 = c3.B - c2.B
+      dca1 = c3.A - c2.A
+
+      If dy1 <> 0 Then dax_step = dx1 / MathF.Abs(dy1)
+      If dy2 <> 0 Then dbx_step = dx2 / MathF.Abs(dy2)
+
+      du1_step = 0
+      dv1_step = 0
+      If dy1 <> 0 Then du1_step = du1 / MathF.Abs(dy1)
+      If dy1 <> 0 Then dv1_step = dv1 / MathF.Abs(dy1)
+      If dy1 <> 0 Then dw1_step = dw1 / MathF.Abs(dy1)
+
+      dcr1_step = 0
+      dcg1_step = 0
+      dcb1_step = 0
+      dca1_step = 0
+      If dy1 <> 0 Then dcr1_step = dcr1 / MathF.Abs(dy1)
+      If dy1 <> 0 Then dcg1_step = dcg1 / MathF.Abs(dy1)
+      If dy1 <> 0 Then dcb1_step = dcb1 / MathF.Abs(dy1)
+      If dy1 <> 0 Then dca1_step = dca1 / MathF.Abs(dy1)
+
+      If dy1 <> 0 Then
+
+        For i = y2 To y3
+
+          Dim ax = CInt(Fix(x2 + (i - y2) * dax_step))
+          Dim bx = CInt(Fix(x1 + (i - y1) * dbx_step))
+
+          Dim tex_su = u2 + (i - y2) * du1_step
+          Dim tex_sv = v2 + (i - y2) * dv1_step
+          Dim tex_sw = w2 + (i - y2) * dw1_step
+
+          Dim tex_eu = u1 + (i - y1) * du2_step
+          Dim tex_ev = v1 + (i - y1) * dv2_step
+          Dim tex_ew = w1 + (i - y1) * dw2_step
+
+          Dim col_sr = c2.R + (i - y2) * dcr1_step
+          Dim col_sg = c2.G + (i - y2) * dcg1_step
+          Dim col_sb = c2.B + (i - y2) * dcb1_step
+          Dim col_sa = c2.A + (i - y2) * dca1_step
+
+          Dim col_er = c1.R + (i - y1) * dcr2_step
+          Dim col_eg = c1.G + (i - y1) * dcg2_step
+          Dim col_eb = c1.B + (i - y1) * dcb2_step
+          Dim col_ea = c1.A + (i - y1) * dca2_step
+
+          If ax > bx Then
+            Swap(ax, bx)
+            Swap(tex_su, tex_eu)
+            Swap(tex_sv, tex_ev)
+            Swap(tex_sw, tex_ew)
+            Swap(col_sr, col_er)
+            Swap(col_sg, col_eg)
+            Swap(col_sb, col_eb)
+            Swap(col_sa, col_ea)
+          End If
+
+          tex_u = tex_su
+          tex_v = tex_sv
+          tex_w = tex_sw
+          col_r = col_sr
+          col_g = col_sg
+          col_b = col_sb
+          col_a = col_sa
+
+          Dim tstep = 1.0F / (bx - ax)
+          Dim t = 0.0F
+
+          For j = ax To bx - 1
+
+            tex_u = (1.0F - t) * tex_su + t * tex_eu
+            tex_v = (1.0F - t) * tex_sv + t * tex_ev
+            tex_w = (1.0F - t) * tex_sw + t * tex_ew
+            col_r = (1.0F - t) * col_sr + t * col_er
+            col_g = (1.0F - t) * col_sg + t * col_eg
+            col_b = (1.0F - t) * col_sb + t * col_eb
+            col_a = (1.0F - t) * col_sa + t * col_ea
+
+            pixel_r = col_r
+            pixel_g = col_g
+            pixel_b = col_b
+            pixel_a = col_a
+
+            If (flags And RenderFlags.RenderTextured) <> 0 Then
+              If spr IsNot Nothing Then
+                Dim sample = spr.Sample(tex_u / tex_w, tex_v / tex_w)
+                pixel_r *= sample.R / 255.0F
+                pixel_g *= sample.G / 255.0F
+                pixel_b *= sample.B / 255.0F
+                pixel_a *= sample.A / 255.0F
+              End If
+            End If
+
+            If (flags And RenderFlags.RenderDepth) <> 0 Then
+              If tex_w > m_DepthBuffer(i * Pge.ScreenWidth() + j) Then
+                If Pge.Draw(j, i, New Pixel(pixel_r * 1.0F, pixel_g * 1.0F, pixel_b * 1.0F, pixel_a * 1.0F)) Then
+                  m_DepthBuffer(i * Pge.ScreenWidth() + j) = tex_w
+                End If
+              End If
+            Else
+              Pge.Draw(j, i, New Pixel(pixel_r * 1.0F, pixel_g * 1.0F, pixel_b * 1.0F, pixel_a * 1.0F))
+            End If
+
+            t += tstep
+
+          Next
+
+        Next
+
+      End If
+
+    End Sub
 
   End Class
 

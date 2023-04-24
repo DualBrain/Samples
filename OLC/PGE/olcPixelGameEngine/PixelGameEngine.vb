@@ -592,7 +592,7 @@ Public MustInherit Class PixelGameEngine
 
 #End Region
 
-  Protected Delegate Function PixelModeDelegate(x As Integer, y As Integer, p1 As Pixel, p2 As Pixel) As Pixel
+  Public Delegate Function PixelModeDelegate(x As Integer, y As Integer, p1 As Pixel, p2 As Pixel) As Pixel
   Private funcPixelMode As PixelModeDelegate
 
   Protected Property AppName As String
@@ -815,6 +815,7 @@ Public MustInherit Class PixelGameEngine
 
   End Sub
 
+  <DebuggerNonUserCode, DebuggerStepThrough>
   Public Function Start() As RCode
 
     ' Construct the window
@@ -1009,7 +1010,7 @@ Public MustInherit Class PixelGameEngine
     DrawLine(x1, y1, x2, y2, Presets.White, &HFFFFFFFFUI)
   End Sub
 
-  Protected Sub DrawLine(x1 As Single, y1 As Single, x2 As Single, y2 As Single, p As Pixel)
+  Public Sub DrawLine(x1 As Single, y1 As Single, x2 As Single, y2 As Single, p As Pixel)
     DrawLine(CInt(Fix(x1)), CInt(Fix(y1)), CInt(Fix(x2)), CInt(Fix(y2)), p, &HFFFFFFFFUI)
   End Sub
 
@@ -1141,6 +1142,10 @@ Public MustInherit Class PixelGameEngine
 
   Protected Sub FillCircle(pos As Vi2d, radius As Integer)
     FillCircle(pos.x, pos.y, radius, Presets.White)
+  End Sub
+
+  Public Sub FillCircle(x As Single, y As Single, radius As Single, p As Pixel)
+    FillCircle(CInt(Fix(x)), CInt(Fix(y)), CInt(Fix(radius)), p)
   End Sub
 
   Public Sub FillCircle(x As Integer, y As Integer, radius As Integer, p As Pixel)
@@ -1569,7 +1574,7 @@ next4:
 
   End Sub
 
-  Protected Sub SetPixelMode(m As Pixel.Mode)
+  Public Sub SetPixelMode(m As Pixel.Mode)
     nPixelMode = m
   End Sub
 
@@ -1579,8 +1584,7 @@ next4:
     End Get
   End Property
 
-  'Private Protected Sub SetPixelMode(pixelMode As Func(Of Integer, Integer, Pixel, Pixel, Pixel), m As Pixel.Mode)
-  Protected Sub SetPixelMode(pixelMode As PixelModeDelegate, m As Pixel.Mode)
+  Public Sub SetPixelMode(pixelMode As PixelModeDelegate)
     funcPixelMode = pixelMode
     nPixelMode = Pixel.Mode.Custom
   End Sub
@@ -2287,6 +2291,12 @@ next4:
     b = t
   End Sub
 
+  Public Shared Sub Swap(ByRef p1 As Pixel, ByRef p2 As Pixel)
+    Dim n = p1.N
+    p1.N = p2.N
+    p2.N = n
+  End Sub
+
 #End Region
 
 #Region "C++'isms"
@@ -2301,7 +2311,7 @@ next4:
   End Property
 
   ' Provide for something *similar* to C++.
-  Protected ReadOnly Property Rand As Integer
+  Public ReadOnly Property Rand As Integer
     Get
       Return CInt(Fix(m_random.NextDouble * RAND_MAX))
     End Get

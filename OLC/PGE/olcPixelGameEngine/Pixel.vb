@@ -45,6 +45,13 @@ Public Structure Pixel
   <FieldOffset(3)> Public B As Byte
   <FieldOffset(4)> Public A As Byte
 
+  Public Sub New(red As Single, green As Single, blue As Single, Optional alpha As Single = 255.0F)
+    R = CByte(Fix(red))
+    G = CByte(Fix(green))
+    B = CByte(Fix(blue))
+    A = CByte(Fix(alpha))
+  End Sub
+
   Public Sub New(red As Integer, green As Integer, blue As Integer, Optional alpha As Integer = 255)
     R = CByte(red)
     G = CByte(green)
