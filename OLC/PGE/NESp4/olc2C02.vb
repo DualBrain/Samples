@@ -562,7 +562,7 @@ Public Class olc2C02
     ' "palette << 2" - Each palette is 4 bytes in size
     ' "pixel"        - Each pixel index is either 0, 1, 2 or 3
     ' "& 0x3F"       - Stops us reading beyond the bounds of the palScreen array
-    Return palScreen(PpuRead(CUShort(&H3F00US + (palette << 2US) + pixel) And &H3FUS))
+    Return palScreen(PpuRead(&H3F00US + CUShort(palette << 2) + CUShort(pixel)) And &H3F)
 
     ' Note: We don't access tblPalette directly here, instead we know that ppuRead()
     ' will map the address onto the separate small RAM attached to the PPU bus.
