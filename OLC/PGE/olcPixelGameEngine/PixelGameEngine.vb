@@ -1144,6 +1144,10 @@ Public MustInherit Class PixelGameEngine
     FillCircle(pos.x, pos.y, radius, Presets.White)
   End Sub
 
+  Protected Sub FillCircle(pos As Vi2d, radius As Integer, p As Pixel)
+    FillCircle(pos.x, pos.y, radius, p)
+  End Sub
+
   Public Sub FillCircle(x As Single, y As Single, radius As Single, p As Pixel)
     FillCircle(CInt(Fix(x)), CInt(Fix(y)), CInt(Fix(radius)), p)
   End Sub

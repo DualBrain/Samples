@@ -74,6 +74,10 @@
     Return New Vi2d(lhs.x + rhs.x, lhs.y + rhs.y)
   End Operator
 
+  Public Shared Operator +(lhs As Vi2d, rhs As Vf2d) As Vi2d
+    Return New Vi2d(lhs.x + CInt(Fix(rhs.x)), lhs.y + CInt(Fix(rhs.y)))
+  End Operator
+
   Public Shared Operator -(left As Vi2d, right As Vi2d) As Vi2d
     Return New Vi2d(left.x - right.x, left.y - right.y)
   End Operator

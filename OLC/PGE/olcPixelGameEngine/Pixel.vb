@@ -39,11 +39,11 @@ End Enum
 
 <StructLayout(LayoutKind.Explicit)>
 Public Structure Pixel
-  <FieldOffset(0)> Public N As Integer
-  <FieldOffset(1)> Public R As Byte
-  <FieldOffset(2)> Public G As Byte
-  <FieldOffset(3)> Public B As Byte
-  <FieldOffset(4)> Public A As Byte
+  <FieldOffset(0)> Public N As UInteger
+  <FieldOffset(0)> Public R As Byte
+  <FieldOffset(1)> Public G As Byte
+  <FieldOffset(2)> Public B As Byte
+  <FieldOffset(3)> Public A As Byte
 
   Public Sub New(red As Single, green As Single, blue As Single, Optional alpha As Single = 255.0F)
     R = CByte(Fix(red))
