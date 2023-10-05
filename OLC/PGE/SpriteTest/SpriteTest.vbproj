@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SpriteTest</RootNamespace>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="sprite1.png" />
+    <None Remove="sprite2.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\olcPixelGameEngine\olcPixelGameEngine.vbproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="sprite1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="sprite2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

@@ -9,18 +9,18 @@ Module Program
 
   Sub Main() 'args As String())
 
-    'Dim documents = {"https://api.github.com/repos/qb64official/QB64/releases",
-    '                 "https://api.github.com/repos/qb64team/QB64/",
-    '                 "https://api.github.com/repos/Galleondragon/qb64/",
-    '                 "https://api.github.com/repos/QB64-Phoenix-Edition/QB64pe/releases"}
+    Dim documents = {"https://api.github.com/repos/qb64official/QB64/releases",
+                     "https://api.github.com/repos/qb64team/QB64/",
+                     "https://api.github.com/repos/Galleondragon/qb64/",
+                     "https://api.github.com/repos/QB64-Phoenix-Edition/QB64pe/releases"}
 
     'Dim documents = {"https://api.github.com/repos/OneLoneCoder/olcPixelGameEngine/"}
 
     'Dim documents = {"https://api.github.com/repos/RetroNick2020/raster-master/"}
 
-    Dim documents = {"https://api.github.com/repos/gooofy/aqb/",
-                     "https://api.github.com/repos/robhagemans/pcbasic/",
-                     "https://api.github.com/repos/freebasic/fbc/"}
+    'Dim documents = {"https://api.github.com/repos/gooofy/aqb/",
+    '                 "https://api.github.com/repos/robhagemans/pcbasic/",
+    '                 "https://api.github.com/repos/freebasic/fbc/"}
 
     'Dim documents = {"https://api.github.com/repos/opentk/opentk/"}
 
@@ -75,7 +75,7 @@ Module Program
                 For Each asset As JsonElement In assets.EnumerateArray()
                   Dim downloadCount = asset.GetProperty("download_count").GetInt32()
                   Dim assetName = asset.GetProperty("name").GetString()
-                  Console.WriteLine($"  {assetName}: {downloadCount}")
+                  'Console.WriteLine($"  {assetName}: {downloadCount}")
                   total += downloadCount
                 Next
 

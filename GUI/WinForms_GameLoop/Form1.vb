@@ -53,7 +53,7 @@ Public Class Form1
     Loop
   End Sub
 
-  Private mode As Integer = 2
+  Private mode As Integer = 1
 
   Private Async Function BootStrapAsync() As Task
     'mousepos = Cursor.HotSpot
@@ -109,11 +109,11 @@ Public Class Form1
       m_stopwatch.Start()
 
       m_gscr.Cls()
-      For i = 1 To 10
+      For i = 1 To 1400
         Dim x1 = rnd.Next(sx)
         Dim y1 = rnd.Next(sy)
-        Dim x2 = rnd.Next(sx)
-        Dim y2 = rnd.Next(sy)
+        Dim x2 = x1 + 9 'rnd.Next(sx)
+        Dim y2 = y1 + 9 'rnd.Next(sy)
         Dim radius = rnd.Next(50)
         Dim r = rnd.Next(255)
         Dim g = rnd.Next(255)
@@ -121,7 +121,7 @@ Public Class Form1
         Dim a = 255
         Dim c = Drawing.Color.FromArgb(a, r, g, b)
         Select Case mode
-          Case 1 : m_gscr.Line(x1, y1, x2, y2, c, True) ', False, Nothing)
+          Case 1 : m_gscr.Line(x1, y1, x2, y2, c, True, True) ', False, Nothing)
           Case 2 : m_gscr.Circle(x1, y1, radius, c) ', start, [end]) ', aspect)
           Case 3 : m_gscr.Pset(x1, y1, c)
           Case Else
