@@ -15,7 +15,7 @@ Module Program
 		WriteLine() : WriteLine() : WriteLine()
 		WriteLine("DO YOU WANT TO SEE THE INSTRUCTIONS? (YES--1,NO--0)")
 		Input(B7)
-		If B7 = 0 Then GoTo 370
+		If B7 = 0 Then GoTo Start
 		WriteLine("THIS IS A GAME IN WHICH YOU WILL BE PLAYING AGAINST THE")
 		WriteLine("RANDOM DECISION OF THE COMPUTER. THE FIELD OF PLAY IS A")
 		WriteLine("CUBE OF SIDE 3. ANY OF THE 27 LOCATIONS CAN BE DESIGNATED")
@@ -40,69 +40,40 @@ Module Program
 		WriteLine("500 DOLLARS IN YOUR ACCOUNT.")
 		WriteLine()
 		WriteLine("GOOD LUCK!")
-370:
+Start:
 		A1 = 500
-380:
+Again:
 		A = Int(3 * (Rnd(X)))
-		If A <> 0 Then GoTo 410
-		A = 3
-410:
+		If A = 0 Then A = 3
 		B = Int(3 * (Rnd(X)))
-		If B <> 0 Then GoTo 440
-		B = 2
-440:
+		If B = 0 Then B = 2
 		C = Int(3 * (Rnd(X)))
-		If C <> 0 Then GoTo 470
-		C = 3
-470:
+		If C = 0 Then C = 3
 		D = Int(3 * (Rnd(X)))
-		If D <> 0 Then GoTo 500
-		D = 1
-500:
+		If D = 0 Then D = 1
 		E = Int(3 * (Rnd(X)))
-		If E <> 0 Then GoTo 530
-		E = 3
-530:
+		If E = 0 Then E = 3
 		F = Int(3 * (Rnd(X)))
-		If F <> 0 Then GoTo 560
-		F = 3
-560:
+		If F = 0 Then F = 3
 		G = Int(3 * (Rnd(X)))
-		If G <> 0 Then GoTo 590
-		G = 3
-590:
+		If G = 0 Then G = 3
 		H = Int(3 * (Rnd(X)))
-		If H <> 0 Then GoTo 620
-		H = 3
-620:
+		If H = 0 Then H = 3
 		I = Int(3 * (Rnd(X)))
-		If I <> 0 Then GoTo 650
-		I = 2
-650:
+		If I = 0 Then I = 2
 		J = Int(3 * (Rnd(X)))
-		If J <> 0 Then GoTo 680
-		J = 3
-680:
+		If J = 0 Then J = 3
 		K = Int(3 * (Rnd(X)))
-		If K <> 0 Then GoTo 710
-		K = 2
-710:
+		If K = 0 Then K = 2
 		L = Int(3 * (Rnd(X)))
-		If L <> 0 Then GoTo 740
-		L = 3
-740:
+		If L = 0 Then L = 3
 		M = Int(3 * (Rnd(X)))
-		If M <> 0 Then GoTo 770
-		M = 3
-770:
+		If M = 0 Then M = 3
 		N = Int(3 * (Rnd(X)))
-		If N <> 0 Then GoTo 800
-		N = 1
-800:
+		If N = 0 Then N = 1
 		O = Int(3 * (Rnd(X)))
-		If O <> 0 Then GoTo 830
-		O = 3
-830:
+		If O = 0 Then O = 3
+
 		WriteLine("WANT TO MAKE A WAGER?")
 		Input(Z)
 		If Z = 0 Then GoTo 880
@@ -214,7 +185,7 @@ Module Program
 1580:
 		Write("DO YOU WANT TO TRY AGAIN ")
 		Input(S)
-		If S = 1 Then GoTo 380
+		If S = 1 Then GoTo Again
 1610:
 		WriteLine("TOUGH LUCK!")
 		WriteLine()
