@@ -44,34 +44,34 @@ Start:
 		A1 = 500
 Again:
 		A = Int(3 * (Rnd(X)))
-		If A = 0 Then A = 3
 		B = Int(3 * (Rnd(X)))
-		If B = 0 Then B = 2
 		C = Int(3 * (Rnd(X)))
-		If C = 0 Then C = 3
 		D = Int(3 * (Rnd(X)))
-		If D = 0 Then D = 1
 		E = Int(3 * (Rnd(X)))
-		If E = 0 Then E = 3
 		F = Int(3 * (Rnd(X)))
-		If F = 0 Then F = 3
 		G = Int(3 * (Rnd(X)))
-		If G = 0 Then G = 3
 		H = Int(3 * (Rnd(X)))
-		If H = 0 Then H = 3
 		I = Int(3 * (Rnd(X)))
-		If I = 0 Then I = 2
 		J = Int(3 * (Rnd(X)))
-		If J = 0 Then J = 3
 		K = Int(3 * (Rnd(X)))
-		If K = 0 Then K = 2
 		L = Int(3 * (Rnd(X)))
-		If L = 0 Then L = 3
 		M = Int(3 * (Rnd(X)))
-		If M = 0 Then M = 3
 		N = Int(3 * (Rnd(X)))
-		If N = 0 Then N = 1
 		O = Int(3 * (Rnd(X)))
+		If A = 0 Then A = 3
+		If B = 0 Then B = 2
+		If C = 0 Then C = 3
+		If D = 0 Then D = 1
+		If E = 0 Then E = 3
+		If F = 0 Then F = 3
+		If G = 0 Then G = 3
+		If H = 0 Then H = 3
+		If I = 0 Then I = 2
+		If J = 0 Then J = 3
+		If K = 0 Then K = 2
+		If L = 0 Then L = 3
+		If M = 0 Then M = 3
+		If N = 0 Then N = 1
 		If O = 0 Then O = 3
 
 		WriteLine("WANT TO MAKE A WAGER?")
