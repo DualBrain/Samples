@@ -9,24 +9,21 @@ Module Program
 
   Sub Main() 'args As String())
 
-    Dim documents = {"https://api.github.com/repos/qb64official/QB64/releases",
-                     "https://api.github.com/repos/qb64team/QB64/",
-                     "https://api.github.com/repos/Galleondragon/qb64/",
-                     "https://api.github.com/repos/QB64-Phoenix-Edition/QB64pe/releases"}
+    'Dim documents = {"https://api.github.com/repos/qb64official/QB64/releases",
+    '                 "https://api.github.com/repos/qb64team/QB64/",
+    '                 "https://api.github.com/repos/Galleondragon/qb64/",
+    '                 "https://api.github.com/repos/QB64-Phoenix-Edition/QB64pe/releases"}
 
     'Dim documents = {"https://api.github.com/repos/OneLoneCoder/olcPixelGameEngine/"}
 
     'Dim documents = {"https://api.github.com/repos/RetroNick2020/raster-master/"}
 
-    'Dim documents = {"https://api.github.com/repos/gooofy/aqb/",
-    '                 "https://api.github.com/repos/robhagemans/pcbasic/",
-    '                 "https://api.github.com/repos/freebasic/fbc/"}
-
-    'Dim documents = {"https://api.github.com/repos/opentk/opentk/"}
-
-    'Dim documents = {"https://api.github.com/repos/FNA-XNA/FNA/",
-    '                 "https://api.github.com/repos/raysan5/raylib/",
-    '                 "https://api.github.com/repos/libsdl-org/SDL/"}
+    Dim documents = {"https://api.github.com/repos/DualBrain/Community.VisualBasic/releases",
+                     "https://api.github.com/repos/DualBrain/vbPixelGameEngine/releases",
+                     "https://api.github.com/repos/DualBrain/vbConsoleGameEngine/releases",
+                     "https://api.github.com/repos/DualBrain/Solitaire/releases",
+                     "https://api.github.com/repos/DualBrain/CheckersSolitaire/releases",
+                     "https://api.github.com/repos/DualBrain/Nibbles/releases"}
 
     For index = 0 To documents.Count - 1
 
@@ -64,7 +61,7 @@ Module Program
               'Dim name = release.GetProperty("name").GetString()
               Dim createdAt = release.GetProperty("created_at").GetDateTime()
 
-              Console.WriteLine($"{tagName} ({createdAt})")
+              Console.Write($"{tagName} ({createdAt}); ")
 
               ' Check if assets property exists
               Dim assets As JsonElement = Nothing
@@ -79,15 +76,15 @@ Module Program
                   total += downloadCount
                 Next
 
-                Console.WriteLine($"  total: {total}")
+                Console.WriteLine($"total: {total}")
 
                 totalTotal += total
 
               End If
 
-              Console.WriteLine()
-
             Next
+
+            Console.WriteLine()
 
             Console.WriteLine("===============================")
             Console.WriteLine($"Combined: {totalTotal}")

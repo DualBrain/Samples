@@ -2,12 +2,21 @@
 
 Welcome to the Cory Smith (DualBrain) Sample Repo... feel free to browse around and, hopefully, make some happy discoveries.
 
-## One Lone Coder
+## QBasic
 
-[OneLoneCoder](https://github.com/OneLoneCoder) has some really awesome videos on [youtube](https://www.youtube.com/@javidx9/videos) and a pretty interesting game engine that, well, abuses the Windows Console and bends it to his will as a "game" output device. This intrigues me to no end and I so wanted to play with stuff, but alas it is all in C++. I could, of course, just use C++ and *get over it* but that just isn't the way I do things. As I see it, there was a need (at least for me) to have it in VB! It was taunting me and I simply had to cowboy up and gitterdun. This section of the Samples repo contains the ongoing results of this effort.
+I've seen many a conversation that VB, specifically the .NET dialect, isn't really BASIC.  The projects in this folder contains conversions of
+several of the included samples that shipped with MS-DOS 5.0 converted to
+VB with an effort to retain as much fidelity as possible to demonstrate 
+that VB, although different, is also very much familiar.
 
-- [olcConsoleGameEngine](OLC/CGE/)
-- [Other](OLC/Other/)
+Read [more...](QBasic/)
+
+## GUI
+
+This folder contains many examples related to the my exploration of various
+projects that provide for video output for the VB (or rather, .NET) developer.
+
+Read [more...](GUI/)
 
 ## BASIC Computer Games
 
@@ -21,25 +30,17 @@ I draw attention to the last bullet point as most, if not all, of the the exampl
 
 Read [more...](BasicComputerGames/)
 
+## One Lone Coder
+
+[OneLoneCoder](https://github.com/OneLoneCoder) has some really awesome videos on [youtube](https://www.youtube.com/@javidx9/videos) and a pretty interesting game engine that, well, abuses the Windows Console and bends it to his will as a "game" output device. This intrigues me to no end and I so wanted to play with stuff, but alas it is all in C++. I could, of course, just use C++ and *get over it* but that just isn't the way I do things. As I see it, there was a need (at least for me) to have it in VB! It was taunting me and I simply had to cowboy up and gitterdun. This section of the Samples repo contains the ongoing results of this effort.
+
+- [vbPixelGameEngine](https://github.com/DualBrain/vbPixelGameEngine)
+- [vbConsoleGameEngine](https://github.com/DualBrain/vbConsoleGameEngine)
+- [Other](OLC/Other/)
+
 ## ClearScript
 
 As far as I can tell, ClearScript is a new project from Microsoft announced around January 2022 to provide an easy means to incorporate
 and provide a scripting engine in your application.
 
 Read [more...](ClearScript/)
-
-## GUI
-
-This folder contains many examples related to the my exploration of various
-projects that provide for video output for the VB (or rather, .NET) developer.
-
-Read [more...](GUI/)
-
-## QBasic
-
-I've seen many a conversation that VB, specifically the .NET dialect, isn't really BASIC.  The projects in this folder contains conversions of
-several of the included samples that shipped with MS-DOS 5.0 converted to
-VB with an effort to retain as much fidelity as possible to demonstrate 
-that VB, although different, is also very much familiar.
-
-Read [more...](QBasic/)
