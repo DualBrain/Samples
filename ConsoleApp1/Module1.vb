@@ -6,6 +6,12 @@ Module Module1
 
 	Public Sub Main1()
 
+		Dim a(10) As Integer
+		Dim b(0 To 10) As Integer
+		'Dim c(10 To 10) As Integer
+
+		Dim l = LBound(b)
+
 		FirstName$ = "Cory"
 		LastName$ = "Smth"
 		GoTo 30

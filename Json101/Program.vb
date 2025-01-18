@@ -1,7 +1,3 @@
-Option Explicit On
-Option Strict On
-Option Infer On
-
 Imports System.Net.Http
 Imports System.Text.Json
 
@@ -9,23 +5,25 @@ Module Program
 
   Sub Main() 'args As String())
 
-    'Dim documents = {"https://api.github.com/repos/qb64official/QB64/releases",
-    '                 "https://api.github.com/repos/qb64team/QB64/",
-    '                 "https://api.github.com/repos/Galleondragon/qb64/",
-    '                 "https://api.github.com/repos/QB64-Phoenix-Edition/QB64pe/releases"}
-
-    'Dim documents = {"https://api.github.com/repos/OneLoneCoder/olcPixelGameEngine/"}
-
-    'Dim documents = {"https://api.github.com/repos/RetroNick2020/raster-master/"}
-
-    Dim documents = {"https://api.github.com/repos/DualBrain/Community.VisualBasic/releases",
-                     "https://api.github.com/repos/DualBrain/vbPixelGameEngine/releases",
-                     "https://api.github.com/repos/DualBrain/vbConsoleGameEngine/releases",
-                     "https://api.github.com/repos/DualBrain/Solitaire/releases",
-                     "https://api.github.com/repos/DualBrain/CheckersSolitaire/releases",
-                     "https://api.github.com/repos/DualBrain/Nibbles/releases"}
+    Dim documents As New List(Of (Name As String, Url As String)) From {
+      ("Community.VisualBasic", "https://api.github.com/repos/DualBrain/Community.VisualBasic/releases"),
+      ("vbPixelGameEngine", "https://api.github.com/repos/DualBrain/vbPixelGameEngine/releases"),
+      ("vbConsoleGameEngine", "https://api.github.com/repos/DualBrain/vbConsoleGameEngine/releases"),
+      ("Solitaire", "https://api.github.com/repos/DualBrain/Solitaire/releases"),
+      ("CheckersSolitaire", "https://api.github.com/repos/DualBrain/CheckersSolitaire/releases"),
+      ("Nibbles", "https://api.github.com/repos/DualBrain/Nibbles/releases"),
+      ("Raster-Master", "https://api.github.com/repos/RetroNick2020/raster-master/"),
+      ("olcPixelGameEngine", "https://api.github.com/repos/OneLoneCoder/olcPixelGameEngine/"),
+      ("QB64 (Official)", "https://api.github.com/repos/qb64official/QB64/releases"),
+      ("QB64 (Team)", "https://api.github.com/repos/qb64team/QB64/"),
+      ("QB64 (Galleon)", "https://api.github.com/repos/Galleondragon/qb64/"),
+      ("QB64pe", "https://api.github.com/repos/QB64-Phoenix-Edition/QB64pe/releases")}
 
     For index = 0 To documents.Count - 1
+
+      Console.WriteLine("*****************************************************************")
+      Console.WriteLine($"* {documents(index).Name}")
+      Console.WriteLine("*****************************************************************")
 
       Dim totalTotal = 0
 
@@ -33,7 +31,7 @@ Module Program
       Using client As New HttpClient()
 
         ' Set the base address for the API
-        client.BaseAddress = New Uri(documents(index))
+        client.BaseAddress = New Uri(documents(index).Url)
 
         ' Set the user agent header required by GitHub API
         client.DefaultRequestHeaders.Add("User-Agent", "My-App")
@@ -52,16 +50,19 @@ Module Program
 
             ' Parse the JSON string
             Dim releases = JsonDocument.Parse(json).RootElement
+            Dim releaseCount = 0
 
             ' Iterate through the releases
             For Each release In releases.EnumerateArray()
+
+              releaseCount += 1
 
               ' Access and print the values
               Dim tagName = release.GetProperty("tag_name").GetString()
               'Dim name = release.GetProperty("name").GetString()
               Dim createdAt = release.GetProperty("created_at").GetDateTime()
 
-              Console.Write($"{tagName} ({createdAt}); ")
+              Console.Write($"{tagName} ({createdAt})") '; ")
 
               ' Check if assets property exists
               Dim assets As JsonElement = Nothing
@@ -76,7 +77,8 @@ Module Program
                   total += downloadCount
                 Next
 
-                Console.WriteLine($"total: {total}")
+                'Console.WriteLine($"total: {total}")
+                Console.WriteLine($": {total}")
 
                 totalTotal += total
 
@@ -84,17 +86,17 @@ Module Program
 
             Next
 
-            Console.WriteLine()
-
-            Console.WriteLine("===============================")
-            Console.WriteLine($"Combined: {totalTotal}")
-            Console.WriteLine("-------------------------------")
+            If releaseCount > 1 AndAlso totalTotal > 0 Then
+              'Console.WriteLine("=================================================================")
+              Console.WriteLine($"(combined: {totalTotal})")
+              'Console.WriteLine("-------------------------------")
+            End If
 
             Console.WriteLine()
 
           Else
-            ' Print the error message if request failed
-            Console.WriteLine("Error: " & response.StatusCode)
+              ' Print the error message if request failed
+              Console.WriteLine("Error: " & response.StatusCode)
           End If
 
         End Using
