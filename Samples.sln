@@ -176,6 +176,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CenturionSide", "SerialTest
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "PcSide", "Serial\PC-To-Centurion\PcSide.vbproj", "{AFDD601C-4D69-482C-8B70-7019863BA4EE}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QSortModern", "QSortModern\QSortModern.vbproj", "{1A822E25-19C1-4D8B-84D6-89F7B86940C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -978,6 +980,18 @@ Global
 		{AFDD601C-4D69-482C-8B70-7019863BA4EE}.Release|x64.Build.0 = Release|Any CPU
 		{AFDD601C-4D69-482C-8B70-7019863BA4EE}.Release|x86.ActiveCfg = Release|Any CPU
 		{AFDD601C-4D69-482C-8B70-7019863BA4EE}.Release|x86.Build.0 = Release|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Debug|x64.Build.0 = Debug|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Debug|x86.Build.0 = Debug|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Release|x64.ActiveCfg = Release|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Release|x64.Build.0 = Release|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Release|x86.ActiveCfg = Release|Any CPU
+		{1A822E25-19C1-4D8B-84D6-89F7B86940C1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

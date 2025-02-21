@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <RootNamespace>SDL2_Gameloop</RootNamespace>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <OptionStrict>On</OptionStrict>
     <StartupObject>Sub Main</StartupObject>
     <AssemblyName>SDL2_Gameloop</AssemblyName>

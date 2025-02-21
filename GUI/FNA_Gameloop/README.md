@@ -8,7 +8,7 @@ https://github.com/FNA-XNA/FNA
 
 Be sure to use the `Core` project.
 
-NOTE: I modified the `<TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>` to be `net7.0` as `net5.0` is not on my machine and Visual Studio "complains". Note that it will still work if you ignore the complaint, but I just don't like the noise.
+NOTE: I modified the `<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>` to be `net8.0` as `net5.0` is not on my machine and Visual Studio "complains". Note that it will still work if you ignore the complaint, but I just don't like the noise.
 
 It also requires a several additional DLLs (included) to either be with the
 produced executable or in the appropriate DLL path(s).

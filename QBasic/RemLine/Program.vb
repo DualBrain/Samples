@@ -121,12 +121,12 @@ FileErr2:
     'Static inlin As String
     'Static token As String
 
-    Dim inlin As String
+    Dim inlin As String = Nothing
     Dim token As String
 
     Do While Not EOF(1)
       ' Get line and first token
-      LINE_INPUT(1, Inlin)
+      LINE_INPUT(1, inlin)
       token = GetToken(inlin, Seps)
       Do While (token <> "")
         For KeyIndex = 1 To KeyWordCount

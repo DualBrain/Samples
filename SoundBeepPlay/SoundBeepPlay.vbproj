@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>SoundBeepPlay</RootNamespace>
-		<TargetFramework>net7.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<AssemblyName>SoundBeepPlay</AssemblyName>
 		<Version>0.0.1.0</Version>
 		<FileVersion>0.0.1.0</FileVersion>

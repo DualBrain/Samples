@@ -10,8 +10,8 @@ Module Program
 		Dim A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, W, X, Y, Z As Single
 		Dim B7, A1, Z1, Z2 As Single
 
-		WriteLine($"{TAB(34)}CUBE")
-		WriteLine($"{TAB(15)}CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY")
+		WriteLine($"{Space(34)}CUBE")
+		WriteLine($"{Space(15)}CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY")
 		WriteLine() : WriteLine() : WriteLine()
 		WriteLine("DO YOU WANT TO SEE THE INSTRUCTIONS? (YES--1,NO--0)")
 		Input(B7)

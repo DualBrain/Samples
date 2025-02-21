@@ -30,7 +30,7 @@ Public Class Form1
       ' adjust the form to be full screen
       WindowState = FormWindowState.Normal
       BackColor = Color.Black
-      FormBorderStyle = Windows.Forms.FormBorderStyle.None
+      FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
       Left = Screen.AllScreens(0).Bounds.Left
       Top = Screen.AllScreens(0).Bounds.Top
       Width = Screen.AllScreens(0).Bounds.Width 'twidth
