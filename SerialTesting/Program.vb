@@ -8,15 +8,10 @@ Module Program
   Const POLY = &H1021
   Private ReadOnly m_crct(256) As Integer
 
-  Private Enum TransferState
-    Idle
-    Ready
-    WaitingStart
-    Receive
-    WaitReceiveResults
-    WaitReadyForNext
-    Abort
-  End Enum
+  'Private Enum TransferState
+  '  WaitingStart
+  '  Receive
+  'End Enum
 
   Sub Main() 'args As String())
 
@@ -83,7 +78,8 @@ Module Program
 
       Dim receiveBuffer(513) As Byte
       Dim sector = 0
-      Dim state = TransferState.WaitingStart
+      'Dim state = TransferState.WaitingStart
+      Dim waiting = True
       Dim offset = 0
       Dim crc = -1
 
@@ -104,87 +100,92 @@ Module Program
 
           If r = 1 Then
 
-            Select Case state
-              Case TransferState.WaitingStart
+            'Select Case state
+            'Case TransferState.WaitingStart
+            If waiting Then
 
-                Console.Write(".")
+              Console.Write(".")
 
-                If b(0) = OK Then
-                  Device.Write({OK}, 0, 1)
-                  state = TransferState.Receive
-                Else
-                  Console.Write("?"c)
-                End If
+              If b(0) = OK Then
+                Device.Write({OK}, 0, 1)
+                'state = TransferState.Receive
+                waiting = False
+              Else
+                Console.Write("?"c)
+              End If
 
-              Case TransferState.Receive
-                If offset = 0 Then Console.WriteLine($"Sector: {sector}")
-                Console.Write("+")
-                receiveBuffer(offset) = b(0)
-                If offset < dataSize - 1 Then
-                  offset += 1
-                ElseIf offset = dataSize - 1 Then
-                  offset += 1
-                  crc = CalcCrc(receiveBuffer, 400)
-                ElseIf offset < dataSize + 2 Then
-                  offset += 1
-                  If offset = dataSize + 2 Then
+            Else 'Case TransferState.Receive
+              If offset = 0 Then Console.WriteLine($"Sector: {sector}")
+              Console.Write("+")
+              receiveBuffer(offset) = b(0)
+              If offset < dataSize - 1 Then
+                offset += 1
+              ElseIf offset = dataSize - 1 Then
+                offset += 1
+                crc = CalcCrc(receiveBuffer, 400)
+              ElseIf offset < dataSize + 2 Then
+                offset += 1
+                If offset = dataSize + 2 Then
 
-                    Console.WriteLine("#")
+                  Console.WriteLine("#")
 
-                    If Device.BytesToRead > 0 Then
-                      Console.WriteLine($"UNEXPECTED: {Device.BytesToRead} more in the buffer...")
-                      Return
-                    End If
-
-                    Dim b1 = (crc And &HFF00) >> 8 ' high byte
-                    Dim b2 = (crc And &HFF) ' low byte
-
-                    If receiveBuffer(dataSize) = b1 AndAlso
-                       receiveBuffer(dataSize + 1) = b2 Then
-                      ' good
-                      sector += 1 : offset = 0 : crc = -1
-                      Device.Write({OK}, 0, 1) ': Sleep(100)
-                    Else
-                      ' bad
-                      offset = 0 : crc = -1
-                      Device.Write({FAILED}, 0, 1) ': Sleep(100)
-                    End If
-                    Device.Write({OK}, 0, 1) ': Sleep(100)
-                    state = TransferState.Receive
-
-                    If sector = totalSectors Then
-                      Console.WriteLine("Completed.")
-                      Return
-                    End If
-
+                  If Device.BytesToRead > 0 Then
+                    Console.WriteLine($"UNEXPECTED: {Device.BytesToRead} more in the buffer...")
+                    Return
                   End If
-                Else
-                  Stop
+
+                  Dim b1 = (crc And &HFF00) >> 8 ' high byte
+                  Dim b2 = (crc And &HFF) ' low byte
+
+                  If receiveBuffer(dataSize) = b1 AndAlso
+                       receiveBuffer(dataSize + 1) = b2 Then
+                    ' good
+                    sector += 1 : offset = 0 : crc = -1
+                    Device.Write({OK}, 0, 1) ': Sleep(100)
+                  Else
+                    ' bad
+                    offset = 0 : crc = -1
+                    Device.Write({FAILED}, 0, 1) ': Sleep(100)
+                  End If
+                  Device.Write({OK}, 0, 1) ': Sleep(100)
+                  'state = TransferState.Receive
+                  waiting = False
+
+                  If sector = totalSectors Then
+                    Console.WriteLine("Completed.")
+                    Return
+                  End If
+
                 End If
-                'Case TransferState.WaitReceiveResults
-                '  Console.WriteLine("Sending OK...")
-                '  buffer(0) = OK
-                '  Device.Write(buffer, 0, 1)
-                '  state = TransferState.WaitReadyForNext
-
-                'Case TransferState.WaitReadyForNext
-                '  Console.WriteLine("WaitReadyForNext")
-
-                '  If buffer(0) = OK Then
-                '    Device.Write(buffer, 0, 1)
-                '    state = TransferState.Receive
-                '  Else
-                '    Console.Write("?"c)
-                '  End If
-
-              Case Else
+              Else
                 Stop
+              End If
+              'Case TransferState.WaitReceiveResults
+              '  Console.WriteLine("Sending OK...")
+              '  buffer(0) = OK
+              '  Device.Write(buffer, 0, 1)
+              '  state = TransferState.WaitReadyForNext
 
-            End Select
+              'Case TransferState.WaitReadyForNext
+              '  Console.WriteLine("WaitReadyForNext")
+
+              '  If buffer(0) = OK Then
+              '    Device.Write(buffer, 0, 1)
+              '    state = TransferState.Receive
+              '  Else
+              '    Console.Write("?"c)
+              '  End If
+
+            End If
+
+            'Case Else
+            '  Stop
+
+            '  End Select
 
           End If
 
-        End If
+          End If
 
       Loop
 
