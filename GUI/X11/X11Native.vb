@@ -149,20 +149,31 @@ End Structure
   Public Sub XDestroyImage(image As IntPtr)
   End Sub
 
-  <DllImport("libX11.so.6")>
-  Public Sub XPutImage(
-    display As IntPtr,
-    drawable As IntPtr,
-    gc As IntPtr,
-    image As IntPtr,
-    src_x As Integer,
-    src_y As Integer,
-    dest_x As Integer,
-    dest_y As Integer,
-    width As Integer,
-    height As Integer)
-  End Sub
+ <DllImport("libX11.so.6")>
+   Public Sub XPutImage(
+     display As IntPtr,
+     drawable As IntPtr,
+     gc As IntPtr,
+     image As IntPtr,
+     src_x As Integer,
+     src_y As Integer,
+     dest_x As Integer,
+     dest_y As Integer,
+     width As Integer,
+     height As Integer)
+   End Sub
 
+   <DllImport("libX11.so.6")>
+   Public Sub XFillRectangle(display As IntPtr, drawable As IntPtr, gc As IntPtr, x As Integer, y As Integer, width As Integer, height As Integer)
+   End Sub
+
+   <DllImport("libX11.so.6")>
+   Public Sub XSetForeground(display As IntPtr, gc As IntPtr, foreground As ULong)
+   End Sub
+
+   <DllImport("libX11.so.6")>
+   Public Sub XCopyArea(display As IntPtr, src As IntPtr, dst As IntPtr, gc As IntPtr, src_x As Integer, src_y As Integer, width As Integer, height As Integer, dst_x As Integer, dst_y As Integer)
+   End Sub
 
 <DllImport("libX11.so.6")>
 Public Function XLookupString(ByRef key_event As XKeyEvent,
@@ -216,7 +227,10 @@ Public Structure XTransform
 End Structure
 
 ' Constants
-Public Const PictStandardARGB32 As Integer = 0 ' Example, may need more
+Public Const PictStandardARGB32 As Integer = 0
+Public Const PictStandardRGB24 As Integer = 1
+Public Const PictOpSrc As Integer = 0
+Public Const PictOpOver As Integer = 1
 
 End Module
 

@@ -2,6 +2,8 @@ Imports System.Runtime.InteropServices
 
 Module X11Backend
 
+  Public UseXRender As Boolean = False
+
   Public Display As IntPtr
   Public Window As IntPtr
   Public GC As IntPtr
@@ -13,9 +15,10 @@ Module X11Backend
   Private DisplayPixels() As Integer
   Private DisplayHandle As GCHandle
   Private DisplayXImage As IntPtr
-  Private SrcPixmap As IntPtr
-  Private SrcPicture As IntPtr
-  Private DestPicture As IntPtr
+   Private SrcPixmap As IntPtr
+   Private SrcPicture As IntPtr
+   Private DestPixmap As IntPtr
+   Private DestPicture As IntPtr
 
   ' Keyboard state tracking
   Private KeyStates(255) As Boolean
@@ -75,7 +78,8 @@ Module X11Backend
     SrcPixmap = XCreatePixmap(Display, Window, FrameBuffer.Width, FrameBuffer.Height, XDefaultDepth(Display, ScreenNum))
     Dim format = XRenderFindVisualFormat(Display, XDefaultVisual(Display, ScreenNum))
     SrcPicture = XRenderCreatePicture(Display, SrcPixmap, format, 0, IntPtr.Zero)
-    DestPicture = XRenderCreatePicture(Display, Window, format, 0, IntPtr.Zero)
+    DestPixmap = XCreatePixmap(Display, Window, DisplayWidth, DisplayHeight, XDefaultDepth(Display, ScreenNum))
+    DestPicture = XRenderCreatePicture(Display, DestPixmap, format, 0, IntPtr.Zero)
 
     ' Setup display buffer
     ReDim DisplayPixels(DisplayWidth * DisplayHeight - 1)
@@ -251,18 +255,24 @@ Public Sub PollEvents(ByRef running As Boolean)
                   If DisplayHandle.IsAllocated Then DisplayHandle.Free()
                   ReDim DisplayPixels(newSize - 1)
                   DisplayHandle = GCHandle.Alloc(DisplayPixels, GCHandleType.Pinned)
-                  DisplayXImage = XCreateImage(
-                    Display,
-                    XDefaultVisual(Display, ScreenNum),
-                    XDefaultDepth(Display, ScreenNum),
-                    2, ' ZPixmap
-                    0,
-                    DisplayHandle.AddrOfPinnedObject(),
-                    DisplayWidth,
-                    DisplayHeight,
-                    32,
-                    DisplayWidth * 4)
-                End If
+                   DisplayXImage = XCreateImage(
+                     Display,
+                     XDefaultVisual(Display, ScreenNum),
+                     XDefaultDepth(Display, ScreenNum),
+                     2, ' ZPixmap
+                     0,
+                     DisplayHandle.AddrOfPinnedObject(),
+                     DisplayWidth,
+                     DisplayHeight,
+                     32,
+                     DisplayWidth * 4)
+                 End If
+                 ' Resize DestPixmap and DestPicture
+                 If DestPixmap <> IntPtr.Zero Then XFreePixmap(Display, DestPixmap)
+                 If DestPicture <> IntPtr.Zero Then XRenderFreePicture(Display, DestPicture)
+                 DestPixmap = XCreatePixmap(Display, Window, DisplayWidth, DisplayHeight, XDefaultDepth(Display, ScreenNum))
+                 Dim resizeFormat = XRenderFindVisualFormat(Display, XDefaultVisual(Display, ScreenNum))
+                 DestPicture = XRenderCreatePicture(Display, DestPixmap, resizeFormat, 0, IntPtr.Zero)
 
             Case 17 ' DestroyNotify
                 running = False
@@ -274,65 +284,111 @@ End Sub
 
 
   Public Sub Present()
-    ' Put framebuffer image to source pixmap
-    XPutImage(
-      Display,
-      SrcPixmap,
-      GC,
-      XImage,
-      0, 0,
-      0, 0,
-      FrameBuffer.Width,
-      FrameBuffer.Height)
+    If UseXRender Then
+      ' XRender path
+      ' Put framebuffer image to source pixmap
+      XPutImage(
+        Display,
+        SrcPixmap,
+        GC,
+        XImage,
+        0, 0,
+        0, 0,
+        FrameBuffer.Width,
+        FrameBuffer.Height)
+      XFlush(Display)
 
-    ' Clear display pixels to black
-    For i = 0 To DisplayPixels.Length - 1
-      DisplayPixels(i) = &HFF000000
-    Next
+      ' Fit the window while maintaining aspect ratio (add black bars)
+      Dim srcW = FrameBuffer.Width
+      Dim srcH = FrameBuffer.Height
+      Dim scaleX = srcW / DisplayWidth
+      Dim scaleY = srcH / DisplayHeight
+      Dim scale = Math.Max(scaleX, scaleY)
+      Dim scaledW = CInt(Fix(srcW / scale))
+      Dim scaledH = CInt(Fix(srcH / scale))
+      Dim offsetX = CInt((DisplayWidth - scaledW) / 2)
+      Dim offsetY = CInt((DisplayHeight - scaledH) / 2)
 
-    ' Fit the window while maintaining aspect ratio (add black bars)
-    Dim srcW = FrameBuffer.Width
-    Dim srcH = FrameBuffer.Height
-    Dim scaleX = DisplayWidth / srcW
-    Dim scaleY = DisplayHeight / srcH
-    Dim scale = Math.Min(scaleX, scaleY)
-    Dim scaledW = CInt(srcW * scale)
-    Dim scaledH = CInt(srcH * scale)
-    Dim offsetX = CInt((DisplayWidth - scaledW) / 2)
-    Dim offsetY = CInt((DisplayHeight - scaledH) / 2)
+      ' Create transform matrix for scaling only
+      Dim transform As New XTransform With {
+        .m11 = CInt(scale * 65536),
+        .m12 = 0,
+        .m13 = 0,
+        .m21 = 0,
+        .m22 = CInt(scale * 65536),
+        .m23 = 0,
+        .m31 = 0,
+        .m32 = 0,
+        .m33 = 65536
+      }
 
-    ' Manually scale the source to fit the display
-    For destY = 0 To scaledH - 1
-      Dim srcY = destY / scale
-      For destX = 0 To scaledW - 1
-        Dim srcX = destX / scale
-        Dim pixel = FrameBuffer.GetPixel(Math.Round(srcX), Math.Round(srcY))
-        DisplayPixels((offsetY + destY) * DisplayWidth + (offsetX + destX)) = pixel
+      ' Set the transform on the source picture
+      Dim transformHandle = GCHandle.Alloc(transform, GCHandleType.Pinned)
+      XRenderSetPictureTransform(Display, SrcPicture, transformHandle.AddrOfPinnedObject())
+      transformHandle.Free()
+
+      ' Fill DestPixmap with black
+      XSetForeground(Display, GC, &HFF000000UL)
+      XFillRectangle(Display, DestPixmap, GC, 0, 0, DisplayWidth, DisplayHeight)
+
+      ' Composite the scaled source to DestPicture at offset
+      XRenderComposite(Display, PictOpOver, SrcPicture, IntPtr.Zero, DestPicture,
+                       0, 0, 0, 0, offsetX, offsetY, DisplayWidth, displayHeight) 'srcW, srcH)
+
+      ' Copy DestPixmap to window
+      XCopyArea(Display, DestPixmap, Window, GC, 0, 0, DisplayWidth, DisplayHeight, 0, 0)
+
+      XFlush(Display)
+    Else
+      ' CPU path
+      ' Clear display pixels to black
+      For i = 0 To DisplayPixels.Length - 1
+        DisplayPixels(i) = &HFF000000
       Next
-    Next
 
-    ' Put the fitted display image
-    XPutImage(
-      Display,
-      Window,
-      GC,
-      DisplayXImage,
-      0, 0,
-      0, 0,
-      DisplayWidth,
-      DisplayHeight)
+      ' Fit the window while maintaining aspect ratio (add black bars)
+      Dim srcW = FrameBuffer.Width
+      Dim srcH = FrameBuffer.Height
+      Dim scaleX = DisplayWidth / srcW
+      Dim scaleY = DisplayHeight / srcH
+      Dim scale = Math.Min(scaleX, scaleY)
+      Dim scaledW = CInt(srcW * scale)
+      Dim scaledH = CInt(srcH * scale)
+      Dim offsetX = CInt((DisplayWidth - scaledW) / 2)
+      Dim offsetY = CInt((DisplayHeight - scaledH) / 2)
 
-    XFlush(Display)
+      ' Manually scale the source to fit the display
+      For destY = 0 To scaledH - 1
+        Dim srcY = destY / scale
+        For destX = 0 To scaledW - 1
+          Dim srcX = destX / scale
+          Dim pixel = FrameBuffer.GetPixel(Math.Round(srcX), Math.Round(srcY))
+          DisplayPixels((offsetY + destY) * DisplayWidth + (offsetX + destX)) = pixel
+        Next
+      Next
 
-    XFlush(Display)
+      ' Put the fitted display image
+      XPutImage(
+        Display,
+        Window,
+        GC,
+        DisplayXImage,
+        0, 0,
+        0, 0,
+        DisplayWidth,
+        DisplayHeight)
+
+      XFlush(Display)
+    End If
   End Sub
 
   Public Sub Shutdown()
-    If PixelHandle.IsAllocated Then PixelHandle.Free()
-    If DisplayHandle.IsAllocated Then DisplayHandle.Free()
-    If SrcPicture <> IntPtr.Zero Then XRenderFreePicture(Display, SrcPicture)
-    If DestPicture <> IntPtr.Zero Then XRenderFreePicture(Display, DestPicture)
-    If SrcPixmap <> IntPtr.Zero Then XFreePixmap(Display, SrcPixmap)
-  End Sub
+     If PixelHandle.IsAllocated Then PixelHandle.Free()
+     If DisplayHandle.IsAllocated Then DisplayHandle.Free()
+     If SrcPicture <> IntPtr.Zero Then XRenderFreePicture(Display, SrcPicture)
+     If DestPicture <> IntPtr.Zero Then XRenderFreePicture(Display, DestPicture)
+     If SrcPixmap <> IntPtr.Zero Then XFreePixmap(Display, SrcPixmap)
+     If DestPixmap <> IntPtr.Zero Then XFreePixmap(Display, DestPixmap)
+   End Sub
 
 End Module

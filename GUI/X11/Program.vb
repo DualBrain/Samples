@@ -2,10 +2,13 @@ Imports System.Diagnostics
 
 Module Program
 
-  Sub Main()
+  Sub Main(args As String())
 
-    QB.SCREEN(320, 200)
-    X11Backend.Init(800, 600)
+     Dim useXRender = Not args.Contains("--cpu")
+     X11Backend.UseXRender = useXRender
+
+     QB.SCREEN(320, 200)
+     X11Backend.Init(800, 600)
 
     Dim running As Boolean = True
     Dim sw As Stopwatch = Stopwatch.StartNew()
