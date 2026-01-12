@@ -132,7 +132,7 @@ Friend Module Program
               If b(0) = OK Then
                 ' load next chunk if under 0x3200
                 sector += 1
-                If sector = &H3200 Then
+                If sector > &H3200 Then
                   Console.WriteLine("#")
                   Return
                 Else
