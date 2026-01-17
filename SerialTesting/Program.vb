@@ -151,7 +151,7 @@ Module Program
                   'state = TransferState.Receive
                   waiting = False
 
-                  If sector = totalSectors Then
+                  If sector > totalSectors Then
                     Console.WriteLine("Completed.")
                     Return
                   End If
